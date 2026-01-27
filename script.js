@@ -71,7 +71,6 @@ async function obtenerRol(email) {
 ========================== */
 
 async function login() {
-
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
 
@@ -81,7 +80,6 @@ async function login() {
   }
 
   try {
-
     const cred = await signInWithEmailAndPassword(auth, email, pass);
 
     const rol = await obtenerRol(cred.user.email);
@@ -94,6 +92,7 @@ async function login() {
     iniciarApp();
 
   } catch (error) {
+    console.error(error);
     mostrarMensaje("Usuario o contraseña incorrectos", "error");
   }
 }
@@ -114,7 +113,6 @@ async function logout() {
 ========================== */
 
 onAuthStateChanged(auth, async (user) => {
-
   if (user) {
 
     const rol = await obtenerRol(user.email);
@@ -126,8 +124,8 @@ onAuthStateChanged(auth, async (user) => {
 
     iniciarApp();
   }
-
 });
+
 
 
 /* ==========================
