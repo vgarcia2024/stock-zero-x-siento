@@ -132,10 +132,24 @@ function limpiarStock(){
 function cargarVendedores(){
   const sel=document.getElementById("ventaVendedor");
   sel.innerHTML="";
-  usuarios.filter(u=>u.rol==="vendedor").forEach(v=>{
+  
+  // Primero agregamos el usuario actual si no está en la lista
+  if(!usuarios.some(u=>u.email === usuarioActual.user)){
+    usuarios.push({email: usuarioActual.user, rol: usuarioActual.rol, nombre: usuarioActual.user});
+  }
+
+  // Filtramos vendedores (rol vendedor o tu mismo)
+  const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.email === usuarioActual.user);
+  
+  vendedores.forEach(v=>{
     const o=document.createElement("option");
-    o.value=v.email; o.textContent=v.nombre || v.email; sel.appendChild(o);
+    o.value=v.email;
+    o.textContent=v.email;
+    sel.appendChild(o);
   });
+
+  // Seleccionamos por defecto tu usuario
+  sel.value = usuarioActual.user;
 }
 
 async function registrarVenta() {
@@ -147,6 +161,7 @@ async function registrarVenta() {
     return;
   }
 
+  // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
     mostrarMensaje("Producto no encontrado", "error");
@@ -158,18 +173,20 @@ async function registrarVenta() {
     return;
   }
 
+  // Vendedor seleccionado
   const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
   const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
+  // Restamos stock y actualizamos Firestore
   const prodRef = doc(db, "productos", codigo);
   await setDoc(prodRef, {
     ...prod,
     cantidad: prod.cantidad - cantidadVenta
   });
 
+  // Guardamos la venta en Firestore
   const ventasCol = collection(db, "ventas");
-  const ventaDoc = doc(ventasCol); // genera un id automático
-  await setDoc(ventaDoc, {
+  await setDoc(doc(ventasCol), {
     codigo,
     nombre: prod.nombre,
     vendedor: vendedorNombre,
@@ -181,10 +198,37 @@ async function registrarVenta() {
   limpiarVenta();
 }
 
+// Limpia inputs de venta después de registrar
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
   document.getElementById("ventaCantidad").value = 1;
+  document.getElementById("ventaVendedor").value = usuarioActual.user; // volver a seleccionar tu usuario
 }
+
+/* ========================== EXPORTAR CSV ========================== */
+function exportarVentasCSV() {
+  if (ventas.length === 0) { mostrarMensaje("No hay ventas para exportar", "error"); return; }
+
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "Vendedor,Producto,Cantidad,Fecha\r\n";
+
+  ventas.forEach(v => {
+    const row = [v.vendedor, v.nombre, v.cantidad, v.fecha].join(",");
+    csvContent += row + "\r\n";
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "ventas.csv");
+  document.body.appendChild(link); // requerido para Firefox
+  link.click();
+  document.body.removeChild(link);
+  mostrarMensaje("Ventas exportadas", "success");
+}
+
+// Exportamos la función
+window.exportarVentasCSV = exportarVentasCSV;
 
 /* ========================== CATEGORIAS ========================== */
 function cargarSelects(){
