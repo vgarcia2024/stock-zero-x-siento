@@ -19,15 +19,14 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 👉 TU CONFIG */
+/* 👉 CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyCwBuxmHQgaqJAac_WiMZkpZUMFVzONFkA",
   authDomain: "zero-x-siento-stock.firebaseapp.com",
   projectId: "zero-x-siento-stock",
   storageBucket: "zero-x-siento-stock.firebasestorage.app",
   messagingSenderId: "764048708615",
-  appId: "1:764048708615:web:1287e135d38a3588b806a2",
-  measurementId: "G-CWKB3TZ9CF"
+  appId: "1:764048708615:web:1287e135d38a3588b806a2"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -47,13 +46,16 @@ let emailANombre = {
   "valen@zeroxsiento.com": "Valen"
 };
 
+let categorias = JSON.parse(localStorage.getItem("categorias")) || ["Textil","Difusor","Aerosol","Sahumerio","Tarjeta","Hornito","Carita","Tecnologia/Varios"];
+let productos = JSON.parse(localStorage.getItem("productos")) || [];
+let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
+
 /* ==========================
    LOGIN
 ========================= */
 async function login() {
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
-
   const errorEl = document.getElementById("loginError");
   errorEl.textContent = "";
 
@@ -73,17 +75,11 @@ async function login() {
   }
 }
 
-/* ==========================
-   LOGOUT
-========================= */
 async function logout() {
   await signOut(auth);
   location.reload();
 }
 
-/* ==========================
-   OBTENER ROL
-========================= */
 async function obtenerRol(user) {
   try {
     const snap = await getDoc(doc(db, "usuarios", user.uid));
@@ -95,9 +91,6 @@ async function obtenerRol(user) {
   }
 }
 
-/* ==========================
-   SESIÓN AUTOMÁTICA
-========================= */
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const rol = await obtenerRol(user);
@@ -149,11 +142,13 @@ function showSection(id) {
 }
 
 /* ==========================
-   DATOS
+   LOCAL STORAGE
 ========================= */
-let categorias = ["Textil","Difusor","Aerosol","Sahumerio","Tarjeta","Hornito","Carita","Tecnologia/Varios"];
-let productos = [];
-let ventas = [];
+function guardar() {
+  localStorage.setItem("categorias", JSON.stringify(categorias));
+  localStorage.setItem("productos", JSON.stringify(productos));
+  localStorage.setItem("ventas", JSON.stringify(ventas));
+}
 
 /* ==========================
    PRODUCTOS
@@ -188,6 +183,17 @@ function limpiarStock() {
 /* ==========================
    VENTAS
 ========================= */
+function cargarVendedores() {
+  const sel = document.getElementById("ventaVendedor");
+  sel.innerHTML = "";
+  vendedores.forEach(v => {
+    const o = document.createElement("option");
+    o.value = v;
+    o.textContent = v;
+    sel.appendChild(o);
+  });
+}
+
 function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
   const cant = Number(document.getElementById("ventaCantidad").value);
@@ -243,6 +249,7 @@ function agregarCategoria() {
   categorias.push(n);
   cargarSelects();
   cargarEliminarCategorias();
+  guardar();
   mostrarMensaje("Categoría agregada", "success");
 }
 
@@ -252,11 +259,12 @@ function eliminarCategoria() {
   categorias = categorias.filter(c => c !== cat);
   cargarSelects();
   cargarEliminarCategorias();
+  guardar();
   mostrarMensaje("Categoría eliminada", "success");
 }
 
 /* ==========================
-   DASHBOARD
+   DASHBOARD / STATS
 ========================= */
 function actualizarDashboard() {
   const hoy = new Date().toLocaleDateString();
@@ -274,9 +282,16 @@ function actualizarDashboard() {
 
   document.getElementById("mejorVendedor").textContent = emailANombre[mejor] || mejor;
 
-  // stats
-  let html = "<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Total</th></tr>";
-  for(const v in ranking) html += `<tr><td>${emailANombre[v]||v}</td><td>${ranking[v]}</td></tr>`;
+  // stats tabla completa
+  let html = "<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>";
+  ventas.forEach(v=>{
+    html += `<tr>
+      <td>${emailANombre[v.vendedor]||v.vendedor}</td>
+      <td>${v.nombre}</td>
+      <td>${v.cantidad}</td>
+      <td>${v.fecha}</td>
+    </tr>`;
+  });
   html += "</table>";
   document.getElementById("statsContent").innerHTML = html;
 }
