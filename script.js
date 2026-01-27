@@ -22,12 +22,13 @@ import {
 
 /* 👉 TU CONFIG */
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_AUTH_DOMAIN",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_STORAGE_BUCKET",
-  messagingSenderId: "TU_MESSAGING_ID",
-  appId: "TU_APP_ID",
+  apiKey: "AIzaSyCwBuxmHQgaqJAac_WiMZkpZUMFVzONFkA",
+  authDomain: "zero-x-siento-stock.firebaseapp.com",
+  projectId: "zero-x-siento-stock",
+  storageBucket: "zero-x-siento-stock.firebasestorage.app",
+  messagingSenderId: "764048708615",
+  appId: "1:764048708615:web:1287e135d38a3588b806a2",
+  measurementId: "G-CWKB3TZ9CF",
 };
 
 const app = initializeApp(firebaseConfig);
