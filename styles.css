@@ -1,28 +1,26 @@
 /* ========================== VARIABLES ========================== */
 :root {
   /* Modo claro */
-  --primary: #1f2933;    /* texto oscuro */
-  --secondary: #4b5563;  /* gris medio */
-  --bg: #ffffff;          /* fondo blanco */
-  --card: #f3f4f6;       /* tarjeta clara */
-  --text: #1f2933;       /* texto principal */
-  --input-border: #d1d5db;
-  --header: #111827;
-  --nav: #f3f4f6;
-  --toast-bg: #1f2933;
+  --primary: #4f46e5;      /* violeta azul */
+  --secondary: #6366f1;    /* azul suave */
+  --bg: #f9fafb;           /* blanco gris claro */
+  --card: #ffffff;          /* tarjeta blanca */
+  --text: #1f2933;          /* texto oscuro */
+  --input-border: #d1d5db;  /* bordes claros */
+  --nav-bg: #e5e7eb;        /* nav gris claro */
+  --header-bg: #4f46e5;     /* header violeta */
 }
 
 /* Modo oscuro */
 .dark-mode {
-  --primary: #f3f4f6;    /* texto claro */
-  --secondary: #9ca3af;  /* gris claro */
-  --bg: #111827;          /* fondo negro profundo */
-  --card: #1f2937;       /* tarjeta gris oscuro */
-  --text: #f3f4f6;       /* texto principal */
-  --input-border: #ffffff;
-  --header: #000000;
-  --nav: #1f1f1f;
-  --toast-bg: #111827;
+  --primary: #ffffff;       /* texto claro */
+  --secondary: #9ca3af;     /* gris claro */
+  --bg: #111827;            /* fondo negro medianoche */
+  --card: #1f2937;          /* tarjeta gris oscuro */
+  --text: #f3f4f6;          /* texto blanco */
+  --input-border: #ffffff;   /* bordes blancos */
+  --nav-bg: #1f1f1f;        /* nav oscuro */
+  --header-bg: #000000;     /* header negro */
 }
 
 /* ========================== GENERAL ========================== */
@@ -35,17 +33,17 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  transition: background 0.3s, color 0.3s;
+  transition: all 0.3s ease;
 }
 
 /* ========================== HEADER ========================== */
 header {
-  background: var(--header);
+  background: var(--header-bg);
   color: var(--text);
   padding: 15px;
   text-align: center;
-  transition: background 0.3s, color 0.3s;
   position: relative;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* ========================== NAV ========================== */
@@ -53,8 +51,9 @@ nav {
   display: flex;
   justify-content: center;
   gap: 10px;
-  background: var(--nav);
+  background: var(--nav-bg);
   padding: 10px;
+  border-radius: 0 0 12px 12px;
   transition: background 0.3s;
 }
 
@@ -70,7 +69,7 @@ nav button {
 
 nav button.active {
   background: var(--primary);
-  color: var(--text);
+  color: var(--card);
 }
 
 /* ========================== MAIN ========================== */
@@ -86,8 +85,8 @@ section {
   background: var(--card);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: background 0.3s, color 0.3s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s;
 }
 
 section.active {
@@ -104,24 +103,31 @@ label {
 input,
 select {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   margin-top: 5px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid var(--input-border);
   background: var(--bg);
   color: var(--text);
   transition: all 0.3s;
 }
 
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
+}
+
 /* ========================== BUTTONS ========================== */
 button.primary {
   margin-top: 15px;
   background: var(--primary);
-  color: var(--text);
+  color: var(--card);
   border: 1px solid var(--input-border);
-  padding: 10px;
+  padding: 12px;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s;
 }
@@ -129,18 +135,23 @@ button.primary {
 button.success { background: #16a34a; color: white; border: none; }
 button.danger { background: #dc2626; color: white; border: none; }
 
-/* ========================== LOGOUT BUTTON ========================== */
+/* ========================== LOGOUT ========================== */
 .logout {
   position: absolute;
-  right: 15px;
   top: 15px;
+  right: 15px;
   background: var(--primary);
-  color: var(--text);
+  color: var(--card);
   border: 1px solid var(--input-border);
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: bold;
   transition: all 0.3s;
+}
+
+.logout:hover {
+  opacity: 0.9;
 }
 
 /* ========================== TABLE ========================== */
@@ -153,9 +164,9 @@ table {
 th,
 td {
   border: 1px solid var(--input-border);
-  padding: 8px;
+  padding: 10px;
   text-align: center;
-  transition: background 0.3s, color 0.3s;
+  transition: all 0.3s;
 }
 
 th {
@@ -170,46 +181,52 @@ th {
   right: -400px;
   min-width: 250px;
   max-width: 350px;
-  background: var(--toast-bg);
-  color: var(--text);
+  background: var(--primary);
+  color: var(--card);
   padding: 15px 20px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  transition: all 0.5s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.5s;
   z-index: 9999;
 }
 
 #toast.show { right: 20px; }
-#toast.success { background: #16a34a; }
-#toast.error { background: #dc2626; }
-#toast.info { background: #2563eb; }
+#toast.success { background: #16a34a; color: white; }
+#toast.error { background: #dc2626; color: white; }
+#toast.info { background: #2563eb; color: white; }
 
-/* ========================== MODAL ========================== */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
+/* ========================== DARK MODE TOGGLE ========================== */
+.theme-switch {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 50px;
+  height: 26px;
+  background: #e5e7eb;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-.modal.show { display: flex; }
+.theme-switch.active {
+  background: #111827;
+}
 
-.modal-content {
-  background: var(--card);
-  padding: 25px;
-  border-radius: 12px;
-  min-width: 280px;
-  max-width: 350px;
-  text-align: center;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-  transition: background 0.3s, color 0.3s;
+.theme-switch .switch-ball {
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s;
+}
+
+.theme-switch.active .switch-ball {
+  left: 26px;
+  background: black;
 }
 
 /* ========================== LOGIN ========================== */
@@ -222,13 +239,7 @@ th {
   border-radius: 16px;
   text-align: center;
   box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-  animation: aparecer 0.6s ease;
-  transition: background 0.3s, color 0.3s;
-}
-
-@keyframes aparecer {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  transition: all 0.3s;
 }
 
 .login-container h2 {
@@ -245,13 +256,6 @@ th {
   border: 1px solid var(--input-border);
   background: var(--bg);
   color: var(--text);
-  transition: all 0.3s;
-}
-
-.login-container input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .login-container button {
@@ -259,17 +263,15 @@ th {
   margin-top: 20px;
   padding: 12px;
   background: var(--primary);
-  color: var(--text);
+  color: var(--card);
+  border-radius: 12px;
   border: 1px solid var(--input-border);
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
 }
 
-.login-container button:hover { background: var(--secondary); }
-.login-container button:active { transform: scale(0.98); }
+.login-container button:hover {
+  opacity: 0.9;
+}
 
 /* ========================== DASHBOARD ========================== */
 .cards {
@@ -284,6 +286,7 @@ th {
   border-radius: 12px;
   text-align: center;
   font-weight: bold;
+  transition: all 0.3s;
 }
 
 .card p {
