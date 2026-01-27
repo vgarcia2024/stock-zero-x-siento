@@ -1,26 +1,27 @@
 /* ========================== VARIABLES ========================== */
 :root {
-  --primary: #4f46e5;
-  --secondary: #6366f1;
-  --bg: #f3f4f6;
-  --card: #ffffff;
-  --text: #1f2933;
-  --header: #4f46e5;
-  --nav: #6366f1;
-  --input-border: #ccc;
+  /* Modo claro */
+  --primary: #1f2933;    /* texto oscuro */
+  --secondary: #4b5563;  /* gris medio */
+  --bg: #ffffff;          /* fondo blanco */
+  --card: #f3f4f6;       /* tarjeta clara */
+  --text: #1f2933;       /* texto principal */
+  --input-border: #d1d5db;
+  --header: #111827;
+  --nav: #f3f4f6;
   --toast-bg: #1f2933;
 }
 
-/* MODO OSCURO */
+/* Modo oscuro */
 .dark-mode {
-  --primary: #1e3a8a;       /* azul oscuro */
-  --secondary: #1e40af;     /* azul medianoche */
-  --bg: #111827;            /* negro profundo */
-  --card: #1f2937;          /* gris oscuro */
-  --text: #e5e7eb;          /* gris claro */
-  --header: #1e40af;
-  --nav: #1e3a8a;
-  --input-border: #374151;
+  --primary: #f3f4f6;    /* texto claro */
+  --secondary: #9ca3af;  /* gris claro */
+  --bg: #111827;          /* fondo negro profundo */
+  --card: #1f2937;       /* tarjeta gris oscuro */
+  --text: #f3f4f6;       /* texto principal */
+  --input-border: #ffffff;
+  --header: #000000;
+  --nav: #1f1f1f;
   --toast-bg: #111827;
 }
 
@@ -40,10 +41,11 @@ body {
 /* ========================== HEADER ========================== */
 header {
   background: var(--header);
-  color: white;
+  color: var(--text);
   padding: 15px;
   text-align: center;
-  transition: background 0.3s;
+  transition: background 0.3s, color 0.3s;
+  position: relative;
 }
 
 /* ========================== NAV ========================== */
@@ -57,38 +59,18 @@ nav {
 }
 
 nav button {
-  background: white;
-  border: none;
+  background: var(--card);
+  border: 1px solid var(--input-border);
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s, color 0.3s;
+  transition: all 0.3s;
 }
 
 nav button.active {
   background: var(--primary);
-  color: white;
-}
-
-/* BOTÓN MODO OSCURO */
-#btnToggleDark {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 12px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  transition: background 0.3s;
-}
-
-#btnToggleDark:hover {
-  background: var(--secondary);
+  color: var(--text);
 }
 
 /* ========================== MAIN ========================== */
@@ -126,30 +108,39 @@ select {
   margin-top: 5px;
   border-radius: 6px;
   border: 1px solid var(--input-border);
-  transition: border 0.3s, background 0.3s, color 0.3s;
-  background: var(--card);
+  background: var(--bg);
   color: var(--text);
+  transition: all 0.3s;
 }
 
 /* ========================== BUTTONS ========================== */
 button.primary {
   margin-top: 15px;
   background: var(--primary);
-  color: white;
-  border: none;
+  color: var(--text);
+  border: 1px solid var(--input-border);
   padding: 10px;
   width: 100%;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s;
 }
 
-button.success {
-  background: #16a34a;
-}
+button.success { background: #16a34a; color: white; border: none; }
+button.danger { background: #dc2626; color: white; border: none; }
 
-button.danger {
-  background: #dc2626;
+/* ========================== LOGOUT BUTTON ========================== */
+.logout {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  background: var(--primary);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 /* ========================== TABLE ========================== */
@@ -161,13 +152,15 @@ table {
 
 th,
 td {
-  border: 1px solid #ddd;
+  border: 1px solid var(--input-border);
   padding: 8px;
   text-align: center;
+  transition: background 0.3s, color 0.3s;
 }
 
 th {
-  background: #e5e7eb;
+  background: var(--secondary);
+  color: var(--text);
 }
 
 /* ========================== TOAST ========================== */
@@ -178,22 +171,19 @@ th {
   min-width: 250px;
   max-width: 350px;
   background: var(--toast-bg);
-  color: white;
+  color: var(--text);
   padding: 15px 20px;
   border-radius: 8px;
   font-weight: bold;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  transition: all 0.5s ease, background 0.3s;
+  transition: all 0.5s ease;
   z-index: 9999;
 }
 
-#toast.show {
-  right: 20px;
-}
-
+#toast.show { right: 20px; }
 #toast.success { background: #16a34a; }
-#toast.error   { background: #dc2626; }
-#toast.info    { background: #2563eb; }
+#toast.error { background: #dc2626; }
+#toast.info { background: #2563eb; }
 
 /* ========================== MODAL ========================== */
 .modal {
@@ -222,17 +212,6 @@ th {
   transition: background 0.3s, color 0.3s;
 }
 
-.modal-content h3 {
-  margin-bottom: 20px;
-}
-
-.modal-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.modal-buttons button { flex: 1; }
-
 /* ========================== LOGIN ========================== */
 .login-container {
   max-width: 380px;
@@ -252,17 +231,21 @@ th {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.login-container h2 { margin-bottom: 25px; color: var(--primary); font-size: 26px; }
+.login-container h2 {
+  margin-bottom: 25px;
+  color: var(--primary);
+  font-size: 26px;
+}
+
 .login-container input {
   width: 100%;
   margin: 12px 0;
   padding: 12px 14px;
   border-radius: 8px;
   border: 1px solid var(--input-border);
-  font-size: 15px;
-  transition: border 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
-  background: var(--card);
+  background: var(--bg);
   color: var(--text);
+  transition: all 0.3s;
 }
 
 .login-container input:focus {
@@ -276,19 +259,17 @@ th {
   margin-top: 20px;
   padding: 12px;
   background: var(--primary);
-  color: white;
-  border: none;
+  color: var(--text);
+  border: 1px solid var(--input-border);
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: all 0.3s;
 }
 
 .login-container button:hover { background: var(--secondary); }
 .login-container button:active { transform: scale(0.98); }
-
-#loginError { margin-top: 15px; color: #dc2626; font-size: 14px; min-height: 18px; }
 
 /* ========================== DASHBOARD ========================== */
 .cards {
@@ -298,7 +279,7 @@ th {
 }
 
 .card {
-  background: #eef2ff;
+  background: var(--card);
   padding: 20px;
   border-radius: 12px;
   text-align: center;
