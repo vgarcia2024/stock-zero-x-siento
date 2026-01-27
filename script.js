@@ -134,14 +134,16 @@ function cargarVendedores(){
     o.value=v.email; o.textContent=v.email; sel.appendChild(o);
   });
 }
-function registrarVenta() {
+async function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
-  const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value); // <-- parseInt
+  const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value);
+
   if (isNaN(cantidadVenta) || cantidadVenta <= 0) {
     mostrarMensaje("Cantidad inválida", "error");
     return;
   }
 
+  // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
     mostrarMensaje("Producto no encontrado", "error");
@@ -153,16 +155,31 @@ function registrarVenta() {
     return;
   }
 
+  // Vendedor seleccionado
   const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
-  prod.cantidad -= cantidadVenta; // <-- esto sí resta correctamente
+  const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
-  ventas.push({
+  // Restamos stock y actualizamos Firestore
+  const prodRef = doc(db, "productos", codigo);
+  await setDoc(prodRef, {
+    ...prod,
+    cantidad: prod.cantidad - cantidadVenta
+  });
+
+  // Guardamos la venta en Firestore
+  const ventasCol = collection(db, "ventas");
+  await setDoc(doc(ventasCol), {
     codigo,
     nombre: prod.nombre,
-    vendedor: vendedorEmail,  // guardamos el email
+    vendedor: vendedorNombre,
     cantidad: cantidadVenta,
     fecha: new Date().toLocaleString()
   });
+
+  mostrarMensaje("Venta registrada", "success");
+  limpiarVenta();
+}
+
 
   guardar();
   limpiarVenta();
