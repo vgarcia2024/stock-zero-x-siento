@@ -46,14 +46,21 @@ async function login() {
   const errorEl = document.getElementById("loginError");
   errorEl.textContent = "";
 
-  if (!email || !pass) { mostrarMensaje("Completá los datos","error"); return; }
+  if (!email || !pass) { 
+    mostrarMensaje("Completá los datos","error"); 
+    return; 
+  }
 
+  // 🔹 BLOQUE TRY-CATCH para login
   try {
-    const cred = await signInWithEmailAndPassword(auth,email,pass);
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
     const rol = await obtenerRol(cred.user);
     usuarioActual = { user: cred.user.email, rol };
     iniciarApp();
-  } catch(e){ console.error(e); mostrarMensaje("Usuario o contraseña incorrectos","error"); }
+  } catch(e){ 
+    console.error(e); 
+    mostrarMensaje("Usuario o contraseña incorrecta", "error"); // aquí usamos el toast corredizo
+  }
 }
 
 async function logout() { await signOut(auth); location.reload(); }
