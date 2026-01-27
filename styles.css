@@ -1,29 +1,13 @@
-/* ========================== VARIABLES ========================== */
 :root {
-  /* Modo claro */
-  --primary: #4f46e5;      /* violeta azul */
-  --secondary: #6366f1;    /* azul suave */
-  --bg: #f9fafb;           /* blanco gris claro */
-  --card: #ffffff;          /* tarjeta blanca */
-  --text: #1f2933;          /* texto oscuro */
-  --input-border: #d1d5db;  /* bordes claros */
-  --nav-bg: #e5e7eb;        /* nav gris claro */
-  --header-bg: #4f46e5;     /* header violeta */
+  --primary: #4f46e5;
+  --secondary: #6366f1;
+  --bg: #f3f4f6;
+  --card: #ffffff;
+  --text: #1f2933;
 }
 
-/* Modo oscuro */
-.dark-mode {
-  --primary: #ffffff;       /* texto claro */
-  --secondary: #9ca3af;     /* gris claro */
-  --bg: #111827;            /* fondo negro medianoche */
-  --card: #1f2937;          /* tarjeta gris oscuro */
-  --text: #f3f4f6;          /* texto blanco */
-  --input-border: #ffffff;   /* bordes blancos */
-  --nav-bg: #1f1f1f;        /* nav oscuro */
-  --header-bg: #000000;     /* header negro */
-}
+/* GENERAL */
 
-/* ========================== GENERAL ========================== */
 * {
   box-sizing: border-box;
   font-family: Arial, sans-serif;
@@ -33,67 +17,65 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  transition: all 0.3s ease;
 }
 
-/* ========================== HEADER ========================== */
+/* HEADER */
+
 header {
-  background: var(--header-bg);
-  color: var(--text);
+  background: var(--primary);
+  color: white;
   padding: 15px;
   text-align: center;
-  position: relative;
-  transition: background 0.3s, color 0.3s;
 }
 
-/* ========================== NAV ========================== */
+/* NAV */
+
 nav {
   display: flex;
   justify-content: center;
   gap: 10px;
-  background: var(--nav-bg);
+  background: var(--secondary);
   padding: 10px;
-  border-radius: 0 0 12px 12px;
-  transition: background 0.3s;
 }
 
 nav button {
-  background: var(--card);
-  border: 1px solid var(--input-border);
+  background: white;
+  border: none;
   padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: all 0.3s;
 }
 
 nav button.active {
   background: var(--primary);
-  color: var(--card);
+  color: white;
 }
 
-/* ========================== MAIN ========================== */
+/* MAIN */
+
 main {
   max-width: 1000px;
   margin: 20px auto;
   padding: 15px;
 }
 
-/* ========================== SECTION ========================== */
+/* SECTION */
+
 section {
   display: none;
   background: var(--card);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  transition: all 0.3s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 section.active {
   display: block;
 }
 
-/* ========================== FORM ========================== */
+/* FORM */
+
 label {
   display: block;
   margin-top: 10px;
@@ -103,58 +85,35 @@ label {
 input,
 select {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   margin-top: 5px;
-  border-radius: 8px;
-  border: 1px solid var(--input-border);
-  background: var(--bg);
-  color: var(--text);
-  transition: all 0.3s;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-input:focus,
-select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
-}
+/* BUTTON */
 
-/* ========================== BUTTONS ========================== */
 button.primary {
   margin-top: 15px;
   background: var(--primary);
-  color: var(--card);
-  border: 1px solid var(--input-border);
-  padding: 12px;
+  color: white;
+  border: none;
+  padding: 10px;
   width: 100%;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-button.success { background: #16a34a; color: white; border: none; }
-button.danger { background: #dc2626; color: white; border: none; }
-
-/* ========================== LOGOUT ========================== */
-.logout {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: var(--primary);
-  color: var(--card);
-  border: 1px solid var(--input-border);
-  padding: 8px 16px;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
 }
 
-.logout:hover {
-  opacity: 0.9;
+.success {
+  background: #16a34a;
 }
 
-/* ========================== TABLE ========================== */
+.danger {
+  background: #dc2626;
+}
+
+/* TABLE */
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -163,134 +122,333 @@ table {
 
 th,
 td {
-  border: 1px solid var(--input-border);
-  padding: 10px;
+  border: 1px solid #ddd;
+  padding: 8px;
   text-align: center;
-  transition: all 0.3s;
 }
 
 th {
-  background: var(--secondary);
-  color: var(--text);
+  background: #e5e7eb;
 }
 
-/* ========================== TOAST ========================== */
+/* TOAST */
+
 #toast {
   position: fixed;
   top: 20px;
   right: -400px;
+
   min-width: 250px;
   max-width: 350px;
-  background: var(--primary);
-  color: var(--card);
+
+  background: #1f2933;
+  color: white;
+
   padding: 15px 20px;
-  border-radius: 12px;
+  border-radius: 8px;
+
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  transition: all 0.5s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+  transition: all 0.5s ease;
+
   z-index: 9999;
 }
 
-#toast.show { right: 20px; }
-#toast.success { background: #16a34a; color: white; }
-#toast.error { background: #dc2626; color: white; }
-#toast.info { background: #2563eb; color: white; }
-
-/* ========================== DARK MODE TOGGLE ========================== */
-.theme-switch {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  width: 50px;
-  height: 26px;
-  background: #e5e7eb;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: background 0.3s;
+#toast.show {
+  right: 20px;
 }
 
-.theme-switch.active {
-  background: #111827;
+#toast.success {
+  background: #16a34a;
 }
 
-.theme-switch .switch-ball {
-  width: 22px;
-  height: 22px;
+#toast.error {
+  background: #dc2626;
+}
+
+#toast.info {
+  background: #2563eb;
+}
+
+/* MODAL */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 10000;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
   background: white;
-  border-radius: 50%;
+
+  padding: 25px;
+  border-radius: 12px;
+
+  min-width: 280px;
+  max-width: 350px;
+
+  text-align: center;
+
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+}
+
+/* LOGIN */
+
+.login-container {
+  position: fixed;
+  inset: 0;
+
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  background: white;
+
+  padding: 30px;
+  border-radius: 12px;
+
+  width: 300px;
+
+  text-align: center;
+
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+}
+
+.login-box input {
+  margin-bottom: 12px;
+}
+
+/* APP */
+
+.hidden {
+  display: none;
+}
+
+.logout {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: all 0.3s;
+  right: 15px;
+  top: 15px;
+
+  background: #dc2626;
+  color: white;
+
+  border: none;
+  padding: 6px 12px;
+
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.theme-switch.active .switch-ball {
-  left: 26px;
-  background: black;
+/* LOGIN */
+
+/* LOGIN */
+
+body:has(#loginScreen:not([style*="none"])) {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  min-height: 100vh;
 }
 
-/* ========================== LOGIN ========================== */
 .login-container {
   max-width: 380px;
   width: 90%;
+
   margin: 120px auto;
-  background: var(--card);
+
+  background: white;
+
   padding: 35px 30px;
+
   border-radius: 16px;
+
   text-align: center;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-  transition: all 0.3s;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+
+  animation: aparecer 0.6s ease;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .login-container h2 {
   margin-bottom: 25px;
+
   color: var(--primary);
+
   font-size: 26px;
 }
 
 .login-container input {
   width: 100%;
+
   margin: 12px 0;
+
   padding: 12px 14px;
+
   border-radius: 8px;
-  border: 1px solid var(--input-border);
-  background: var(--bg);
-  color: var(--text);
+
+  border: 1px solid #d1d5db;
+
+  font-size: 15px;
+
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.login-container input:focus {
+  outline: none;
+
+  border-color: var(--primary);
+
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .login-container button {
   width: 100%;
+
   margin-top: 20px;
+
   padding: 12px;
+
   background: var(--primary);
-  color: var(--card);
-  border-radius: 12px;
-  border: 1px solid var(--input-border);
+
+  color: white;
+
+  border: none;
+
+  border-radius: 10px;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
   cursor: pointer;
+
+  transition: background 0.2s, transform 0.1s;
 }
 
 .login-container button:hover {
-  opacity: 0.9;
+  background: #4338ca;
 }
 
-/* ========================== DASHBOARD ========================== */
+.login-container button:active {
+  transform: scale(0.98);
+}
+
+#loginError {
+  margin-top: 15px;
+
+  color: #dc2626;
+
+  font-size: 14px;
+
+  min-height: 18px;
+}
+
+/* USER BAR */
+
+.user-bar {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.user-bar button {
+  background: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* DASHBOARD */
+
 .cards {
   display: grid;
+
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
   gap: 15px;
 }
 
 .card {
-  background: var(--card);
+  background: #eef2ff;
+
   padding: 20px;
+
   border-radius: 12px;
+
   text-align: center;
+
   font-weight: bold;
-  transition: all 0.3s;
 }
 
 .card p {
   font-size: 28px;
+
   margin: 10px 0 0;
+
   color: var(--primary);
+}
+
+/* FIX LOGIN INPUTS */
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.login-container input,
+.login-container button {
+  display: block;
+  width: 100%;
 }
