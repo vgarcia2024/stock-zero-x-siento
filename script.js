@@ -401,3 +401,13 @@ function guardar() {
   localStorage.setItem("ventas", JSON.stringify(ventas));
   localStorage.setItem("categorias", JSON.stringify(categorias));
 }
+
+window.login = login;
+window.logout = logout;
+window.showSection = showSection;
+window.agregarProducto = agregarProducto;
+window.registrarVenta = registrarVenta;
+window.resetearTodo = resetearTodo;
+window.agregarCategoria = agregarCategoria;
+window.eliminarCategoria = eliminarCategoria;
+
