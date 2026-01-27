@@ -367,6 +367,112 @@ function guardar() {
 }
 
 /* ==========================
+   FIRESTORE USERS
+========================= */
+const usuariosCol = collection(db, "usuarios");
+
+/* ==========================
+   CREAR USUARIO
+========================= */
+async function crearUsuario() {
+  if (!soloAdmin()) return;
+
+  const email = document.getElementById("nuevoUsuarioEmail").value.trim();
+  const rol = document.getElementById("nuevoUsuarioRol").value;
+
+  if (!email) {
+    mostrarMensaje("Completá el email", "error");
+    return;
+  }
+
+  try {
+    const userDoc = doc(db, "usuarios", email);
+    await setDoc(userDoc, { rol });
+
+    mostrarMensaje(`Usuario ${email} creado como ${rol}`, "success");
+    document.getElementById("nuevoUsuarioEmail").value = "";
+    cargarUsuarios();
+  } catch (e) {
+    console.error(e);
+    mostrarMensaje("Error al crear usuario", "error");
+  }
+}
+
+/* ==========================
+   CARGAR USUARIOS
+========================= */
+async function cargarUsuarios() {
+  const tbody = document.querySelector("#tablaUsuarios tbody");
+  tbody.innerHTML = "";
+
+  try {
+    const snap = await getDocs(usuariosCol);
+    snap.forEach(docu => {
+      const data = docu.data();
+      const email = docu.id;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${email}</td>
+        <td>
+          <select class="rolSelect">
+            <option value="vendedor" ${data.rol === "vendedor" ? "selected" : ""}>Vendedor</option>
+            <option value="admin" ${data.rol === "admin" ? "selected" : ""}>Admin</option>
+          </select>
+        </td>
+        <td>
+          <button class="primary danger btnEliminarUsuario">Eliminar</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      // Cambiar rol
+      tr.querySelector(".rolSelect").addEventListener("change", async (e) => {
+        const nuevoRol = e.target.value;
+        await setDoc(doc(db, "usuarios", email), { rol: nuevoRol });
+        mostrarMensaje(`Rol de ${email} cambiado a ${nuevoRol}`, "success");
+      });
+
+      // Eliminar usuario
+      tr.querySelector(".btnEliminarUsuario").addEventListener("click", async () => {
+        if (!confirm(`Eliminar usuario ${email}?`)) return;
+        await deleteDoc(doc(db, "usuarios", email));
+        mostrarMensaje(`Usuario ${email} eliminado`, "info");
+        cargarUsuarios();
+      });
+    });
+  } catch (e) {
+    console.error(e);
+    mostrarMensaje("Error al cargar usuarios", "error");
+  }
+}
+
+/* ==========================
+   CARGAR USUARIOS AL INICIAR APP
+========================= */
+function iniciarApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  document.getElementById("userName").textContent =
+    usuarioActual.user + " (" + usuarioActual.rol + ")";
+
+  if (usuarioActual.rol !== "admin") {
+    document.getElementById("btnAjustes").style.display = "none";
+  }
+
+  cargarSelects();
+  cargarEliminarCategorias();
+  cargarVendedores();
+  actualizarDashboard();
+
+  if (usuarioActual.rol === "admin") {
+    cargarUsuarios(); // <-- carga la tabla de usuarios
+  }
+}
+
+
+/* ==========================
    EXPORT GLOBAL
 ========================= */
 window.login = login;
