@@ -27,6 +27,7 @@ const firebaseConfig = {
   appId: "1:764048708615:web:1287e135d38a3588b806a2"
 };
 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -50,6 +51,7 @@ async function login() {
     return; 
   }
 
+  // 🔹 BLOQUE TRY-CATCH para login
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const rol = await obtenerRol(cred.user);
@@ -57,7 +59,7 @@ async function login() {
     iniciarApp();
   } catch(e){ 
     console.error(e); 
-    mostrarMensaje("Usuario o contraseña incorrecta", "error");
+    mostrarMensaje("Usuario o contraseña incorrecta", "error"); // aquí usamos el toast corredizo
   }
 }
 
@@ -95,7 +97,7 @@ function iniciarApp(){
   actualizarDashboard();
 }
 
-/* ========================== CONSULTAR ENVÍO ========================== */
+// public/script.js
 export async function consultarEnvio() {
   const trackingNumber = document.getElementById("trackingNumber").value.trim();
   if (!trackingNumber) return;
@@ -108,6 +110,8 @@ export async function consultarEnvio() {
     if (!res.ok) throw new Error("No se pudo consultar el seguimiento");
 
     const data = await res.json();
+
+    // Mostrar info básica
     statsDiv.innerHTML = `
       <h3>Seguimiento: ${trackingNumber}</h3>
       <pre>${JSON.stringify(data, null, 2)}</pre>
@@ -116,7 +120,11 @@ export async function consultarEnvio() {
     statsDiv.innerHTML = `<p style="color:red">${err.message}</p>`;
   }
 }
+
+
+// Hacemos accesible la función desde HTML
 window.consultarEnvio = consultarEnvio;
+
 
 /* ========================== TOAST ========================== */
 function mostrarMensaje(t,tipo="info"){
@@ -161,10 +169,12 @@ function cargarVendedores(){
   const sel=document.getElementById("ventaVendedor");
   sel.innerHTML="";
   
+  // Primero agregamos el usuario actual si no está en la lista
   if(!usuarios.some(u=>u.email === usuarioActual.user)){
     usuarios.push({email: usuarioActual.user, rol: usuarioActual.rol, nombre: usuarioActual.user});
   }
 
+  // Filtramos vendedores (rol vendedor o tu mismo)
   const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.email === usuarioActual.user);
   
   vendedores.forEach(v=>{
@@ -174,6 +184,7 @@ function cargarVendedores(){
     sel.appendChild(o);
   });
 
+  // Seleccionamos por defecto tu usuario
   sel.value = usuarioActual.user;
 }
 
@@ -186,6 +197,7 @@ async function registrarVenta() {
     return;
   }
 
+  // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
     mostrarMensaje("Producto no encontrado", "error");
@@ -197,15 +209,18 @@ async function registrarVenta() {
     return;
   }
 
+  // Vendedor seleccionado
   const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
   const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
+  // Restamos stock y actualizamos Firestore
   const prodRef = doc(db, "productos", codigo);
   await setDoc(prodRef, {
     ...prod,
     cantidad: prod.cantidad - cantidadVenta
   });
 
+  // Guardamos la venta en Firestore
   const ventasCol = collection(db, "ventas");
   await setDoc(doc(ventasCol), {
     codigo,
@@ -219,10 +234,11 @@ async function registrarVenta() {
   limpiarVenta();
 }
 
+// Limpia inputs de venta después de registrar
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
   document.getElementById("ventaCantidad").value = 1;
-  document.getElementById("ventaVendedor").value = usuarioActual.user;
+  document.getElementById("ventaVendedor").value = usuarioActual.user; // volver a seleccionar tu usuario
 }
 
 /* ========================== EXPORTAR CSV ========================== */
@@ -241,12 +257,13 @@ function exportarVentasCSV() {
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
   link.setAttribute("download", "ventas.csv");
-  document.body.appendChild(link);
+  document.body.appendChild(link); // requerido para Firefox
   link.click();
   document.body.removeChild(link);
   mostrarMensaje("Ventas exportadas", "success");
 }
 
+// Exportamos la función
 window.exportarVentasCSV = exportarVentasCSV;
 
 /* ========================== CATEGORIAS ========================== */
