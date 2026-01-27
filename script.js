@@ -27,6 +27,12 @@ const firebaseConfig = {
   appId: "1:764048708615:web:1287e135d38a3588b806a2"
 };
 
+const btnDark = document.getElementById("btnToggleDark");
+btnDark.addEventListener("click", ()=>{
+  document.body.classList.toggle("dark-mode");
+});
+
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
