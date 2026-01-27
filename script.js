@@ -28,7 +28,7 @@ const firebaseConfig = {
   storageBucket: "zero-x-siento-stock.firebasestorage.app",
   messagingSenderId: "764048708615",
   appId: "1:764048708615:web:1287e135d38a3588b806a2",
-  measurementId: "G-CWKB3TZ9CF",
+  measurementId: "G-CWKB3TZ9CF"
 };
 
 const app = initializeApp(firebaseConfig);
