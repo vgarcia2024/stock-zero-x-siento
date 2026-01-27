@@ -98,44 +98,29 @@ function iniciarApp(){
 }
 
 // public/script.js
-async function consultarEnvio() {
+export async function consultarEnvio() {
   const trackingNumber = document.getElementById("trackingNumber").value.trim();
-  const statsContent = document.getElementById("statsContent");
-  statsContent.innerHTML = "";
+  if (!trackingNumber) return;
 
-  if (!trackingNumber) {
-    statsContent.textContent = "Ingresá un número de seguimiento";
-    return;
-  }
+  const statsDiv = document.getElementById("statsContent");
+  statsDiv.innerHTML = "Cargando...";
 
   try {
     const res = await fetch(`/api/seguimiento?tracking=${trackingNumber}`);
+    if (!res.ok) throw new Error("No se pudo consultar el seguimiento");
+
     const data = await res.json();
 
-    if (res.ok) {
-      // Mostramos info básica
-      let html = `<h3>Estado del envío</h3>`;
-      html += `<p><strong>Tracking:</strong> ${trackingNumber}</p>`;
-      html += `<p><strong>Estado:</strong> ${data.status || 'Desconocido'}</p>`;
-      html += `<p><strong>Última actualización:</strong> ${data.last_update || 'Desconocida'}</p>`;
-
-      if (data.history && data.history.length) {
-        html += `<h4>Historial</h4><ul>`;
-        data.history.forEach(e => {
-          html += `<li>${e.date || ''} - ${e.status || ''} - ${e.location || ''}</li>`;
-        });
-        html += `</ul>`;
-      }
-
-      statsContent.innerHTML = html;
-    } else {
-      statsContent.textContent = data.error || 'Error al consultar el envío';
-    }
+    // Mostrar info básica
+    statsDiv.innerHTML = `
+      <h3>Seguimiento: ${trackingNumber}</h3>
+      <pre>${JSON.stringify(data, null, 2)}</pre>
+    `;
   } catch (err) {
-    console.error(err);
-    statsContent.textContent = "Error al conectar con el servidor";
+    statsDiv.innerHTML = `<p style="color:red">${err.message}</p>`;
   }
 }
+
 
 // Hacemos accesible la función desde HTML
 window.consultarEnvio = consultarEnvio;
