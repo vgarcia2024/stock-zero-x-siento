@@ -90,6 +90,25 @@
       <!-- STATS -->
       <section id="stats">
         <h2>Estadísticas</h2>
+
+            <section id="stats">
+      <h2>Estadísticas</h2>
+    
+      <!-- Buscador de seguimiento -->
+      <div class="seguimiento">
+        <input id="trackingNumber" type="text" placeholder="Número de seguimiento">
+        <button onclick="consultarEnvio()">Consultar Envío</button>
+      </div>
+    
+      <!-- Aquí se muestran las estadísticas y el seguimiento -->
+      <div id="statsContent"></div>
+    </section>
+    
+    <script type="module">
+      import { consultarEnvio } from './seguimiento.js';
+      window.consultarEnvio = consultarEnvio; // para poder llamarlo desde onclick
+    </script>
+
         <div id="statsContent"></div>
       </section>
 
