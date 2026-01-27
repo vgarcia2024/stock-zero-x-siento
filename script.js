@@ -46,11 +46,13 @@ let usuarioActual = null;
    OBTENER ROL
 ========================== */
 
-async function obtenerRol(email) {
-
+async function obtenerRol(user) {
   try {
+    const uid = user.uid;
 
-    const ref = doc(db, "usuarios", email);
+    console.log("BUSCANDO UID:", uid);
+
+    const ref = doc(db, "usuarios", uid);
     const snap = await getDoc(ref);
 
     if (snap.exists()) {
@@ -64,6 +66,7 @@ async function obtenerRol(email) {
     return "vendedor";
   }
 }
+
 
 
 /* ==========================
@@ -84,12 +87,15 @@ async function login() {
 
     const rol = await obtenerRol(cred.user.email);
 
-    usuarioActual = {
+    const rol = await obtenerRol(cred.user);
+
+   usuarioActual = {
       user: cred.user.email,
       rol: rol,
-    };
+   };
+      
+   iniciarApp();
 
-    iniciarApp();
 
   } catch (error) {
     console.error(error);
@@ -115,7 +121,7 @@ async function logout() {
 onAuthStateChanged(auth, async (user) => {
   if (user) {
 
-    const rol = await obtenerRol(user.email);
+    const rol = await obtenerRol(user);
 
     usuarioActual = {
       user: user.email,
@@ -125,8 +131,6 @@ onAuthStateChanged(auth, async (user) => {
     iniciarApp();
   }
 });
-
-
 
 /* ==========================
    INICIAR APP
