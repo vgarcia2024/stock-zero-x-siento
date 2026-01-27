@@ -181,12 +181,6 @@ async function registrarVenta() {
 }
 
 
-  guardar();
-  limpiarVenta();
-  actualizarDashboard();
-  mostrarMensaje("Venta registrada", "success");
-}
-
 // Limpia inputs de venta después de registrar
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
