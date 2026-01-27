@@ -27,16 +27,19 @@
       </div>
     </header>
 
+    <!-- NAV -->
     <nav>
       <button onclick="showSection('dashboard')" class="active">Inicio</button>
       <button onclick="showSection('stock')">Stock</button>
       <button onclick="showSection('ventas')">Ventas</button>
       <button onclick="showSection('stats')">Estadísticas</button>
+      <button onclick="showSection('seguimiento')">Seguimiento</button>
       <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
     </nav>
 
+    <!-- MAIN -->
     <main>
-      <!-- DASHBOARD / INICIO -->
+      <!-- DASHBOARD -->
       <section id="dashboard" class="active">
         <h2>Panel General</h2>
         <div class="cards">
@@ -87,35 +90,25 @@
         <button class="primary success" onclick="registrarVenta()">Vender</button>
       </section>
 
-      <!-- STATS -->
+      <!-- ESTADÍSTICAS -->
       <section id="stats">
         <h2>Estadísticas</h2>
-
-            <section id="stats">
-      <h2>Estadísticas</h2>
-    
-      <!-- Buscador de seguimiento -->
-      <div class="seguimiento">
-        <input id="trackingNumber" type="text" placeholder="Número de seguimiento">
-        <button onclick="consultarEnvio()">Consultar Envío</button>
-      </div>
-    
-      <!-- Aquí se muestran las estadísticas y el seguimiento -->
-      <div id="statsContent"></div>
-    </section>
-    
-    <script type="module">
-      import { consultarEnvio } from './seguimiento.js';
-      window.consultarEnvio = consultarEnvio; // para poder llamarlo desde onclick
-    </script>
-
         <div id="statsContent"></div>
+      </section>
+
+      <!-- SEGUIMIENTO -->
+      <section id="seguimiento">
+        <h2>Seguimiento de Envíos</h2>
+        <div class="seguimiento">
+          <input id="trackingNumber" type="text" placeholder="Número de seguimiento">
+          <button onclick="consultarEnvio()">Consultar Envío</button>
+        </div>
+        <div id="seguimientoContent"></div>
       </section>
 
       <!-- AJUSTES -->
       <section id="ajustes">
         <h2>Ajustes (Admin)</h2>
-
         <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
 
         <h3>Nueva Categoría</h3>
@@ -150,5 +143,16 @@
 
     <div id="toast"></div>
   </div>
+
+  <!-- SCRIPT PARA TRACK123 -->
+  <script type="module">
+    import { consultarEnvio } from './seguimiento.js';
+    window.consultarEnvio = async function(){
+      const numero = document.getElementById('trackingNumber').value.trim();
+      if(!numero) return alert("Ingresá un número de seguimiento");
+      const data = await consultarEnvio(numero);
+      document.getElementById('seguimientoContent').innerHTML = JSON.stringify(data, null, 2);
+    };
+  </script>
 </body>
 </html>
