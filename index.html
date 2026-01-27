@@ -104,19 +104,47 @@
         </section>
 
         <!-- AJUSTES -->
-        <section id="ajustes">
-          <h2>Ajustes (Admin)</h2>
+        <!-- AJUSTES -->
+<section id="ajustes">
+  <h2>Ajustes (Admin)</h2>
 
-          <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
+  <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
 
-          <h3>Nueva Categoría</h3>
-          <input id="nuevaCategoria" />
-          <button class="primary" onclick="agregarCategoria()">Agregar</button>
+  <h3>Nueva Categoría</h3>
+  <input id="nuevaCategoria" />
+  <button class="primary" onclick="agregarCategoria()">Agregar</button>
 
-          <h3>Eliminar Categoría</h3>
-          <select id="categoriaEliminar"></select>
-          <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
-        </section>
+  <h3>Eliminar Categoría</h3>
+  <select id="categoriaEliminar"></select>
+  <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
+
+  <!-- GESTIÓN DE USUARIOS -->
+  <h3>Gestión de Usuarios</h3>
+
+  <!-- Crear usuario -->
+  <input id="nuevoUsuarioEmail" placeholder="Email" />
+  <select id="nuevoUsuarioRol">
+    <option value="vendedor">Vendedor</option>
+    <option value="admin">Admin</option>
+  </select>
+  <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
+
+  <!-- Lista de usuarios -->
+  <h4>Usuarios existentes</h4>
+  <table id="tablaUsuarios">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Se llenará dinámicamente con JS -->
+    </tbody>
+  </table>
+</section>
+
       </main>
 
       <div id="toast"></div>
