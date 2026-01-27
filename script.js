@@ -1,7 +1,6 @@
 /* ==========================
    FIREBASE CONFIG
-========================== */
-
+========================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -13,6 +12,8 @@ import {
   getFirestore,
   doc,
   getDoc,
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 👉 TU CONFIG */
@@ -32,16 +33,16 @@ const db = getFirestore(app);
 
 /* ==========================
    ESTADO
-========================== */
+========================= */
 let usuarioActual = null;
+let vendedores = ["Fito", "Andre", "Juli", "Luli", "Valen"];
 
 /* ==========================
    OBTENER ROL
-========================== */
+========================= */
 async function obtenerRol(user) {
   try {
     const uid = user.uid;
-    console.log("BUSCANDO UID:", uid);
     const ref = doc(db, "usuarios", uid);
     const snap = await getDoc(ref);
     if (snap.exists()) return snap.data().rol;
@@ -54,7 +55,7 @@ async function obtenerRol(user) {
 
 /* ==========================
    LOGIN
-========================== */
+========================= */
 async function login() {
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
@@ -82,7 +83,7 @@ async function login() {
 
 /* ==========================
    LOGOUT
-========================== */
+========================= */
 async function logout() {
   await signOut(auth);
   location.reload();
@@ -90,7 +91,7 @@ async function logout() {
 
 /* ==========================
    SESIÓN AUTOMÁTICA
-========================== */
+========================= */
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const rol = await obtenerRol(user);
@@ -104,7 +105,7 @@ onAuthStateChanged(auth, async (user) => {
 
 /* ==========================
    INICIAR APP
-========================== */
+========================= */
 function iniciarApp() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
@@ -118,45 +119,52 @@ function iniciarApp() {
 
   cargarSelects();
   cargarEliminarCategorias();
+  cargarVendedores();
   actualizarDashboard();
 }
 
 /* ==========================
+   CARGAR VENDEDORES
+========================= */
+function cargarVendedores() {
+  const select = document.getElementById("ventaVendedor");
+  select.innerHTML = '<option value="">Elige vendedor</option>';
+  vendedores.forEach(v => {
+    const o = document.createElement("option");
+    o.value = v;
+    o.textContent = v;
+    select.appendChild(o);
+  });
+}
+
+/* ==========================
    TOAST
-========================== */
+========================= */
 function mostrarMensaje(t, tipo = "info") {
   const toast = document.getElementById("toast");
   toast.textContent = t;
   toast.className = "";
   toast.classList.add("show", tipo);
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3500);
+  setTimeout(() => toast.classList.remove("show"), 3500);
 }
 
 /* ==========================
    DATOS
-========================== */
+========================= */
 let categorias = JSON.parse(localStorage.getItem("categorias")) || [
-  "Textil",
-  "Difusor",
-  "Aerosol",
-  "Sahumerio",
-  "Tarjeta",
-  "Hornito",
-  "Carita",
-  "Tecnologia/Varios",
+  "Textil", "Difusor", "Aerosol", "Sahumerio",
+  "Tarjeta", "Hornito", "Carita", "Tecnologia/Varios",
 ];
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
 
 /* ==========================
    NAV
-========================== */
+========================= */
 function showSection(id) {
-  document.querySelectorAll("section").forEach((s) => s.classList.remove("active"));
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach((b) => b.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
   event.target.classList.add("active");
 
   if (id === "stats") cargarStats();
@@ -165,36 +173,32 @@ function showSection(id) {
 
 /* ==========================
    DASHBOARD
-========================== */
+========================= */
 function actualizarDashboard() {
-  let hoy = new Date().toLocaleDateString();
-  let ventasHoy = ventas.filter((v) => v.fecha.includes(hoy));
+  const hoy = new Date().toLocaleDateString();
+  const ventasHoy = ventas.filter(v => v.fecha.includes(hoy));
   document.getElementById("ventasHoy").textContent = ventasHoy.length;
 
   let total = 0;
-  productos.forEach((p) => (total += p.cantidad));
+  productos.forEach(p => total += p.cantidad);
   document.getElementById("stockTotal").textContent = total;
 
-  let ranking = {};
-  ventas.forEach((v) => {
-    ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
-  });
+  const ranking = {};
+  ventas.forEach(v => ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad);
 
-  let mejor = "-";
-  let max = 0;
-  for (let v in ranking) {
+  let mejor = "-", max = 0;
+  for (const v in ranking) {
     if (ranking[v] > max) {
       max = ranking[v];
       mejor = v;
     }
   }
-
   document.getElementById("mejorVendedor").textContent = mejor;
 }
 
 /* ==========================
    ADMIN
-========================== */
+========================= */
 function soloAdmin() {
   if (usuarioActual.rol !== "admin") {
     mostrarMensaje("No autorizado", "error");
@@ -205,7 +209,7 @@ function soloAdmin() {
 
 /* ==========================
    PRODUCTOS
-========================== */
+========================= */
 function agregarProducto() {
   const codigo = codigoEl().value;
   const nombre = nombreEl().value;
@@ -217,7 +221,7 @@ function agregarProducto() {
     return;
   }
 
-  let ex = productos.find((p) => p.codigo === codigo);
+  const ex = productos.find(p => p.codigo === codigo);
   if (ex) ex.cantidad += cantidad;
   else productos.push({ codigo, nombre, categoria, cantidad });
 
@@ -228,11 +232,11 @@ function agregarProducto() {
 
 /* ==========================
    VENTAS
-========================== */
+========================= */
 function registrarVenta() {
   const codigo = ventaCodigoEl().value;
   const cant = Number(ventaCantidadEl().value);
-  let prod = productos.find((p) => p.codigo === codigo);
+  const prod = productos.find(p => p.codigo === codigo);
 
   if (!prod) {
     mostrarMensaje("No encontrado", "error");
@@ -244,12 +248,13 @@ function registrarVenta() {
     return;
   }
 
-  prod.cantidad -= cant;
+  const vendedor = document.getElementById("ventaVendedor").value || usuarioActual.user;
 
+  prod.cantidad -= cant;
   ventas.push({
     codigo,
     nombre: prod.nombre,
-    vendedor: usuarioActual.user,
+    vendedor,
     cantidad: cant,
     fecha: new Date().toLocaleString(),
   });
@@ -261,7 +266,7 @@ function registrarVenta() {
 
 /* ==========================
    AJUSTES
-========================== */
+========================= */
 function resetearTodo() {
   if (!soloAdmin()) return;
   productos = [];
@@ -292,7 +297,7 @@ function eliminarCategoria() {
     mostrarMensaje("Elegí una", "error");
     return;
   }
-  categorias = categorias.filter((c) => c !== cat);
+  categorias = categorias.filter(c => c !== cat);
   guardar();
   cargarSelects();
   cargarEliminarCategorias();
@@ -301,39 +306,30 @@ function eliminarCategoria() {
 
 /* ==========================
    STATS
-========================== */
+========================= */
 function cargarStats() {
-  let html = "<h3>Ventas</h3>";
-  html += "<table><tr><th>Vendedor</th><th>Total</th></tr>";
-
-  let r = {};
-  ventas.forEach((v) => {
-    r[v.vendedor] = (r[v.vendedor] || 0) + v.cantidad;
-  });
-
-  for (let v in r) {
-    html += `<tr><td>${v}</td><td>${r[v]}</td></tr>`;
-  }
-
+  let html = "<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Total</th></tr>";
+  const r = {};
+  ventas.forEach(v => r[v.vendedor] = (r[v.vendedor] || 0) + v.cantidad);
+  for (const v in r) html += `<tr><td>${v}</td><td>${r[v]}</td></tr>`;
   html += "</table>";
   document.getElementById("statsContent").innerHTML = html;
 }
 
 /* ==========================
    HELPERS
-========================== */
+========================= */
 const codigoEl = () => codigo;
 const nombreEl = () => nombre;
 const categoriaEl = () => categoria;
 const cantidadEl = () => cantidad;
-
 const ventaCodigoEl = () => ventaCodigo;
 const ventaCantidadEl = () => ventaCantidad;
 
 function cargarSelects() {
   categoria.innerHTML = '<option value="">Elige</option>';
-  categorias.forEach((c) => {
-    let o = document.createElement("option");
+  categorias.forEach(c => {
+    const o = document.createElement("option");
     o.value = c;
     o.textContent = c;
     categoria.appendChild(o);
@@ -342,8 +338,8 @@ function cargarSelects() {
 
 function cargarEliminarCategorias() {
   categoriaEliminar.innerHTML = '<option value="">Seleccionar</option>';
-  categorias.forEach((c) => {
-    let o = document.createElement("option");
+  categorias.forEach(c => {
+    const o = document.createElement("option");
     o.value = c;
     o.textContent = c;
     categoriaEliminar.appendChild(o);
@@ -365,7 +361,7 @@ function guardar() {
 
 /* ==========================
    EXPORT GLOBAL
-========================== */
+========================= */
 window.login = login;
 window.logout = logout;
 window.showSection = showSection;
