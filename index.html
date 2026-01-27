@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <title>Zero X Siento - Stock</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script type="module" src="script.js"></script>
     <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="script.js"></script>
   </head>
   <body>
     <!-- LOGIN -->
@@ -16,7 +16,6 @@
       <input id="loginPass" type="password" placeholder="Contraseña" />
 
       <button onclick="login()">Entrar</button>
-
       <p id="loginError"></p>
     </div>
 
@@ -37,13 +36,13 @@
         <button onclick="showSection('ventas')">Ventas</button>
         <button onclick="showSection('stats')">Estadísticas</button>
         <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
+        <button id="btnUsuarios" onclick="showSection('usuarios')">Usuarios</button>
       </nav>
 
       <main>
         <!-- DASHBOARD -->
         <section id="dashboard" class="active">
           <h2>Panel General</h2>
-
           <div class="cards">
             <div class="card">
               <h3>Ventas Hoy</h3>
@@ -65,7 +64,6 @@
         <!-- STOCK -->
         <section id="stock">
           <h2>Agregar Producto</h2>
-
           <label>Código</label>
           <input id="codigo" />
 
@@ -104,61 +102,47 @@
         </section>
 
         <!-- AJUSTES -->
-        <!-- AJUSTES -->
-<section id="ajustes">
-  <h2>Ajustes (Admin)</h2>
+        <section id="ajustes">
+          <h2>Ajustes (Admin)</h2>
 
-  <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
+          <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
 
-  <h3>Nueva Categoría</h3>
-  <input id="nuevaCategoria" />
-  <button class="primary" onclick="agregarCategoria()">Agregar</button>
+          <h3>Nueva Categoría</h3>
+          <input id="nuevaCategoria" />
+          <button class="primary" onclick="agregarCategoria()">Agregar</button>
 
-  <h3>Eliminar Categoría</h3>
-  <select id="categoriaEliminar"></select>
-  <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
+          <h3>Eliminar Categoría</h3>
+          <select id="categoriaEliminar"></select>
+          <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
+        </section>
 
-  <!-- GESTIÓN DE USUARIOS -->
-  <h3>Gestión de Usuarios</h3>
+        <!-- USUARIOS -->
+        <section id="usuarios">
+          <h2>Gestión de Usuarios</h2>
 
-  <!-- Crear usuario -->
-  <input id="nuevoUsuarioEmail" placeholder="Email" />
-  <select id="nuevoUsuarioRol">
-    <option value="vendedor">Vendedor</option>
-    <option value="admin">Admin</option>
-  </select>
-  <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
+          <h3>Nuevo Usuario</h3>
+          <input id="nuevoUsuarioEmail" placeholder="Email" />
+          <select id="nuevoUsuarioRol">
+            <option value="vendedor">Vendedor</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
 
-  <!-- Lista de usuarios -->
-  <h4>Usuarios existentes</h4>
-  <table id="tablaUsuarios">
-    <thead>
-      <tr>
-        <th>Email</th>
-        <th>Rol</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Se llenará dinámicamente con JS -->
-    </tbody>
-  </table>
-</section>
-
+          <h3>Usuarios existentes</h3>
+          <table id="tablaUsuarios">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
       </main>
 
       <div id="toast"></div>
-
-      <!-- MODAL -->
-      <div id="modalConfirm" class="modal">
-        <div class="modal-content">
-          <h3 id="modalText"></h3>
-          <div class="modal-buttons">
-            <button id="btnConfirm" class="primary success">Confirmar</button>
-            <button id="btnCancel" class="primary danger">Cancelar</button>
-          </div>
-        </div>
-      </div>
     </div>
   </body>
 </html>
