@@ -3,6 +3,7 @@
 ========================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -10,7 +11,14 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* 👉 REEMPLAZÁ CON TU CONFIG */
+import {
+  getFirestore,
+  doc,
+  getDoc,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+/* 👉 TU CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyCwBuxmHQgaqJAac_WiMZkpZUMFVzONFkA",
   authDomain: "zero-x-siento-stock.firebaseapp.com",
@@ -21,8 +29,11 @@ const firebaseConfig = {
   measurementId: "G-CWKB3TZ9CF",
 };
 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
+
 
 /* ==========================
    ESTADO
@@ -30,11 +41,37 @@ const auth = getAuth(app);
 
 let usuarioActual = null;
 
+
+/* ==========================
+   OBTENER ROL
+========================== */
+
+async function obtenerRol(email) {
+
+  try {
+
+    const ref = doc(db, "usuarios", email);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      return snap.data().rol;
+    }
+
+    return "vendedor";
+
+  } catch (e) {
+    console.error("Error rol:", e);
+    return "vendedor";
+  }
+}
+
+
 /* ==========================
    LOGIN
 ========================== */
 
 async function login() {
+
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
 
@@ -44,18 +81,23 @@ async function login() {
   }
 
   try {
+
     const cred = await signInWithEmailAndPassword(auth, email, pass);
+
+    const rol = await obtenerRol(cred.user.email);
 
     usuarioActual = {
       user: cred.user.email,
-      rol: email === "admin@local.com" ? "admin" : "vendedor",
+      rol: rol,
     };
 
     iniciarApp();
+
   } catch (error) {
     mostrarMensaje("Usuario o contraseña incorrectos", "error");
   }
 }
+
 
 /* ==========================
    LOGOUT
@@ -66,26 +108,34 @@ async function logout() {
   location.reload();
 }
 
+
 /* ==========================
    SESIÓN AUTOMÁTICA
 ========================== */
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
+
   if (user) {
+
+    const rol = await obtenerRol(user.email);
+
     usuarioActual = {
       user: user.email,
-      rol: user.email === "admin@local.com" ? "admin" : "vendedor",
+      rol: rol,
     };
 
     iniciarApp();
   }
+
 });
+
 
 /* ==========================
    INICIAR APP
 ========================== */
 
 function iniciarApp() {
+
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
 
@@ -101,11 +151,13 @@ function iniciarApp() {
   actualizarDashboard();
 }
 
+
 /* ==========================
    TOAST
 ========================== */
 
 function mostrarMensaje(t, tipo = "info") {
+
   const toast = document.getElementById("toast");
 
   toast.textContent = t;
@@ -117,6 +169,7 @@ function mostrarMensaje(t, tipo = "info") {
     toast.classList.remove("show");
   }, 3500);
 }
+
 
 /* ==========================
    DATOS
@@ -136,11 +189,13 @@ let categorias = JSON.parse(localStorage.getItem("categorias")) || [
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
 
+
 /* ==========================
    NAV
 ========================== */
 
 function showSection(id) {
+
   document
     .querySelectorAll("section")
     .forEach((s) => s.classList.remove("active"));
@@ -157,11 +212,13 @@ function showSection(id) {
   if (id === "dashboard") actualizarDashboard();
 }
 
+
 /* ==========================
    DASHBOARD
 ========================== */
 
 function actualizarDashboard() {
+
   let hoy = new Date().toLocaleDateString();
 
   let ventasHoy = ventas.filter((v) => v.fecha.includes(hoy));
@@ -193,11 +250,13 @@ function actualizarDashboard() {
   document.getElementById("mejorVendedor").textContent = mejor;
 }
 
+
 /* ==========================
    ADMIN
 ========================== */
 
 function soloAdmin() {
+
   if (usuarioActual.rol !== "admin") {
     mostrarMensaje("No autorizado", "error");
     return false;
@@ -206,11 +265,13 @@ function soloAdmin() {
   return true;
 }
 
+
 /* ==========================
    PRODUCTOS
 ========================== */
 
 function agregarProducto() {
+
   const codigo = codigoEl().value;
   const nombre = nombreEl().value;
   const categoria = categoriaEl().value;
@@ -233,11 +294,13 @@ function agregarProducto() {
   mostrarMensaje("Producto guardado", "success");
 }
 
+
 /* ==========================
    VENTAS
 ========================== */
 
 function registrarVenta() {
+
   const codigo = ventaCodigoEl().value;
   const cant = Number(ventaCantidadEl().value);
 
@@ -270,11 +333,13 @@ function registrarVenta() {
   mostrarMensaje("Venta registrada", "success");
 }
 
+
 /* ==========================
    AJUSTES
 ========================== */
 
 function resetearTodo() {
+
   if (!soloAdmin()) return;
 
   productos = [];
@@ -285,7 +350,9 @@ function resetearTodo() {
   mostrarMensaje("Sistema limpio", "info");
 }
 
+
 function agregarCategoria() {
+
   if (!soloAdmin()) return;
 
   const n = nuevaCategoria.value.trim();
@@ -307,7 +374,9 @@ function agregarCategoria() {
   mostrarMensaje("Categoría agregada", "success");
 }
 
+
 function eliminarCategoria() {
+
   if (!soloAdmin()) return;
 
   const cat = categoriaEliminar.value;
@@ -327,11 +396,13 @@ function eliminarCategoria() {
   mostrarMensaje("Eliminada", "success");
 }
 
+
 /* ==========================
    STATS
 ========================== */
 
 function cargarStats() {
+
   let html = "<h3>Ventas</h3>";
 
   html += "<table><tr><th>Vendedor</th><th>Total</th></tr>";
@@ -351,6 +422,7 @@ function cargarStats() {
   document.getElementById("statsContent").innerHTML = html;
 }
 
+
 /* ==========================
    HELPERS
 ========================== */
@@ -363,7 +435,9 @@ const cantidadEl = () => cantidad;
 const ventaCodigoEl = () => ventaCodigo;
 const ventaCantidadEl = () => ventaCantidad;
 
+
 function cargarSelects() {
+
   categoria.innerHTML = '<option value="">Elige</option>';
 
   categorias.forEach((c) => {
@@ -376,7 +450,9 @@ function cargarSelects() {
   });
 }
 
+
 function cargarEliminarCategorias() {
+
   categoriaEliminar.innerHTML = '<option value="">Seleccionar</option>';
 
   categorias.forEach((c) => {
@@ -389,18 +465,27 @@ function cargarEliminarCategorias() {
   });
 }
 
+
 function limpiarStock() {
+
   codigo.value = "";
   nombre.value = "";
   categoria.value = "";
   cantidad.value = "";
 }
 
+
 function guardar() {
+
   localStorage.setItem("productos", JSON.stringify(productos));
   localStorage.setItem("ventas", JSON.stringify(ventas));
   localStorage.setItem("categorias", JSON.stringify(categorias));
 }
+
+
+/* ==========================
+   EXPORT GLOBAL
+========================== */
 
 window.login = login;
 window.logout = logout;
@@ -410,4 +495,3 @@ window.registrarVenta = registrarVenta;
 window.resetearTodo = resetearTodo;
 window.agregarCategoria = agregarCategoria;
 window.eliminarCategoria = eliminarCategoria;
-
