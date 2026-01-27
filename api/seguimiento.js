@@ -1,39 +1,48 @@
-// api/seguimiento.js
+// /api/seguimiento.js
+import fetch from "node-fetch"; // Necesario en Vercel si vas a usar fetch en Node
+
 export default async function handler(req, res) {
-  // Solo GET
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método no permitido' });
+  // Solo aceptamos GET
+  if (req.method !== "GET") {
+    res.status(405).json({ error: "Method not allowed" });
+    return;
   }
 
-  const tracking = req.query.tracking;
-  if (!tracking) {
-    return res.status(400).json({ error: 'Falta el número de seguimiento' });
-  }
+  const trackingNumber = req.query.tracking;
 
-  // Tu API Key de Track123 como variable de entorno en Vercel
-  const API_KEY = process.env.TRACK123_API_KEY;
-
-  if (!API_KEY) {
-    return res.status(500).json({ error: 'No hay API key configurada' });
+  if (!trackingNumber) {
+    res.status(400).json({ error: "Falta el número de seguimiento" });
+    return;
   }
 
   try {
-    const response = await fetch(`https://api.track123.com/trackings/${tracking}`, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json'
+    // Tu API Key de Track123 (la que pusiste en Vercel como ENV VAR)
+    const API_KEY = process.env.TRACK123_API_KEY;
+
+    // Llamada a Track123
+    const response = await fetch(
+      `https://api.track123.com/v1/trackings/${trackingNumber}`,
+      {
+        headers: {
+          "Authorization": `Bearer ${API_KEY}`,
+          "Content-Type": "application/json"
+        }
       }
-    });
+    );
 
     if (!response.ok) {
       const text = await response.text();
-      return res.status(response.status).json({ error: text });
+      res.status(response.status).json({ error: text || "Error al consultar API" });
+      return;
     }
 
     const data = await response.json();
-    return res.status(200).json(data);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Error al conectar con Track123' });
+
+    // Devuelve el JSON al front
+    res.status(200).json(data);
+
+  } catch (error) {
+    console.error("Error API seguimiento:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 }
