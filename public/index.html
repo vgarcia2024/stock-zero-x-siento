@@ -37,7 +37,6 @@
       <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
     </nav>
 
-    <!-- MAIN -->
     <main>
       <!-- DASHBOARD -->
       <section id="dashboard" class="active">
@@ -143,16 +142,5 @@
 
     <div id="toast"></div>
   </div>
-
-  <!-- SCRIPT PARA TRACK123 -->
-  <script type="module">
-    import { consultarEnvio } from './seguimiento.js';
-    window.consultarEnvio = async function(){
-      const numero = document.getElementById('trackingNumber').value.trim();
-      if(!numero) return alert("Ingresá un número de seguimiento");
-      const data = await consultarEnvio(numero);
-      document.getElementById('seguimientoContent').innerHTML = JSON.stringify(data, null, 2);
-    };
-  </script>
 </body>
 </html>
