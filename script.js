@@ -83,25 +83,22 @@ async function login() {
   }
 
   try {
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
+  const cred = await signInWithEmailAndPassword(auth, email, pass);
 
-    const rol = await obtenerRol(cred.user.email);
+  const rol = await obtenerRol(cred.user);
 
-    const rol = await obtenerRol(cred.user);
+  usuarioActual = {
+    user: cred.user.email,
+    rol: rol,
+  };
 
-   usuarioActual = {
-      user: cred.user.email,
-      rol: rol,
-   };
-      
-   iniciarApp();
+  iniciarApp();
 
-
-  } catch (error) {
-    console.error(error);
-    mostrarMensaje("Usuario o contraseña incorrectos", "error");
-  }
+} catch (error) {
+  console.error(error);
+  mostrarMensaje("Usuario o contraseña incorrectos", "error");
 }
+
 
 
 /* ==========================
