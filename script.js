@@ -45,14 +45,14 @@ async function login() {
   const errorEl = document.getElementById("loginError");
   errorEl.textContent = "";
 
-  if (!email || !pass) { errorEl.textContent = "Completá los datos"; return; }
+  if (!email || !pass) { mostrarMensaje("Completá los datos","error"); return; }
 
   try {
     const cred = await signInWithEmailAndPassword(auth,email,pass);
     const rol = await obtenerRol(cred.user);
     usuarioActual = { user: cred.user.email, rol };
     iniciarApp();
-  } catch(e){ console.error(e); errorEl.textContent="Usuario o contraseña incorrectos"; }
+  } catch(e){ console.error(e); mostrarMensaje("Usuario o contraseña incorrectos","error"); }
 }
 
 async function logout() { await signOut(auth); location.reload(); }
@@ -108,6 +108,7 @@ function showSection(id){
 
 /* ========================== PRODUCTOS ========================== */
 const productosCol = collection(db,"productos");
+
 async function agregarProducto(){
   const codigo=document.getElementById("codigo").value.trim();
   const nombre=document.getElementById("nombre").value.trim();
@@ -119,6 +120,7 @@ async function agregarProducto(){
   mostrarMensaje("Producto guardado","success");
   limpiarStock();
 }
+
 function limpiarStock(){
   document.getElementById("codigo").value="";
   document.getElementById("nombre").value="";
@@ -131,9 +133,10 @@ function cargarVendedores(){
   sel.innerHTML="";
   usuarios.filter(u=>u.rol==="vendedor").forEach(v=>{
     const o=document.createElement("option");
-    o.value=v.email; o.textContent=v.email; sel.appendChild(o);
+    o.value=v.email; o.textContent=v.nombre || v.email; sel.appendChild(o);
   });
 }
+
 async function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
   const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value);
@@ -143,7 +146,6 @@ async function registrarVenta() {
     return;
   }
 
-  // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
     mostrarMensaje("Producto no encontrado", "error");
@@ -155,20 +157,18 @@ async function registrarVenta() {
     return;
   }
 
-  // Vendedor seleccionado
   const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
   const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
-  // Restamos stock y actualizamos Firestore
   const prodRef = doc(db, "productos", codigo);
   await setDoc(prodRef, {
     ...prod,
     cantidad: prod.cantidad - cantidadVenta
   });
 
-  // Guardamos la venta en Firestore
   const ventasCol = collection(db, "ventas");
-  await setDoc(doc(ventasCol), {
+  const ventaDoc = doc(ventasCol); // genera un id automático
+  await setDoc(ventaDoc, {
     codigo,
     nombre: prod.nombre,
     vendedor: vendedorNombre,
@@ -180,13 +180,10 @@ async function registrarVenta() {
   limpiarVenta();
 }
 
-
-// Limpia inputs de venta después de registrar
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
   document.getElementById("ventaCantidad").value = 1;
 }
-
 
 /* ========================== CATEGORIAS ========================== */
 function cargarSelects(){
@@ -197,6 +194,7 @@ function cargarSelects(){
     o.value=c; o.textContent=c; categoriaSel.appendChild(o);
   });
 }
+
 function cargarEliminarCategorias(){
   const catElim=document.getElementById("categoriaEliminar");
   catElim.innerHTML='<option value="">Seleccionar</option>';
@@ -205,12 +203,14 @@ function cargarEliminarCategorias(){
     o.value=c; o.textContent=c; catElim.appendChild(o);
   });
 }
+
 function agregarCategoria(){
   const n=document.getElementById("nuevaCategoria").value.trim();
-  if(!n)return;
+  if(!n) return;
   if(categorias.includes(n)){ mostrarMensaje("Ya existe","error"); return; }
   categorias.push(n); cargarSelects(); cargarEliminarCategorias(); mostrarMensaje("Categoría agregada","success");
 }
+
 function eliminarCategoria(){
   const cat=document.getElementById("categoriaEliminar").value;
   if(!cat){ mostrarMensaje("Elegí una","error"); return; }
@@ -233,7 +233,6 @@ function actualizarDashboard(){
   for(const v in ranking)if(ranking[v]>max){ max=ranking[v]; mejor=v; }
   document.getElementById("mejorVendedor").textContent=mejor;
 
-  // tabla productos disponibles
   const tbody=document.querySelector("#productosDisponibles tbody");
   tbody.innerHTML="";
   productos.forEach(p=>{
@@ -242,7 +241,6 @@ function actualizarDashboard(){
     tbody.appendChild(tr);
   });
 
-  // stats ventas
   let html="<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>";
   ventas.forEach(v=>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
   html+="</table>";
@@ -267,7 +265,7 @@ async function crearUsuario(){
   }catch(e){ console.error(e); mostrarMensaje("Error al crear usuario","error"); }
 }
 
-/* ========================== CARGAR FIRESTORE EN TIEMPO REAL ========================== */
+/* ========================== FIRESTORE EN TIEMPO REAL ========================== */
 async function cargarUsuarios(){
   const tbody=document.querySelector("#tablaUsuarios tbody");
   onSnapshot(usuariosCol, snapshot=>{
@@ -275,8 +273,8 @@ async function cargarUsuarios(){
     tbody.innerHTML="";
     snapshot.forEach(docu=>{
       const data=docu.data();
-      if(usuarios.find(u=>u.email===data.email)) return; // evitar duplicados
-      usuarios.push({email:data.email,rol:data.rol,id:docu.id});
+      if(usuarios.find(u=>u.email===data.email)) return;
+      usuarios.push({email:data.email,rol:data.rol,id:docu.id,nombre:data.nombre});
       const tr=document.createElement("tr");
       tr.innerHTML=`<td>${data.email}</td>
       <td><select class="rolSelect"><option value="vendedor"${data.rol==="vendedor"?" selected":""}>Vendedor</option><option value="admin"${data.rol==="admin"?" selected":""}>Admin</option></select></td>
@@ -288,10 +286,11 @@ async function cargarUsuarios(){
         mostrarMensaje(`Rol de ${data.email} cambiado a ${e.target.value}`,"success");
         cargarVendedores();
       });
+
       tr.querySelector(".btnEliminarUsuario").addEventListener("click", async ()=>{
-        if(!confirm(`Eliminar usuario ${data.email}?`)) return;
+        mostrarMensaje(`Eliminando usuario ${data.email}...`,"info");
         await deleteDoc(doc(db,"usuarios",docu.id));
-        mostrarMensaje(`Usuario ${data.email} eliminado`,"info");
+        mostrarMensaje(`Usuario ${data.email} eliminado`,"success");
       });
     });
     cargarVendedores();
@@ -319,6 +318,31 @@ function cargarVentas(){
   });
 }
 
+/* ========================== RESET TOTAL ========================== */
+async function resetearTodo() {
+  if(usuarioActual.rol!=="admin"){ mostrarMensaje("No autorizado","error"); return; }
+
+  mostrarMensaje("Reseteando stock y ventas...","info");
+
+  try {
+    const productosSnapshot = await getDocs(productosCol);
+    const ventasCol = collection(db,"ventas");
+    const ventasSnapshot = await getDocs(ventasCol);
+
+    const borrarProductos = productosSnapshot.docs.map(d=>deleteDoc(doc(db,"productos",d.id)));
+    const borrarVentas = ventasSnapshot.docs.map(d=>deleteDoc(doc(db,"ventas",d.id)));
+    await Promise.all([...borrarProductos,...borrarVentas]);
+
+    productos = [];
+    ventas = [];
+    actualizarDashboard();
+    mostrarMensaje("Stock y ventas reseteados correctamente","success");
+  } catch(e){
+    console.error(e);
+    mostrarMensaje("Error al resetear","error");
+  }
+}
+
 /* ========================== EXPORTS ========================== */
 window.login=login;
 window.logout=logout;
@@ -328,3 +352,4 @@ window.registrarVenta=registrarVenta;
 window.agregarCategoria=agregarCategoria;
 window.eliminarCategoria=eliminarCategoria;
 window.crearUsuario=crearUsuario;
+window.resetearTodo=resetearTodo;
