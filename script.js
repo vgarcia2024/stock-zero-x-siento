@@ -1,21 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  getDocs,
-  deleteDoc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 🔹 CONFIG FIREBASE */
 const firebaseConfig = {
@@ -26,7 +11,6 @@ const firebaseConfig = {
   messagingSenderId: "764048708615",
   appId: "1:764048708615:web:1287e135d38a3588b806a2"
 };
-
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -88,6 +72,7 @@ function iniciarApp(){
   cargarProductos();
   cargarVentas();
   actualizarDashboard();
+  agregarBotonExportAdmin();
 }
 
 /* ========================== TOAST ========================== */
@@ -132,15 +117,14 @@ function limpiarStock(){
 function cargarVendedores(){
   const sel=document.getElementById("ventaVendedor");
   sel.innerHTML="";
-  
-  // Primero agregamos el usuario actual si no está en la lista
-  if(!usuarios.some(u=>u.email === usuarioActual.user)){
-    usuarios.push({email: usuarioActual.user, rol: usuarioActual.rol, nombre: usuarioActual.user});
+
+  // Aseguramos que tu usuario siempre esté en la lista
+  if(!usuarios.some(u=>u.email === "valen@zeroxsiento.com")){
+    usuarios.push({email: "valen@zeroxsiento.com", rol: "vendedor", nombre: "Valen"});
   }
 
-  // Filtramos vendedores (rol vendedor o tu mismo)
-  const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.email === usuarioActual.user);
-  
+  // Añadimos todos los vendedores + tu usuario
+  const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.email === usuarioActual.user || u.email==="valen@zeroxsiento.com");
   vendedores.forEach(v=>{
     const o=document.createElement("option");
     o.value=v.email;
@@ -148,8 +132,7 @@ function cargarVendedores(){
     sel.appendChild(o);
   });
 
-  // Seleccionamos por defecto tu usuario
-  sel.value = usuarioActual.user;
+  sel.value = usuarioActual.user || "valen@zeroxsiento.com";
 }
 
 async function registrarVenta() {
@@ -161,7 +144,6 @@ async function registrarVenta() {
     return;
   }
 
-  // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
     mostrarMensaje("Producto no encontrado", "error");
@@ -173,18 +155,15 @@ async function registrarVenta() {
     return;
   }
 
-  // Vendedor seleccionado
-  const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
+  const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user || "valen@zeroxsiento.com";
   const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
-  // Restamos stock y actualizamos Firestore
   const prodRef = doc(db, "productos", codigo);
   await setDoc(prodRef, {
     ...prod,
     cantidad: prod.cantidad - cantidadVenta
   });
 
-  // Guardamos la venta en Firestore
   const ventasCol = collection(db, "ventas");
   await setDoc(doc(ventasCol), {
     codigo,
@@ -198,19 +177,17 @@ async function registrarVenta() {
   limpiarVenta();
 }
 
-// Limpia inputs de venta después de registrar
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
   document.getElementById("ventaCantidad").value = 1;
-  document.getElementById("ventaVendedor").value = usuarioActual.user; // volver a seleccionar tu usuario
+  document.getElementById("ventaVendedor").value = usuarioActual.user || "valen@zeroxsiento.com";
 }
 
 /* ========================== EXPORTAR CSV ========================== */
 function exportarVentasCSV() {
   if (ventas.length === 0) { mostrarMensaje("No hay ventas para exportar", "error"); return; }
 
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Vendedor,Producto,Cantidad,Fecha\r\n";
+  let csvContent = "data:text/csv;charset=utf-8,Vendedor,Producto,Cantidad,Fecha\r\n";
 
   ventas.forEach(v => {
     const row = [v.vendedor, v.nombre, v.cantidad, v.fecha].join(",");
@@ -221,14 +198,31 @@ function exportarVentasCSV() {
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
   link.setAttribute("download", "ventas.csv");
-  document.body.appendChild(link); // requerido para Firefox
+  document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+
   mostrarMensaje("Ventas exportadas", "success");
 }
 
-// Exportamos la función
-window.exportarVentasCSV = exportarVentasCSV;
+/* Solo muestra botón exportar en Estadísticas si es admin */
+function agregarBotonExportAdmin() {
+  const stats = document.getElementById("statsContent");
+  if(!stats) return;
+  // Limpiamos primero cualquier botón previo
+  const existingBtn = document.getElementById("btnExportAdmin");
+  if(existingBtn) existingBtn.remove();
+
+  if(usuarioActual.rol==="admin") {
+    const btn = document.createElement("button");
+    btn.textContent="Exportar CSV";
+    btn.id="btnExportAdmin";
+    btn.classList.add("primary");
+    btn.style.marginBottom="10px";
+    btn.onclick = exportarVentasCSV;
+    stats.prepend(btn);
+  }
+}
 
 /* ========================== CATEGORIAS ========================== */
 function cargarSelects(){
@@ -242,6 +236,7 @@ function cargarSelects(){
 
 function cargarEliminarCategorias(){
   const catElim=document.getElementById("categoriaEliminar");
+  if(!catElim) return;
   catElim.innerHTML='<option value="">Seleccionar</option>';
   categorias.forEach(c=>{
     const o=document.createElement("option");
@@ -266,30 +261,33 @@ function eliminarCategoria(){
 function actualizarDashboard(){
   const hoy=new Date().toLocaleDateString();
   const ventasHoy=ventas.filter(v=>v.fecha.includes(hoy));
-  document.getElementById("ventasHoy").textContent=ventasHoy.length;
+  document.getElementById("ventasHoy")?.textContent=ventasHoy.length;
 
   let total=productos.reduce((sum,p)=>sum+p.cantidad,0);
-  document.getElementById("stockTotal").textContent=total;
+  document.getElementById("stockTotal")?.textContent=total;
 
   const ranking={};
   ventas.forEach(v=>ranking[v.vendedor]=(ranking[v.vendedor]||0)+v.cantidad);
 
   let mejor="-", max=0;
   for(const v in ranking)if(ranking[v]>max){ max=ranking[v]; mejor=v; }
-  document.getElementById("mejorVendedor").textContent=mejor;
+  document.getElementById("mejorVendedor")?.textContent=mejor;
 
   const tbody=document.querySelector("#productosDisponibles tbody");
-  tbody.innerHTML="";
-  productos.forEach(p=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.cantidad}</td>`;
-    tbody.appendChild(tr);
-  });
+  if(tbody){
+    tbody.innerHTML="";
+    productos.forEach(p=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.cantidad}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
 
   let html="<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>";
   ventas.forEach(v=>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
   html+="</table>";
   document.getElementById("statsContent").innerHTML=html;
+  agregarBotonExportAdmin();
 }
 
 /* ========================== USUARIOS ========================== */
@@ -342,6 +340,7 @@ async function cargarUsuarios(){
   });
 }
 
+/* ========================== FIRESTORE EN TIEMPO REAL PRODUCTOS/VENTAS ========================== */
 function cargarProductos(){
   onSnapshot(productosCol, snapshot=>{
     productos=[];
@@ -363,31 +362,6 @@ function cargarVentas(){
   });
 }
 
-/* ========================== RESET TOTAL ========================== */
-async function resetearTodo() {
-  if(usuarioActual.rol!=="admin"){ mostrarMensaje("No autorizado","error"); return; }
-
-  mostrarMensaje("Reseteando stock y ventas...","info");
-
-  try {
-    const productosSnapshot = await getDocs(productosCol);
-    const ventasCol = collection(db,"ventas");
-    const ventasSnapshot = await getDocs(ventasCol);
-
-    const borrarProductos = productosSnapshot.docs.map(d=>deleteDoc(doc(db,"productos",d.id)));
-    const borrarVentas = ventasSnapshot.docs.map(d=>deleteDoc(doc(db,"ventas",d.id)));
-    await Promise.all([...borrarProductos,...borrarVentas]);
-
-    productos = [];
-    ventas = [];
-    actualizarDashboard();
-    mostrarMensaje("Stock y ventas reseteados correctamente","success");
-  } catch(e){
-    console.error(e);
-    mostrarMensaje("Error al resetear","error");
-  }
-}
-
 /* ========================== EXPORTS ========================== */
 window.login=login;
 window.logout=logout;
@@ -397,4 +371,4 @@ window.registrarVenta=registrarVenta;
 window.agregarCategoria=agregarCategoria;
 window.eliminarCategoria=eliminarCategoria;
 window.crearUsuario=crearUsuario;
-window.resetearTodo=resetearTodo;
+window.exportarVentasCSV=exportarVentasCSV;
