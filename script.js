@@ -2,8 +2,19 @@
    FIREBASE CONFIG
 ========================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 👉 TU CONFIG */
 const firebaseConfig = {
@@ -25,6 +36,13 @@ const db = getFirestore(app);
 ========================= */
 let usuarioActual = null;
 let vendedores = ["Fito", "Andre", "Juli", "Luli", "Valen"];
+let emailANombre = {
+  "fito@zeroxsiento.com": "Fito",
+  "andre@zeroxsiento.com": "Andre",
+  "juli@zeroxsiento.com": "Juli",
+  "luli@zeroxsiento.com": "Luli",
+  "valen@zeroxsiento.com": "Valen"
+};
 
 /* ==========================
    OBTENER ROL
@@ -34,7 +52,8 @@ async function obtenerRol(user) {
     const uid = user.uid;
     const ref = doc(db, "usuarios", uid);
     const snap = await getDoc(ref);
-    return snap.exists() ? snap.data().rol : "vendedor";
+    if (snap.exists()) return snap.data().rol;
+    return "vendedor";
   } catch (e) {
     console.error("Error rol:", e);
     return "vendedor";
@@ -47,12 +66,21 @@ async function obtenerRol(user) {
 async function login() {
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
-  if (!email || !pass) return mostrarMensaje("Completá los datos", "error");
+
+  if (!email || !pass) {
+    mostrarMensaje("Completá los datos", "error");
+    return;
+  }
 
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const rol = await obtenerRol(cred.user);
-    usuarioActual = { user: cred.user.email, rol };
+
+    usuarioActual = {
+      user: cred.user.email,
+      rol: rol,
+    };
+
     iniciarApp();
   } catch (error) {
     console.error(error);
@@ -74,7 +102,10 @@ async function logout() {
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const rol = await obtenerRol(user);
-    usuarioActual = { user: user.email, rol };
+    usuarioActual = {
+      user: user.email,
+      rol: rol,
+    };
     iniciarApp();
   }
 });
@@ -85,8 +116,13 @@ onAuthStateChanged(auth, async (user) => {
 function iniciarApp() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
-  document.getElementById("userName").textContent = usuarioActual.user + " (" + usuarioActual.rol + ")";
-  if (usuarioActual.rol !== "admin") document.getElementById("btnAjustes").style.display = "none";
+
+  document.getElementById("userName").textContent =
+    usuarioActual.user + " (" + usuarioActual.rol + ")";
+
+  if (usuarioActual.rol !== "admin") {
+    document.getElementById("btnAjustes").style.display = "none";
+  }
 
   cargarSelects();
   cargarEliminarCategorias();
@@ -106,9 +142,6 @@ function cargarVendedores() {
     o.textContent = v;
     select.appendChild(o);
   });
-
-  // Seleccionar el usuario actual si está en la lista
-  if (vendedores.includes(usuarioActual.user)) select.value = usuarioActual.user;
 }
 
 /* ==========================
@@ -126,7 +159,8 @@ function mostrarMensaje(t, tipo = "info") {
    DATOS
 ========================= */
 let categorias = JSON.parse(localStorage.getItem("categorias")) || [
-  "Textil","Difusor","Aerosol","Sahumerio","Tarjeta","Hornito","Carita","Tecnologia/Varios"
+  "Textil", "Difusor", "Aerosol", "Sahumerio",
+  "Tarjeta", "Hornito", "Carita", "Tecnologia/Varios",
 ];
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
@@ -139,6 +173,7 @@ function showSection(id) {
   document.getElementById(id).classList.add("active");
   document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
   event.target.classList.add("active");
+
   if (id === "stats") cargarStats();
   if (id === "dashboard") actualizarDashboard();
 }
@@ -160,16 +195,22 @@ function actualizarDashboard() {
 
   let mejor = "-", max = 0;
   for (const v in ranking) {
-    if (ranking[v] > max) { max = ranking[v]; mejor = v; }
+    if (ranking[v] > max) {
+      max = ranking[v];
+      mejor = v;
+    }
   }
-  document.getElementById("mejorVendedor").textContent = mejor;
+  document.getElementById("mejorVendedor").textContent = emailANombre[mejor] || mejor;
 }
 
 /* ==========================
    ADMIN
 ========================= */
 function soloAdmin() {
-  if (usuarioActual.rol !== "admin") { mostrarMensaje("No autorizado", "error"); return false; }
+  if (usuarioActual.rol !== "admin") {
+    mostrarMensaje("No autorizado", "error");
+    return false;
+  }
   return true;
 }
 
@@ -181,10 +222,15 @@ function agregarProducto() {
   const nombre = nombreEl().value;
   const categoria = categoriaEl().value;
   const cantidad = Number(cantidadEl().value);
-  if (!codigo || !nombre || !categoria || cantidad <= 0) return mostrarMensaje("Completá todos los datos", "error");
+
+  if (!codigo || !nombre || !categoria || cantidad <= 0) {
+    mostrarMensaje("Completá todos los datos", "error");
+    return;
+  }
 
   const ex = productos.find(p => p.codigo === codigo);
-  if (ex) ex.cantidad += cantidad; else productos.push({ codigo, nombre, categoria, cantidad });
+  if (ex) ex.cantidad += cantidad;
+  else productos.push({ codigo, nombre, categoria, cantidad });
 
   guardar();
   limpiarStock();
@@ -198,20 +244,31 @@ function registrarVenta() {
   const codigo = ventaCodigoEl().value;
   const cant = Number(ventaCantidadEl().value);
   const prod = productos.find(p => p.codigo === codigo);
-  if (!prod) return mostrarMensaje("No encontrado", "error");
-  if (prod.cantidad < cant) return mostrarMensaje("Stock insuficiente", "error");
+
+  if (!prod) {
+    mostrarMensaje("No encontrado", "error");
+    return;
+  }
+
+  if (prod.cantidad < cant) {
+    mostrarMensaje("Stock insuficiente", "error");
+    return;
+  }
 
   const vendedor = document.getElementById("ventaVendedor").value || usuarioActual.user;
-  prod.cantidad -= cant;
 
-  ventas.push({ codigo, nombre: prod.nombre, vendedor, cantidad: cant, fecha: new Date().toLocaleString() });
+  prod.cantidad -= cant;
+  ventas.push({
+    codigo,
+    nombre: prod.nombre,
+    vendedor,
+    cantidad: cant,
+    fecha: new Date().toLocaleString(),
+  });
+
   guardar();
   actualizarDashboard();
   mostrarMensaje("Venta registrada", "success");
-
-  // limpiar inputs
-  ventaCodigo.value = "";
-  ventaCantidad.value = 1;
 }
 
 /* ==========================
@@ -229,8 +286,10 @@ function agregarCategoria() {
   if (!soloAdmin()) return;
   const n = nuevaCategoria.value.trim();
   if (!n) return;
-  if (categorias.includes(n)) return mostrarMensaje("Ya existe", "error");
-
+  if (categorias.includes(n)) {
+    mostrarMensaje("Ya existe", "error");
+    return;
+  }
   categorias.push(n);
   guardar();
   cargarSelects();
@@ -241,8 +300,10 @@ function agregarCategoria() {
 function eliminarCategoria() {
   if (!soloAdmin()) return;
   const cat = categoriaEliminar.value;
-  if (!cat) return mostrarMensaje("Elegí una", "error");
-
+  if (!cat) {
+    mostrarMensaje("Elegí una", "error");
+    return;
+  }
   categorias = categorias.filter(c => c !== cat);
   guardar();
   cargarSelects();
@@ -257,7 +318,7 @@ function cargarStats() {
   let html = "<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Total</th></tr>";
   const r = {};
   ventas.forEach(v => r[v.vendedor] = (r[v.vendedor] || 0) + v.cantidad);
-  for (const v in r) html += `<tr><td>${v}</td><td>${r[v]}</td></tr>`;
+  for (const v in r) html += `<tr><td>${emailANombre[v] || v}</td><td>${r[v]}</td></tr>`;
   html += "</table>";
   document.getElementById("statsContent").innerHTML = html;
 }
@@ -274,12 +335,22 @@ const ventaCantidadEl = () => ventaCantidad;
 
 function cargarSelects() {
   categoria.innerHTML = '<option value="">Elige</option>';
-  categorias.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; categoria.appendChild(o); });
+  categorias.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c;
+    o.textContent = c;
+    categoria.appendChild(o);
+  });
 }
 
 function cargarEliminarCategorias() {
   categoriaEliminar.innerHTML = '<option value="">Seleccionar</option>';
-  categorias.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; categoriaEliminar.appendChild(o); });
+  categorias.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c;
+    o.textContent = c;
+    categoriaEliminar.appendChild(o);
+  });
 }
 
 function limpiarStock() {
