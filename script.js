@@ -395,6 +395,50 @@ async function resetearTodo() {
   }
 }
 
+// seguimiento.js
+
+// Función para consultar un envío
+export async function consultarEnvio() {
+  const numero = document.getElementById("trackingNumber").value.trim();
+  if (!numero) return alert("Ingrese un número de seguimiento");
+
+  const statsContent = document.getElementById("statsContent");
+  statsContent.innerHTML = "<p>Cargando seguimiento...</p>";
+
+  try {
+    const res = await fetch("/api/seguimiento", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ trackingNumber: numero })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      statsContent.innerHTML = `<p>Error: ${data.error}</p>`;
+      return;
+    }
+
+    // Mostrar datos de manera sencilla
+    let html = `<h3>Seguimiento del envío ${numero}</h3>`;
+    html += `<ul>`;
+    if (data.events && data.events.length > 0) {
+      data.events.forEach(e => {
+        html += `<li>${e.date} - ${e.status} (${e.location || "-"})</li>`;
+      });
+    } else {
+      html += `<li>No hay eventos disponibles</li>`;
+    }
+    html += `</ul>`;
+    statsContent.innerHTML = html;
+
+  } catch (err) {
+    console.error(err);
+    statsContent.innerHTML = "<p>Error al consultar el seguimiento.</p>";
+  }
+}
+
+
 /* ========================== EXPORTS ========================== */
 window.login=login;
 window.logout=logout;
