@@ -35,10 +35,10 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 /* ==========================
-   ESTADO
+   ESTADO GLOBAL
 ========================= */
 let usuarioActual = null;
-let vendedores = ["Fito", "Andre", "Juli", "Luli", "Valen"];
+let vendedores = ["Fito","Andre","Juli","Luli","Valen"];
 let emailANombre = {
   "fito@zeroxsiento.com": "Fito",
   "andre@zeroxsiento.com": "Andre",
@@ -59,28 +59,29 @@ let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
 async function login() {
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
-  if (!email || !pass) { mostrarMensaje("Completá los datos","error"); return; }
+  if(!email || !pass){ mostrarMensaje("Completá los datos","error"); return; }
 
   try {
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    const rol = await obtenerRol(cred.user.uid);
-    usuarioActual = { user: cred.user.email, rol };
+    const cred = await signInWithEmailAndPassword(auth,email,pass);
+    usuarioActual = { uid: cred.user.uid, user: cred.user.email, rol: await obtenerRol(cred.user.uid) };
     iniciarApp();
-  } catch (e) { console.error(e); mostrarMensaje("Usuario o contraseña incorrectos","error"); }
+  } catch(e){
+    console.error(e);
+    mostrarMensaje("Usuario o contraseña incorrectos","error");
+  }
 }
 
 /* ==========================
    LOGOUT
 ========================= */
-async function logout() { await signOut(auth); location.reload(); }
+async function logout(){ await signOut(auth); location.reload(); }
 
 /* ==========================
    SESIÓN AUTOMÁTICA
 ========================= */
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async(user)=>{
   if(user){
-    const rol = await obtenerRol(user.uid);
-    usuarioActual = { user: user.email, rol };
+    usuarioActual = { uid: user.uid, user: user.email, rol: await obtenerRol(user.uid) };
     iniciarApp();
   }
 });
@@ -91,7 +92,8 @@ onAuthStateChanged(auth, async (user) => {
 async function obtenerRol(uid){
   try{
     const snap = await getDoc(doc(db,"usuarios",uid));
-    return snap.exists() ? snap.data().rol : "vendedor";
+    if(snap.exists()) return snap.data().rol;
+    return "vendedor";
   }catch(e){ console.error(e); return "vendedor"; }
 }
 
@@ -101,8 +103,7 @@ async function obtenerRol(uid){
 function iniciarApp(){
   document.getElementById("loginScreen").style.display="none";
   document.getElementById("app").style.display="block";
-
-  document.getElementById("userName").textContent=usuarioActual.user+" ("+usuarioActual.rol+")";
+  document.getElementById("userName").textContent = `${usuarioActual.user} (${usuarioActual.rol})`;
 
   if(usuarioActual.rol!=="admin"){
     document.getElementById("btnAjustes").style.display="none";
@@ -124,7 +125,7 @@ function showSection(id){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
+  if(event) event.target.classList.add("active");
 
   if(id==="stats") cargarStats();
   if(id==="dashboard") actualizarDashboard();
@@ -145,34 +146,32 @@ function mostrarMensaje(t,tipo="info"){
    PRODUCTOS
 ========================= */
 function agregarProducto(){
-  const codigo = codigoEl().value;
-  const nombre = nombreEl().value;
-  const categoria = categoriaEl().value;
-  const cantidad = Number(cantidadEl().value);
+  const codigo=codigoEl().value;
+  const nombre=nombreEl().value;
+  const categoria=categoriaEl().value;
+  const cantidad=Number(cantidadEl().value);
   if(!codigo||!nombre||!categoria||cantidad<=0){ mostrarMensaje("Completá todos los datos","error"); return; }
 
-  const ex = productos.find(p=>p.codigo===codigo);
+  const ex=productos.find(p=>p.codigo===codigo);
   if(ex) ex.cantidad+=cantidad;
   else productos.push({codigo,nombre,categoria,cantidad});
 
-  guardar();
-  limpiarStock();
-  mostrarMensaje("Producto guardado","success");
+  guardar(); limpiarStock(); mostrarMensaje("Producto guardado","success");
 }
 
 /* ==========================
    VENTAS
 ========================= */
 function registrarVenta(){
-  const codigo = ventaCodigoEl().value;
-  const cant = Number(ventaCantidadEl().value);
-  const prod = productos.find(p=>p.codigo===codigo);
+  const codigo=ventaCodigoEl().value;
+  const cant=Number(ventaCantidadEl().value);
+  const prod=productos.find(p=>p.codigo===codigo);
   if(!prod){ mostrarMensaje("No encontrado","error"); return; }
   if(prod.cantidad<cant){ mostrarMensaje("Stock insuficiente","error"); return; }
 
   const vendedor = document.getElementById("ventaVendedor").value || usuarioActual.user;
-  prod.cantidad-=cant;
-  ventas.push({codigo, nombre:prod.nombre, vendedor, cantidad:cant, fecha:new Date().toLocaleString()});
+  prod.cantidad -= cant;
+  ventas.push({codigo,nombre:prod.nombre,vendedor,cantidad:cant,fecha:new Date().toLocaleString()});
   guardar(); actualizarDashboard(); mostrarMensaje("Venta registrada","success");
 }
 
@@ -180,8 +179,8 @@ function registrarVenta(){
    DASHBOARD
 ========================= */
 function actualizarDashboard(){
-  const hoy = new Date().toLocaleDateString();
-  const ventasHoy = ventas.filter(v=>v.fecha.includes(hoy));
+  const hoy=new Date().toLocaleDateString();
+  const ventasHoy=ventas.filter(v=>v.fecha.includes(hoy));
   document.getElementById("ventasHoy").textContent=ventasHoy.length;
 
   let total=0; productos.forEach(p=>total+=p.cantidad);
@@ -200,8 +199,7 @@ function actualizarDashboard(){
 ========================= */
 function cargarStats(){
   let html="<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Total</th></tr>";
-  const r={};
-  ventas.forEach(v=>r[v.vendedor]=(r[v.vendedor]||0)+v.cantidad);
+  const r={}; ventas.forEach(v=>r[v.vendedor]=(r[v.vendedor]||0)+v.cantidad);
   for(const v in r) html+=`<tr><td>${emailANombre[v]||v}</td><td>${r[v]}</td></tr>`;
   html+="</table>"; document.getElementById("statsContent").innerHTML=html;
 }
@@ -245,11 +243,10 @@ const usuariosCol = collection(db,"usuarios");
 /* CREAR USUARIO */
 async function crearUsuario(){
   if(!soloAdmin()) return;
-  const email = document.getElementById("nuevoUsuarioEmail").value.trim();
-  const clave = document.getElementById("nuevoUsuarioClave").value.trim();
-  const rol = document.getElementById("nuevoUsuarioRol").value;
-
-  if(!email || !clave){ mostrarMensaje("Completa email y clave","error"); return; }
+  const email=document.getElementById("nuevoUsuarioEmail").value.trim();
+  const clave=document.getElementById("nuevoUsuarioClave").value.trim();
+  const rol=document.getElementById("nuevoUsuarioRol").value;
+  if(!email||!clave){ mostrarMensaje("Completa email y clave","error"); return; }
 
   try{
     const cred = await createUserWithEmailAndPassword(auth,email,clave);
@@ -263,14 +260,13 @@ async function crearUsuario(){
 
 /* CARGAR USUARIOS */
 async function cargarUsuarios(){
-  const tbody = document.querySelector("#tablaUsuarios tbody");
-  tbody.innerHTML="";
+  const tbody=document.querySelector("#tablaUsuarios tbody"); tbody.innerHTML="";
   try{
-    const snap = await getDocs(usuariosCol);
+    const snap=await getDocs(usuariosCol);
     snap.forEach(docu=>{
-      const data = docu.data();
-      const email = data.email;
-      const rol = data.rol;
+      const data=docu.data();
+      const email=data.email;
+      const rol=data.rol;
       const tr=document.createElement("tr");
       tr.innerHTML=`
         <td>${email}</td>
@@ -284,14 +280,12 @@ async function cargarUsuarios(){
       `;
       tbody.appendChild(tr);
 
-      // Cambiar rol
-      tr.querySelector(".rolSelect").addEventListener("change", async e=>{
+      tr.querySelector(".rolSelect").addEventListener("change",async e=>{
         await setDoc(doc(db,"usuarios",docu.id),{email,rol:e.target.value});
         mostrarMensaje(`Rol de ${email} cambiado a ${e.target.value}`,"success");
       });
 
-      // Eliminar usuario
-      tr.querySelector(".btnEliminarUsuario").addEventListener("click", async ()=>{
+      tr.querySelector(".btnEliminarUsuario").addEventListener("click",async ()=>{
         if(!confirm(`Eliminar usuario ${email}?`)) return;
         await deleteDoc(doc(db,"usuarios",docu.id));
         mostrarMensaje(`Usuario ${email} eliminado`,"info");
@@ -304,12 +298,12 @@ async function cargarUsuarios(){
 /* ==========================
    EXPORT GLOBAL
 ========================= */
-window.login = login;
-window.logout = logout;
-window.showSection = showSection;
-window.agregarProducto = agregarProducto;
-window.registrarVenta = registrarVenta;
-window.resetearTodo = resetearTodo;
-window.agregarCategoria = agregarCategoria;
-window.eliminarCategoria = eliminarCategoria;
-window.crearUsuario = crearUsuario;
+window.login=login;
+window.logout=logout;
+window.showSection=showSection;
+window.agregarProducto=agregarProducto;
+window.registrarVenta=registrarVenta;
+window.resetearTodo=resetearTodo;
+window.agregarCategoria=agregarCategoria;
+window.eliminarCategoria=eliminarCategoria;
+window.crearUsuario=crearUsuario;
