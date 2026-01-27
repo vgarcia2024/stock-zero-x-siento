@@ -1,128 +1,122 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Zero X Siento - Stock</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script type="module" src="script.js"></script>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <!-- LOGIN -->
-    <div id="loginScreen" class="login-container">
-      <h2>Iniciar Sesión</h2>
-      <input id="loginUser" placeholder="Usuario" />
-      <input id="loginPass" type="password" placeholder="Contraseña" />
-      <button onclick="login()">Entrar</button>
-      <p id="loginError"></p>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <title>Zero X Siento - Stock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+  <!-- LOGIN -->
+  <div id="loginScreen" class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <input id="loginUser" type="email" placeholder="Email" />
+    <input id="loginPass" type="password" placeholder="Contraseña" />
+    <button onclick="login()">Entrar</button>
+    <p id="loginError"></p>
+  </div>
 
-    <!-- APP -->
-    <div id="app" style="display: none">
-      <header>
-        <h1>Organizador de Stock</h1>
-        <div class="user-bar">
-          <span id="userName"></span>
-          <button onclick="logout()">Salir</button>
-        </div>
-      </header>
+  <!-- APP -->
+  <div id="app" style="display: none">
+    <header>
+      <h1>Organizador de Stock</h1>
+      <div class="user-bar">
+        <span id="userName"></span>
+        <button onclick="logout()">Salir</button>
+      </div>
+    </header>
 
-      <nav>
-        <button onclick="showSection('dashboard')" class="active">Inicio</button>
-        <button onclick="showSection('stock')">Stock</button>
-        <button onclick="showSection('ventas')">Ventas</button>
-        <button onclick="showSection('stats')">Estadísticas</button>
-        <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
-        <button id="btnUsuarios" onclick="showSection('usuarios')">Usuarios</button>
-      </nav>
+    <nav>
+      <button onclick="showSection('dashboard')" class="active">Inicio</button>
+      <button onclick="showSection('stock')">Stock</button>
+      <button onclick="showSection('ventas')">Ventas</button>
+      <button onclick="showSection('stats')">Estadísticas</button>
+      <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
+    </nav>
 
-      <main>
-        <!-- DASHBOARD -->
-        <section id="dashboard" class="active">
-          <h2>Panel General</h2>
-          <div class="cards">
-            <div class="card">
-              <h3>Ventas Hoy</h3>
-              <p id="ventasHoy">0</p>
-            </div>
-            <div class="card">
-              <h3>Stock Total</h3>
-              <p id="stockTotal">0</p>
-            </div>
-            <div class="card">
-              <h3>Mejor Vendedor</h3>
-              <p id="mejorVendedor">-</p>
-            </div>
+    <main>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="active">
+        <h2>Panel General</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Ventas Hoy</h3>
+            <p id="ventasHoy">0</p>
           </div>
-        </section>
+          <div class="card">
+            <h3>Stock Total</h3>
+            <p id="stockTotal">0</p>
+          </div>
+          <div class="card">
+            <h3>Mejor Vendedor</h3>
+            <p id="mejorVendedor">-</p>
+          </div>
+        </div>
+      </section>
 
-        <!-- STOCK -->
-        <section id="stock">
-          <h2>Agregar Producto</h2>
-          <label>Código</label>
-          <input id="codigo" />
-          <label>Producto</label>
-          <input id="nombre" />
-          <label>Categoría</label>
-          <select id="categoria"></select>
-          <label>Cantidad</label>
-          <input type="number" id="cantidad" />
-          <button class="primary" onclick="agregarProducto()">Guardar</button>
-        </section>
+      <!-- STOCK -->
+      <section id="stock">
+        <h2>Agregar Producto</h2>
+        <label>Código</label><input id="codigo" />
+        <label>Producto</label><input id="nombre" />
+        <label>Categoría</label><select id="categoria"></select>
+        <label>Cantidad</label><input type="number" id="cantidad" />
+        <button class="primary" onclick="agregarProducto()">Guardar</button>
+      </section>
 
-        <!-- VENTAS -->
-        <section id="ventas">
-          <h2>Registrar Venta</h2>
-          <label>Código</label>
-          <input id="ventaCodigo" />
-          <label>Vendedor</label>
-          <select id="ventaVendedor"></select>
-          <label>Cantidad</label>
-          <input type="number" id="ventaCantidad" value="1" />
-          <button class="primary success" onclick="registrarVenta()">Vender</button>
-        </section>
+      <!-- VENTAS -->
+      <section id="ventas">
+        <h2>Registrar Venta</h2>
+        <label>Código</label><input id="ventaCodigo" />
+        <label>Vendedor</label><select id="ventaVendedor"></select>
+        <label>Cantidad</label><input type="number" id="ventaCantidad" value="1" />
+        <button class="primary success" onclick="registrarVenta()">Vender</button>
+      </section>
 
-        <!-- STATS -->
-        <section id="stats">
-          <h2>Estadísticas</h2>
-          <div id="statsContent"></div>
-        </section>
+      <!-- STATS -->
+      <section id="stats">
+        <h2>Estadísticas</h2>
+        <div id="statsContent"></div>
+      </section>
 
-        <!-- AJUSTES -->
-        <section id="ajustes">
-          <h2>Ajustes (Admin)</h2>
-          <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
-          <h3>Nueva Categoría</h3>
-          <input id="nuevaCategoria" />
-          <button class="primary" onclick="agregarCategoria()">Agregar</button>
-          <h3>Eliminar Categoría</h3>
-          <select id="categoriaEliminar"></select>
-          <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
-        </section>
+      <!-- AJUSTES -->
+      <section id="ajustes">
+        <h2>Ajustes (Admin)</h2>
 
-        <!-- USUARIOS -->
-        <section id="usuarios">
-          <h2>Gestión de Usuarios</h2>
-          <h3>Crear Usuario</h3>
-          <input id="nuevoUsuarioEmail" placeholder="Email" />
-          <input id="nuevoUsuarioClave" type="password" placeholder="Clave" />
-          <select id="nuevoUsuarioRol">
-            <option value="vendedor">Vendedor</option>
-            <option value="admin">Admin</option>
-          </select>
-          <button class="primary" onclick="crearUsuario()">Crear</button>
+        <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
 
-          <h3>Usuarios Registrados</h3>
-          <table id="tablaUsuarios">
-            <thead>
-              <tr><th>Email</th><th>Rol</th><th>Acción</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </section>
-      </main>
+        <h3>Nueva Categoría</h3>
+        <input id="nuevaCategoria" />
+        <button class="primary" onclick="agregarCategoria()">Agregar</button>
 
-      <div id="toast"></div>
-    </div>
-  </body>
+        <h3>Eliminar Categoría</h3>
+        <select id="categoriaEliminar"></select>
+        <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
+
+        <h3>Usuarios</h3>
+        <input id="nuevoUsuarioEmail" type="email" placeholder="Email" />
+        <input id="nuevoUsuarioClave" type="password" placeholder="Contraseña" />
+        <select id="nuevoUsuarioRol">
+          <option value="vendedor">Vendedor</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
+
+        <table id="tablaUsuarios">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+
+    <div id="toast"></div>
+  </div>
+</body>
 </html>
