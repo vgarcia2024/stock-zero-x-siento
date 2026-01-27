@@ -1,13 +1,30 @@
+/* ========================== VARIABLES ========================== */
 :root {
   --primary: #4f46e5;
   --secondary: #6366f1;
   --bg: #f3f4f6;
   --card: #ffffff;
   --text: #1f2933;
+  --header: #4f46e5;
+  --nav: #6366f1;
+  --input-border: #ccc;
+  --toast-bg: #1f2933;
 }
 
-/* GENERAL */
+/* MODO OSCURO */
+.dark-mode {
+  --primary: #1e3a8a;       /* azul oscuro */
+  --secondary: #1e40af;     /* azul medianoche */
+  --bg: #111827;            /* negro profundo */
+  --card: #1f2937;          /* gris oscuro */
+  --text: #e5e7eb;          /* gris claro */
+  --header: #1e40af;
+  --nav: #1e3a8a;
+  --input-border: #374151;
+  --toast-bg: #111827;
+}
 
+/* ========================== GENERAL ========================== */
 * {
   box-sizing: border-box;
   font-family: Arial, sans-serif;
@@ -17,25 +34,26 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
+  transition: background 0.3s, color 0.3s;
 }
 
-/* HEADER */
-
+/* ========================== HEADER ========================== */
 header {
-  background: var(--primary);
+  background: var(--header);
   color: white;
   padding: 15px;
   text-align: center;
+  transition: background 0.3s;
 }
 
-/* NAV */
-
+/* ========================== NAV ========================== */
 nav {
   display: flex;
   justify-content: center;
   gap: 10px;
-  background: var(--secondary);
+  background: var(--nav);
   padding: 10px;
+  transition: background 0.3s;
 }
 
 nav button {
@@ -45,6 +63,7 @@ nav button {
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s, color 0.3s;
 }
 
 nav button.active {
@@ -52,30 +71,48 @@ nav button.active {
   color: white;
 }
 
-/* MAIN */
+/* BOTÓN MODO OSCURO */
+#btnToggleDark {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: background 0.3s;
+}
 
+#btnToggleDark:hover {
+  background: var(--secondary);
+}
+
+/* ========================== MAIN ========================== */
 main {
   max-width: 1000px;
   margin: 20px auto;
   padding: 15px;
 }
 
-/* SECTION */
-
+/* ========================== SECTION ========================== */
 section {
   display: none;
   background: var(--card);
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: background 0.3s, color 0.3s;
 }
 
 section.active {
   display: block;
 }
 
-/* FORM */
-
+/* ========================== FORM ========================== */
 label {
   display: block;
   margin-top: 10px;
@@ -88,11 +125,13 @@ select {
   padding: 8px;
   margin-top: 5px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--input-border);
+  transition: border 0.3s, background 0.3s, color 0.3s;
+  background: var(--card);
+  color: var(--text);
 }
 
-/* BUTTON */
-
+/* ========================== BUTTONS ========================== */
 button.primary {
   margin-top: 15px;
   background: var(--primary);
@@ -102,18 +141,18 @@ button.primary {
   width: 100%;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
-.success {
+button.success {
   background: #16a34a;
 }
 
-.danger {
+button.danger {
   background: #dc2626;
 }
 
-/* TABLE */
-
+/* ========================== TABLE ========================== */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -131,27 +170,20 @@ th {
   background: #e5e7eb;
 }
 
-/* TOAST */
-
+/* ========================== TOAST ========================== */
 #toast {
   position: fixed;
   top: 20px;
   right: -400px;
-
   min-width: 250px;
   max-width: 350px;
-
-  background: #1f2933;
+  background: var(--toast-bg);
   color: white;
-
   padding: 15px 20px;
   border-radius: 8px;
-
   font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-
-  transition: all 0.5s ease;
-
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: all 0.5s ease, background 0.3s;
   z-index: 9999;
 }
 
@@ -159,53 +191,35 @@ th {
   right: 20px;
 }
 
-#toast.success {
-  background: #16a34a;
-}
+#toast.success { background: #16a34a; }
+#toast.error   { background: #dc2626; }
+#toast.info    { background: #2563eb; }
 
-#toast.error {
-  background: #dc2626;
-}
-
-#toast.info {
-  background: #2563eb;
-}
-
-/* MODAL */
-
+/* ========================== MODAL ========================== */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-
   width: 100%;
   height: 100%;
-
-  background: rgba(0, 0, 0, 0.5);
-
+  background: rgba(0,0,0,0.5);
   display: none;
   justify-content: center;
   align-items: center;
-
   z-index: 10000;
 }
 
-.modal.show {
-  display: flex;
-}
+.modal.show { display: flex; }
 
 .modal-content {
-  background: white;
-
+  background: var(--card);
   padding: 25px;
   border-radius: 12px;
-
   min-width: 280px;
   max-width: 350px;
-
   text-align: center;
-
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  transition: background 0.3s, color 0.3s;
 }
 
 .modal-content h3 {
@@ -217,238 +231,82 @@ th {
   gap: 10px;
 }
 
-.modal-buttons button {
-  flex: 1;
-}
+.modal-buttons button { flex: 1; }
 
-/* LOGIN */
-
-.login-container {
-  position: fixed;
-  inset: 0;
-
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.login-box {
-  background: white;
-
-  padding: 30px;
-  border-radius: 12px;
-
-  width: 300px;
-
-  text-align: center;
-
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-}
-
-.login-box h2 {
-  margin-bottom: 20px;
-}
-
-.login-box input {
-  margin-bottom: 12px;
-}
-
-/* APP */
-
-.hidden {
-  display: none;
-}
-
-.logout {
-  position: absolute;
-  right: 15px;
-  top: 15px;
-
-  background: #dc2626;
-  color: white;
-
-  border: none;
-  padding: 6px 12px;
-
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* LOGIN */
-
-/* LOGIN */
-
-body:has(#loginScreen:not([style*="none"])) {
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-  min-height: 100vh;
-}
-
+/* ========================== LOGIN ========================== */
 .login-container {
   max-width: 380px;
   width: 90%;
-
   margin: 120px auto;
-
-  background: white;
-
+  background: var(--card);
   padding: 35px 30px;
-
   border-radius: 16px;
-
   text-align: center;
-
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
   animation: aparecer 0.6s ease;
+  transition: background 0.3s, color 0.3s;
 }
 
 @keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.login-container h2 {
-  margin-bottom: 25px;
-
-  color: var(--primary);
-
-  font-size: 26px;
-}
-
+.login-container h2 { margin-bottom: 25px; color: var(--primary); font-size: 26px; }
 .login-container input {
   width: 100%;
-
   margin: 12px 0;
-
   padding: 12px 14px;
-
   border-radius: 8px;
-
-  border: 1px solid #d1d5db;
-
+  border: 1px solid var(--input-border);
   font-size: 15px;
-
-  transition: border 0.2s, box-shadow 0.2s;
+  transition: border 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+  background: var(--card);
+  color: var(--text);
 }
 
 .login-container input:focus {
   outline: none;
-
   border-color: var(--primary);
-
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .login-container button {
   width: 100%;
-
   margin-top: 20px;
-
   padding: 12px;
-
   background: var(--primary);
-
   color: white;
-
   border: none;
-
   border-radius: 10px;
-
   font-size: 16px;
-
   font-weight: bold;
-
   cursor: pointer;
-
   transition: background 0.2s, transform 0.1s;
 }
 
-.login-container button:hover {
-  background: #4338ca;
-}
+.login-container button:hover { background: var(--secondary); }
+.login-container button:active { transform: scale(0.98); }
 
-.login-container button:active {
-  transform: scale(0.98);
-}
+#loginError { margin-top: 15px; color: #dc2626; font-size: 14px; min-height: 18px; }
 
-#loginError {
-  margin-top: 15px;
-
-  color: #dc2626;
-
-  font-size: 14px;
-
-  min-height: 18px;
-}
-
-/* USER BAR */
-
-.user-bar {
-  position: absolute;
-  right: 20px;
-  top: 15px;
-
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.user-bar button {
-  background: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-/* DASHBOARD */
-
+/* ========================== DASHBOARD ========================== */
 .cards {
   display: grid;
-
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-
   gap: 15px;
 }
 
 .card {
   background: #eef2ff;
-
   padding: 20px;
-
   border-radius: 12px;
-
   text-align: center;
-
   font-weight: bold;
 }
 
 .card p {
   font-size: 28px;
-
   margin: 10px 0 0;
-
   color: var(--primary);
-}
-
-/* FIX LOGIN INPUTS */
-
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.login-container input,
-.login-container button {
-  display: block;
-  width: 100%;
 }
