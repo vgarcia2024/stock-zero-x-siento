@@ -134,23 +134,48 @@ function cargarVendedores(){
     o.value=v.email; o.textContent=v.email; sel.appendChild(o);
   });
 }
-async function registrarVenta(){
-  const codigo=document.getElementById("ventaCodigo").value.trim();
-  const cant=Number(document.getElementById("ventaCantidad").value);
-  const prod=productos.find(p=>p.codigo===codigo);
-  if(!prod){ mostrarMensaje("Producto no encontrado","error"); return; }
-  if(prod.cantidad<cant){ mostrarMensaje("Stock insuficiente","error"); return; }
+function registrarVenta() {
+  const codigo = document.getElementById("ventaCodigo").value.trim();
+  const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value); // <-- parseInt
+  if (isNaN(cantidadVenta) || cantidadVenta <= 0) {
+    mostrarMensaje("Cantidad inválida", "error");
+    return;
+  }
 
-  const vendedor=document.getElementById("ventaVendedor").value||usuarioActual.user;
-  await setDoc(doc(collection(db,"ventas")),{
+  const prod = productos.find(p => p.codigo === codigo);
+  if (!prod) {
+    mostrarMensaje("Producto no encontrado", "error");
+    return;
+  }
+
+  if (prod.cantidad < cantidadVenta) {
+    mostrarMensaje("Stock insuficiente", "error");
+    return;
+  }
+
+  const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
+  prod.cantidad -= cantidadVenta; // <-- esto sí resta correctamente
+
+  ventas.push({
     codigo,
-    nombre:prod.nombre,
-    vendedor,
-    cantidad:cant,
-    fecha:new Date().toLocaleString()
+    nombre: prod.nombre,
+    vendedor: vendedorEmail,  // guardamos el email
+    cantidad: cantidadVenta,
+    fecha: new Date().toLocaleString()
   });
-  mostrarMensaje("Venta registrada","success");
+
+  guardar();
+  limpiarVenta();
+  actualizarDashboard();
+  mostrarMensaje("Venta registrada", "success");
 }
+
+// Limpia inputs de venta después de registrar
+function limpiarVenta() {
+  document.getElementById("ventaCodigo").value = "";
+  document.getElementById("ventaCantidad").value = 1;
+}
+
 
 /* ========================== CATEGORIAS ========================== */
 function cargarSelects(){
