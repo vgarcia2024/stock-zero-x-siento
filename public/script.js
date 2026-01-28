@@ -14,7 +14,11 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  onSnapshot
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  increment,
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* 🔹 CONFIG FIREBASE */
@@ -170,6 +174,39 @@ async function registrarVenta() {
     mostrarMensaje("Cantidad inválida", "error");
     return;
   }
+
+  const prod = productos.find(p => p.codigo === codigo);
+  if (!prod) {
+    mostrarMensaje("Producto no encontrado", "error");
+    return;
+  }
+
+  if (prod.cantidad < cantidadVenta) {
+    mostrarMensaje("Stock insuficiente", "error");
+    return;
+  }
+
+  const vendedor = document.getElementById("ventaVendedor").value || usuarioActual.user;
+
+  // 🔹 bajar stock
+  await updateDoc(doc(db, "productos", codigo), {
+    cantidad: increment(-cantidadVenta)
+  });
+
+  // 🔹 guardar venta con estado
+  await addDoc(collection(db, "ventas"), {
+    codigo,
+    nombre: prod.nombre,
+    vendedor,
+    cantidad: cantidadVenta,
+    status: "completed",
+    createdAt: Timestamp.now()
+  });
+
+  mostrarMensaje("Venta registrada", "success");
+  limpiarVenta();
+}
+
 
   // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
