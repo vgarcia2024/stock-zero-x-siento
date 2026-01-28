@@ -302,6 +302,35 @@ function actualizarDashboard(){
   document.getElementById("statsContent").innerHTML=html;
 }
 
+function filtrarProductos() {
+  const texto = document
+    .getElementById("busquedaProducto")
+    .value
+    .toLowerCase();
+
+  const filtrados = productos.filter(p => {
+    const categoria = p.categoria?.toLowerCase() || "";
+    const nombre = p.nombre?.toLowerCase() || "";
+    const codigo = p.codigo?.toLowerCase() || "";
+
+    // formato inferido
+    const formato =
+      nombre.includes("250ml") ? "250ml" :
+      nombre.includes("280cc") ? "280cc" :
+      nombre.includes("125ml") ? "125ml" : "";
+
+    return (
+      categoria.includes(texto) ||
+      nombre.includes(texto) ||
+      formato.includes(texto) ||
+      codigo.includes(texto)
+    );
+  });
+
+  renderTablaProductos(filtrados);
+}
+
+
 /* ========================== USUARIOS ========================== */
 const usuariosCol = collection(db,"usuarios");
 async function crearUsuario(){
