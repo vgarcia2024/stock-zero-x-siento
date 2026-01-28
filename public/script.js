@@ -171,6 +171,15 @@ async function registrarVenta() {
     return;
   }
 
+  function filtrarProductos(){
+    const q = document.getElementById("busquedaProducto").value.toLowerCase();
+
+    const filtrados = productos.filter(p =>
+      p.codigo.toLowerCase().includes(q) || p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)
+      );
+    renderProductos(filtrados);
+  }
+  
   // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
