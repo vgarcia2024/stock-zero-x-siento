@@ -276,7 +276,10 @@ function eliminarCategoria(){
 function actualizarDashboard(){
   const hoy=new Date().toLocaleDateString();
   const ventasHoy=ventas.filter(v=>v.fecha.includes(hoy));
-  document.getElementById("ventasHoy").textContent=ventasHoy.length;
+  
+  const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.cantidad || 0), 0);
+  document.getElementById("ventasHoy").textContent = totalHoy;
+
 
   let total=productos.reduce((sum,p)=>sum+p.cantidad,0);
   document.getElementById("stockTotal").textContent=total;
