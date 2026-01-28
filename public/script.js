@@ -437,6 +437,22 @@ async function resetearTodo() {
     mostrarMensaje("Error al resetear","error");
   }
 }
+async function cancelarVenta(idVenta, codigo, cantidad, estado) {
+  if (estado === "cancelled") return;
+
+  // devolver stock
+  await updateDoc(doc(db, "productos", codigo), {
+    cantidad: increment(cantidad)
+  });
+
+  // marcar venta cancelada
+  await updateDoc(doc(db, "ventas", idVenta), {
+    status: "cancelled"
+  });
+
+  mostrarMensaje("Venta cancelada y stock restaurado", "success");
+}
+
 
 /* ========================== EXPORTS ========================== */
 window.login=login;
