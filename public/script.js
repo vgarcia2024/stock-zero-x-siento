@@ -288,19 +288,30 @@ function actualizarDashboard(){
   for(const v in ranking)if(ranking[v]>max){ max=ranking[v]; mejor=v; }
   document.getElementById("mejorVendedor").textContent=mejor;
 
-  const tbody=document.querySelector("#productosDisponibles tbody");
-  tbody.innerHTML="";
-  productos.forEach(p=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.cantidad}</td>`;
-    tbody.appendChild(tr);
-  });
+  renderTablaProductos(productos);
 
   let html="<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>";
   ventas.forEach(v=>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
   html+="</table>";
   document.getElementById("statsContent").innerHTML=html;
 }
+
+function renderTablaProductos(lista) {
+  const tbody = document.querySelector("#productosDisponibles tbody");
+  tbody.innerHTML = "";
+
+  lista.forEach(p => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.codigo}</td>
+      <td>${p.nombre}</td>
+      <td>${p.categoria}</td>
+      <td>${p.cantidad}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 
 function filtrarProductos() {
   const texto = document
