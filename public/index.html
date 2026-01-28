@@ -8,105 +8,129 @@
   <script type="module" src="script.js"></script>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="loginScreen" class="login-container">
-  <h2>Iniciar Sesión</h2>
-  <input id="loginUser" type="email" placeholder="Email" />
-  <input id="loginPass" type="password" placeholder="Contraseña" />
-  <button onclick="login()">Entrar</button>
-  <p id="loginError"></p>
-</div>
-
-<!-- APP -->
-<div id="app" style="display:none">
-
-<header>
-  <h1>Organizador de Stock</h1>
-  <div class="user-bar">
-    <span id="userName"></span>
-    <button onclick="logout()">Salir</button>
+  <!-- LOGIN -->
+  <div id="loginScreen" class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <input id="loginUser" type="email" placeholder="Email" />
+    <input id="loginPass" type="password" placeholder="Contraseña" />
+    <button onclick="login()">Entrar</button>
+    <p id="loginError"></p>
   </div>
-</header>
 
-<nav>
-  <button onclick="showSection('home')" class="active">Inicio</button>
-  <button onclick="showSection('stock')">Stock</button>
-  <button onclick="showSection('ventas')">Ventas</button>
-  <button onclick="showSection('stats')">Estadísticas</button>
-  <button id="btnUsuarios" onclick="showSection('usuarios')">Usuarios</button>
-  <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
-</nav>
+  <!-- APP -->
+  <div id="app" style="display: none">
+    <header>
+      <h1>Organizador de Stock</h1>
+      <div class="user-bar">
+        <span id="userName"></span>
+        <button onclick="logout()">Salir</button>
+      </div>
+    </header>
 
-<main>
+    <!-- NAV -->
+    <nav>
+        <button onclick="showSection('dashboard')" class="active">Inicio</button>
+        <button onclick="showSection('stock')">Stock</button>
+        <button onclick="showSection('ventas')">Ventas</button>
+        <button onclick="showSection('stats')">Estadísticas</button>
+        <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
+    </nav>
 
-<!-- HOME -->
-<section id="home" class="active">
-  <h2>Buscar productos</h2>
+    <main>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="active">
+        <h2>Panel General</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Ventas Hoy</h3>
+            <p id="ventasHoy">0</p>
+          </div>
+          <div class="card">
+            <h3>Stock Total</h3>
+            <p id="stockTotal">0</p>
+          </div>
+          <div class="card">
+            <h3>Mejor Vendedor</h3>
+            <p id="mejorVendedor">-</p>
+          </div>
+        </div>
 
-  <input
-    id="buscador"
-    type="text"
-    placeholder="Buscar por nombre, categoría o código..."
-    oninput="filtrarProductos()"
-  />
+        <h3>Productos Disponibles</h3>
+        <table id="productosDisponibles">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-  <div class="banner">ESPACIO PARA BANNER</div>
+      <!-- STOCK -->
+      <section id="stock">
+        <h2>Agregar Producto</h2>
+        <label>Código</label><input id="codigo" />
+        <label>Producto</label><input id="nombre" />
+        <label>Categoría</label><select id="categoria"></select>
+        <label>Cantidad</label><input type="number" id="cantidad" />
+        <button class="primary" onclick="agregarProducto()">Guardar</button>
+      </section>
 
-  <div id="cardsProductos" class="cards-grid"></div>
+      <!-- VENTAS -->
+      <section id="ventas">
+        <h2>Registrar Venta</h2>
+        <label>Código</label><input id="ventaCodigo" />
+        <label>Vendedor</label><select id="ventaVendedor"></select>
+        <label>Cantidad</label><input type="number" id="ventaCantidad" value="1" />
+        <button class="primary success" onclick="registrarVenta()">Vender</button>
+      </section>
 
-  <button class="primary" onclick="irACarrito()">Ir al carrito</button>
-</section>
+      <!-- ESTADÍSTICAS -->
+      <section id="stats">
+        <h2>Estadísticas</h2>
+        <div id="statsContent"></div>
+      </section>
 
-<!-- STOCK -->
-<section id="stock">
-  <h2>Agregar Producto</h2>
-  <input id="codigo" placeholder="Código" />
-  <input id="nombre" placeholder="Producto" />
-  <select id="categoria"></select>
-  <input id="cantidad" type="number" placeholder="Cantidad" />
-  <button class="primary" onclick="agregarProducto()">Guardar</button>
-</section>
 
-<!-- VENTAS -->
-<section id="ventas">
-  <h2>Registrar Venta</h2>
-  <input id="ventaCodigo" placeholder="Código" />
-  <input id="ventaCantidad" type="number" value="1" />
-  <button class="primary" onclick="registrarVenta()">Vender</button>
-</section>
+      <!-- AJUSTES -->
+      <section id="ajustes">
+        <h2>Ajustes (Admin)</h2>
+        <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
 
-<!-- USUARIOS -->
-<section id="usuarios">
-  <h2>Crear Usuario</h2>
+        <h3>Nueva Categoría</h3>
+        <input id="nuevaCategoria" />
+        <button class="primary" onclick="agregarCategoria()">Agregar</button>
 
-  <input id="nuevoEmail" type="email" placeholder="Email del usuario" />
-  <input id="nuevoPass" type="password" placeholder="Contraseña" />
+        <h3>Eliminar Categoría</h3>
+        <select id="categoriaEliminar"></select>
+        <button class="primary danger" onclick="eliminarCategoria()">Eliminar</button>
 
-  <select id="nuevoRol">
-    <option value="vendedor">Vendedor</option>
-    <option value="admin">Admin</option>
-  </select>
+        <h3>Usuarios</h3>
+        <input id="nuevoUsuarioEmail" type="email" placeholder="Email" />
+        <input id="nuevoUsuarioClave" type="password" placeholder="Contraseña" />
+        <select id="nuevoUsuarioRol">
+          <option value="vendedor">Vendedor</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
 
-  <button class="primary" onclick="crearUsuario()">Crear usuario</button>
-</section>
+        <table id="tablaUsuarios">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
 
-<!-- STATS -->
-<section id="stats">
-  <h2>Estadísticas</h2>
-  <div id="statsContent"></div>
-</section>
-
-<!-- AJUSTES -->
-<section id="ajustes">
-  <h2>Ajustes</h2>
-  <button class="primary danger" onclick="resetearTodo()">Resetear Stock</button>
-</section>
-
-</main>
-
-<div id="toast"></div>
-</div>
-
+    <div id="toast"></div>
+  </div>
 </body>
 </html>
