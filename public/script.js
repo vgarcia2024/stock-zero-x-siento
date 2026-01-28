@@ -98,32 +98,6 @@ function iniciarApp(){
 }
 
 // public/script.js
-export async function consultarEnvio() {
-  const trackingNumber = document.getElementById("trackingNumber").value.trim();
-  if (!trackingNumber) return;
-
-  const statsDiv = document.getElementById("statsContent");
-  statsDiv.innerHTML = "Cargando...";
-
-  try {
-    const res = await fetch(`/api/seguimiento?tracking=${trackingNumber}`);
-    if (!res.ok) throw new Error("No se pudo consultar el seguimiento");
-
-    const data = await res.json();
-
-    // Mostrar info básica
-    statsDiv.innerHTML = `
-      <h3>Seguimiento: ${trackingNumber}</h3>
-      <pre>${JSON.stringify(data, null, 2)}</pre>
-    `;
-  } catch (err) {
-    statsDiv.innerHTML = `<p style="color:red">${err.message}</p>`;
-  }
-}
-
-
-// Hacemos accesible la función desde HTML
-window.consultarEnvio = consultarEnvio;
 
 
 /* ========================== TOAST ========================== */
