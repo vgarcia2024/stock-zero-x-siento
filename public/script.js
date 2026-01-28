@@ -25,6 +25,13 @@ const firebaseConfig = {
   appId: "1:764048708615:web:1287e135d38a3588b806a2"
 };
 
+let btnUsuarios;
+let btnAjustes;
+let loginScreen;
+let app;
+let userName;
+
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
