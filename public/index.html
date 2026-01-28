@@ -29,12 +29,11 @@
 
     <!-- NAV -->
     <nav>
-      <button onclick="showSection('dashboard')" class="active">Inicio</button>
-      <button onclick="showSection('stock')">Stock</button>
-      <button onclick="showSection('ventas')">Ventas</button>
-      <button onclick="showSection('stats')">Estadísticas</button>
-      <button onclick="showSection('seguimiento')">Seguimiento</button>
-      <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
+        <button onclick="showSection('dashboard')" class="active">Inicio</button>
+        <button onclick="showSection('stock')">Stock</button>
+        <button onclick="showSection('ventas')">Ventas</button>
+        <button onclick="showSection('stats')">Estadísticas</button>
+        <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
     </nav>
 
     <main>
@@ -95,15 +94,6 @@
         <div id="statsContent"></div>
       </section>
 
-      <!-- SEGUIMIENTO -->
-      <section id="seguimiento">
-        <h2>Seguimiento de Envíos</h2>
-        <div class="seguimiento">
-          <input id="trackingNumber" type="text" placeholder="Número de seguimiento">
-          <button onclick="consultarEnvio()">Consultar Envío</button>
-        </div>
-        <div id="seguimientoContent"></div>
-      </section>
 
       <!-- AJUSTES -->
       <section id="ajustes">
