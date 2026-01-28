@@ -25,16 +25,12 @@ const firebaseConfig = {
   appId: "1:764048708615:web:1287e135d38a3588b806a2"
 };
 
-let btnUsuarios;
-let btnAjustes;
-let loginScreen;
-let app;
-let userName;
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+/* DOM */
+let loginScreen, appEl, userName, btnUsuarios, btnAjustes;
 
 /* ESTADO */
 let usuarioActual = null;
@@ -44,10 +40,19 @@ let carrito = [];
 /* LOGIN */
 async function login() {
   try {
-    const cred = await signInWithEmailAndPassword(auth, loginUser.value, loginPass.value);
-    usuarioActual = { email: cred.user.email, rol: await obtenerRol(cred.user.uid) };
+    const cred = await signInWithEmailAndPassword(
+      auth,
+      loginUser.value,
+      loginPass.value
+    );
+
+    usuarioActual = {
+      email: cred.user.email,
+      rol: await obtenerRol(cred.user.uid)
+    };
+
     iniciarApp();
-  } catch {
+  } catch (e) {
     mostrarMensaje("Error de login", "error");
   }
 }
@@ -62,17 +67,18 @@ async function obtenerRol(uid) {
   return snap.exists() ? snap.data().rol : "vendedor";
 }
 
-/* CREAR USUARIO (ADMIN) */
+/* CREAR USUARIO */
 async function crearUsuario() {
   try {
-    const email = nuevoEmail.value;
-    const pass = nuevoPass.value;
-    const rol = nuevoRol.value;
+    const cred = await createUserWithEmailAndPassword(
+      auth,
+      nuevoEmail.value,
+      nuevoPass.value
+    );
 
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, "usuarios", cred.user.uid), {
-      email,
-      rol
+      email: nuevoEmail.value,
+      rol: nuevoRol.value
     });
 
     mostrarMensaje("Usuario creado", "success");
@@ -81,9 +87,13 @@ async function crearUsuario() {
   }
 }
 
+/* AUTH STATE */
 onAuthStateChanged(auth, async user => {
   if (user) {
-    usuarioActual = { email: user.email, rol: await obtenerRol(user.uid) };
+    usuarioActual = {
+      email: user.email,
+      rol: await obtenerRol(user.uid)
+    };
     iniciarApp();
   }
 });
@@ -91,38 +101,37 @@ onAuthStateChanged(auth, async user => {
 /* INIT */
 function iniciarApp() {
   loginScreen = document.getElementById("loginScreen");
-  app = document.getElementById("app");
+  appEl = document.getElementById("app");
   userName = document.getElementById("userName");
   btnUsuarios = document.getElementById("btnUsuarios");
   btnAjustes = document.getElementById("btnAjustes");
 
   loginScreen.style.display = "none";
-  app.style.display = "block";
+  appEl.style.display = "block";
 
   userName.textContent = `${usuarioActual.email} (${usuarioActual.rol})`;
 
-  if (btnUsuarios) {
+  if (btnUsuarios)
     btnUsuarios.style.display = usuarioActual.rol === "admin" ? "block" : "none";
-  }
 
-  if (btnAjustes) {
+  if (btnAjustes)
     btnAjustes.style.display = usuarioActual.rol === "admin" ? "block" : "none";
-  }
 
   cargarProductos();
 }
 
-
 /* UI */
 function showSection(id) {
-  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll("section").forEach(s =>
+    s.classList.remove("active")
+  );
   document.getElementById(id).classList.add("active");
 }
 
 function mostrarMensaje(txt, tipo = "info") {
   toast.textContent = txt;
   toast.className = `show ${tipo}`;
-  setTimeout(() => toast.className = "", 3000);
+  setTimeout(() => (toast.className = ""), 3000);
 }
 
 /* PRODUCTOS */
@@ -153,10 +162,13 @@ function renderCards(lista) {
 
 function filtrarProductos() {
   const t = buscador.value.toLowerCase();
-  renderCards(productos.filter(p =>
-    p.nombre.toLowerCase().includes(t) ||
-    p.codigo.toLowerCase().includes(t)
-  ));
+  renderCards(
+    productos.filter(
+      p =>
+        p.nombre.toLowerCase().includes(t) ||
+        p.codigo.toLowerCase().includes(t)
+    )
+  );
 }
 
 function agregarAlCarrito(codigo) {
@@ -171,7 +183,7 @@ function irACarrito() {
   ventaCodigo.value = carrito[0]?.codigo || "";
 }
 
-/* EXPORT */
+/* EXPORT GLOBAL */
 window.login = login;
 window.logout = logout;
 window.crearUsuario = crearUsuario;
