@@ -171,30 +171,8 @@ async function registrarVenta() {
     return;
   }
 
-  function filtrarProductos(){
-    const q = document.getElementById("busquedaProducto").value.toLowerCase();
+  /* ========================== BUSCADOR DE PRODUCTOS ========================== */
 
-    const filtrados = productos.filter(p =>
-      p.codigo.toLowerCase().includes(q) || p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)
-      );
-    renderProductos(filtrados);
-  }
-
-  function renderProductos(lista){
-  const tbody = document.querySelector("#productosDisponibles tbody");
-  tbody.innerHTML = "";
-
-  lista.forEach(p=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${p.codigo}</td>
-      <td>${p.nombre}</td>
-      <td>${p.categoria}</td>
-      <td>${p.cantidad}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
   // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
@@ -295,6 +273,39 @@ function eliminarCategoria(){
   if(!cat){ mostrarMensaje("Elegí una","error"); return; }
   categorias=categorias.filter(c=>c!==cat); cargarSelects(); cargarEliminarCategorias(); mostrarMensaje("Categoría eliminada","success");
 }
+
+/* ========================== BUSCADOR DE PRODUCTOS ========================== */
+function filtrarProductos(){
+  const q = document
+    .getElementById("busquedaProducto")
+    .value
+    .toLowerCase();
+
+  const filtrados = productos.filter(p =>
+    p.codigo.toLowerCase().includes(q) ||
+    p.nombre.toLowerCase().includes(q) ||
+    p.categoria.toLowerCase().includes(q)
+  );
+
+  renderProductos(filtrados);
+}
+
+function renderProductos(lista){
+  const tbody = document.querySelector("#productosDisponibles tbody");
+  tbody.innerHTML = "";
+
+  lista.forEach(p=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.codigo}</td>
+      <td>${p.nombre}</td>
+      <td>${p.categoria}</td>
+      <td>${p.cantidad}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 
 /* ========================== DASHBOARD ========================== */
 function actualizarDashboard(){
