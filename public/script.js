@@ -179,7 +179,22 @@ async function registrarVenta() {
       );
     renderProductos(filtrados);
   }
-  
+
+  function renderProductos(lista){
+  const tbody = document.querySelector("#productosDisponibles tbody");
+  tbody.innerHTML = "";
+
+  lista.forEach(p=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${p.codigo}</td>
+      <td>${p.nombre}</td>
+      <td>${p.categoria}</td>
+      <td>${p.cantidad}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
   // Buscamos el producto
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) {
