@@ -110,12 +110,14 @@ function mostrarMensaje(t,tipo="info"){
 }
 
 /* ========================== NAV ========================== */
-function showSection(id){
+function showSection(id, btn){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
+
   document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
+  if(btn) btn.classList.add("active");
 }
+
 
 /* ========================== PRODUCTOS ========================== */
 const productosCol = collection(db,"productos");
