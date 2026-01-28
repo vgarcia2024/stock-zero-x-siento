@@ -327,6 +327,8 @@ function actualizarDashboard(){
   ventas.forEach(v=>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
   html+="</table>";
   document.getElementById("statsContent").innerHTML=html;
+
+  renderProductos(productos);
 }
 
 /* ========================== USUARIOS ========================== */
