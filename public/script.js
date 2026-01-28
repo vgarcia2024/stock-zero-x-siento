@@ -89,7 +89,7 @@ let ventas = [];
 let usuarios = [];
 
 /* ========================== LOGIN ========================== */
-async function login() {
+/* async function login() {
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
   const errorEl = document.getElementById("loginError");
@@ -129,7 +129,7 @@ onAuthStateChanged(auth, async (user)=>{
     iniciarApp();
   }
 });
-
+*/
 /* ========================== INICIAR APP ========================== */
 function iniciarApp(){
   document.getElementById("loginScreen").style.display = "none";
@@ -159,10 +159,22 @@ function mostrarMensaje(t,tipo="info"){
 }
 
 /* ========================== NAV ========================== */
-function showSection(id){
-  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+function showSection(id) {
+  if (id === "ajustes" && usuarioActual.rol !== "admin") {
+    mostrarMensaje("Acceso solo para administradores", "error");
+    return;
+  }
+
+  document.querySelectorAll("section").forEach(s =>
+    s.classList.remove("active")
+  );
+
   document.getElementById(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+
+  document.querySelectorAll("nav button").forEach(b =>
+    b.classList.remove("active")
+  );
+
   event.target.classList.add("active");
 }
 
@@ -449,6 +461,15 @@ async function resetearTodo() {
     mostrarMensaje("Error al resetear","error");
   }
 }
+
+function asegurarAdmin() {
+  if (usuarioActual.rol !== "admin") {
+    mostrarMensaje("No autorizado", "error");
+    return false;
+  }
+  return true;
+}
+
 
 /* ========================== EXPORTS ========================== */
 window.login=login;
