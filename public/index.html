@@ -9,33 +9,13 @@
 </head>
 <body>
   <!-- LOGIN -->
-  <!-- PERFIL -->
-<div id="perfilScreen" class="perfil-container">
-  <h2>¿Quién está usando el sistema?</h2>
-
-  <div class="perfiles">
-    <div class="perfil" onclick="entrarComoVendedor()">
-      <span>Vendedor</span>
-    </div>
-
-    <div class="perfil admin" onclick="mostrarPinAdmin()">
-      <span>Administrador</span>
-    </div>
+  <div id="loginScreen" class="login-container">
+    <h2>Iniciar Sesión</h2>
+    <input id="loginUser" type="email" placeholder="Email" />
+    <input id="loginPass" type="password" placeholder="Contraseña" />
+    <button onclick="login()">Entrar</button>
+    <p id="loginError"></p>
   </div>
-</div>
-
-<!-- PIN ADMIN -->
-<div id="modalPin" class="modal">
-  <div class="modal-content">
-    <h3>Clave de Administrador</h3>
-    <input id="adminPin" type="password" placeholder="PIN" />
-    <div class="modal-buttons">
-      <button class="primary" onclick="validarPin()">Entrar</button>
-      <button onclick="cerrarPin()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
 
   <!-- APP -->
   <div id="app" style="display: none">
