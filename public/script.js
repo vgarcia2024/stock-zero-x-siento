@@ -450,3 +450,5 @@ window.agregarCategoria=agregarCategoria;
 window.eliminarCategoria=eliminarCategoria;
 window.crearUsuario=crearUsuario;
 window.resetearTodo=resetearTodo;
+window.filtrarProductos = filtrarProductos;
+
