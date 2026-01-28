@@ -83,15 +83,28 @@ onAuthStateChanged(auth, async user => {
 
 /* INIT */
 function iniciarApp() {
+  loginScreen = document.getElementById("loginScreen");
+  app = document.getElementById("app");
+  userName = document.getElementById("userName");
+  btnUsuarios = document.getElementById("btnUsuarios");
+  btnAjustes = document.getElementById("btnAjustes");
+
   loginScreen.style.display = "none";
   app.style.display = "block";
+
   userName.textContent = `${usuarioActual.email} (${usuarioActual.rol})`;
 
-  btnUsuarios.style.display = usuarioActual.rol === "admin" ? "block" : "none";
-  btnAjustes.style.display = usuarioActual.rol === "admin" ? "block" : "none";
+  if (btnUsuarios) {
+    btnUsuarios.style.display = usuarioActual.rol === "admin" ? "block" : "none";
+  }
+
+  if (btnAjustes) {
+    btnAjustes.style.display = usuarioActual.rol === "admin" ? "block" : "none";
+  }
 
   cargarProductos();
 }
+
 
 /* UI */
 function showSection(id) {
