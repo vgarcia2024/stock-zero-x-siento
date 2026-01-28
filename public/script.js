@@ -17,6 +17,55 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* ================= PERFIL ================= */
+const ADMIN_PIN = "1234"; // después lo podés mover a Firebase
+
+function entrarComoVendedor() {
+  usuarioActual = { user: "Vendedor", rol: "vendedor" };
+  iniciarAppPerfil();
+}
+
+function mostrarPinAdmin() {
+  document.getElementById("modalPin").classList.add("show");
+}
+
+function cerrarPin() {
+  document.getElementById("modalPin").classList.remove("show");
+  document.getElementById("adminPin").value = "";
+}
+
+function validarPin() {
+  const pin = document.getElementById("adminPin").value;
+  if (pin !== ADMIN_PIN) {
+    mostrarMensaje("PIN incorrecto", "error");
+    return;
+  }
+
+  usuarioActual = { user: "Administrador", rol: "admin" };
+  cerrarPin();
+  iniciarAppPerfil();
+}
+
+function iniciarAppPerfil() {
+  document.getElementById("perfilScreen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  document.getElementById("userName").textContent =
+    usuarioActual.user + " (" + usuarioActual.rol + ")";
+
+  document.getElementById("btnAjustes").style.display =
+    usuarioActual.rol === "admin" ? "block" : "none";
+
+  cargarSelects();
+  cargarEliminarCategorias();
+  cargarVendedores();
+  cargarUsuarios();
+  cargarProductos();
+  cargarVentas();
+  actualizarDashboard();
+}
+
+
 /* 🔹 CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyCwBuxmHQgaqJAac_WiMZkpZUMFVzONFkA",
