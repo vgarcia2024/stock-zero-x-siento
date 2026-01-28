@@ -17,55 +17,6 @@ import {
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ================= PERFIL ================= */
-const ADMIN_PIN = "1234"; // después lo podés mover a Firebase
-
-function entrarComoVendedor() {
-  usuarioActual = { user: "Vendedor", rol: "vendedor" };
-  iniciarAppPerfil();
-}
-
-function mostrarPinAdmin() {
-  document.getElementById("modalPin").classList.add("show");
-}
-
-function cerrarPin() {
-  document.getElementById("modalPin").classList.remove("show");
-  document.getElementById("adminPin").value = "";
-}
-
-function validarPin() {
-  const pin = document.getElementById("adminPin").value;
-  if (pin !== ADMIN_PIN) {
-    mostrarMensaje("PIN incorrecto", "error");
-    return;
-  }
-
-  usuarioActual = { user: "Administrador", rol: "admin" };
-  cerrarPin();
-  iniciarAppPerfil();
-}
-
-function iniciarAppPerfil() {
-  document.getElementById("perfilScreen").style.display = "none";
-  document.getElementById("app").style.display = "block";
-
-  document.getElementById("userName").textContent =
-    usuarioActual.user + " (" + usuarioActual.rol + ")";
-
-  document.getElementById("btnAjustes").style.display =
-    usuarioActual.rol === "admin" ? "block" : "none";
-
-  cargarSelects();
-  cargarEliminarCategorias();
-  cargarVendedores();
-  cargarUsuarios();
-  cargarProductos();
-  cargarVentas();
-  actualizarDashboard();
-}
-
-
 /* 🔹 CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyCwBuxmHQgaqJAac_WiMZkpZUMFVzONFkA",
@@ -89,7 +40,7 @@ let ventas = [];
 let usuarios = [];
 
 /* ========================== LOGIN ========================== */
-/* async function login() {
+async function login() {
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
   const errorEl = document.getElementById("loginError");
@@ -129,7 +80,7 @@ onAuthStateChanged(auth, async (user)=>{
     iniciarApp();
   }
 });
-*/
+
 /* ========================== INICIAR APP ========================== */
 function iniciarApp(){
   document.getElementById("loginScreen").style.display = "none";
@@ -159,22 +110,10 @@ function mostrarMensaje(t,tipo="info"){
 }
 
 /* ========================== NAV ========================== */
-function showSection(id) {
-  if (id === "ajustes" && usuarioActual.rol !== "admin") {
-    mostrarMensaje("Acceso solo para administradores", "error");
-    return;
-  }
-
-  document.querySelectorAll("section").forEach(s =>
-    s.classList.remove("active")
-  );
-
+function showSection(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-
-  document.querySelectorAll("nav button").forEach(b =>
-    b.classList.remove("active")
-  );
-
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
   event.target.classList.add("active");
 }
 
@@ -461,15 +400,6 @@ async function resetearTodo() {
     mostrarMensaje("Error al resetear","error");
   }
 }
-
-function asegurarAdmin() {
-  if (usuarioActual.rol !== "admin") {
-    mostrarMensaje("No autorizado", "error");
-    return false;
-  }
-  return true;
-}
-
 
 /* ========================== EXPORTS ========================== */
 window.login=login;
