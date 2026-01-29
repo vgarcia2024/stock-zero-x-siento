@@ -170,7 +170,7 @@ async function registrarVenta() {
   const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value);
 
   if (!codigo || isNaN(cantidadVenta) || cantidadVenta <= 0) {
-    mostrarMensaje("Datos de venta inválidos", "error");
+    mostrarMensaje("Datos inválidos", "error");
     return;
   }
 
@@ -190,73 +190,40 @@ async function registrarVenta() {
   const vendedorNombre =
     usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
-  // 🔻 actualizar stock
-  const prodRef = doc(db, "productos", codigo);
-  await setDoc(prodRef, {
-    ...prod,
-    cantidad: prod.cantidad - cantidadVenta
-  });
-
-  // 🔻 guardar venta
-  const ventasCol = collection(db, "ventas");
-  const ventaRef = doc(ventasCol);
-
-  await setDoc(ventaRef, {
-    codigo,
-    nombre: prod.nombre,
-    vendedor: vendedorNombre,
-    cantidad: cantidadVenta,
-    fecha: new Date().toLocaleString(),
-    timestamp: Date.now()
-  });
-
-  ultimaVenta = {
-    id: ventaRef.id,
-    codigo,
-    cantidad: cantidadVenta
-  };
-
-  mostrarMensaje("Venta registrada", "success");
-  limpiarVenta();
-}
-
-
-async function revertirUltimaVenta() {
-  if (!ultimaVenta) {
-    mostrarMensaje("No hay venta para revertir", "error");
-    return;
-  }
-
   try {
-    // buscamos el producto
-    const prod = productos.find(p => p.codigo === ultimaVenta.codigo);
-    if (!prod) {
-      mostrarMensaje("Producto no encontrado", "error");
-      return;
-    }
-
-    // devolvemos el stock
-    const prodRef = doc(db, "productos", ultimaVenta.codigo);
-    await setDoc(prodRef, {
+    // actualizar stock
+    await setDoc(doc(db, "productos", codigo), {
       ...prod,
-      cantidad: prod.cantidad + ultimaVenta.cantidad
+      cantidad: prod.cantidad - cantidadVenta
     });
 
-    // eliminamos la venta
-    await deleteDoc(doc(db, "ventas", ultimaVenta.id));
+    // guardar venta
+    const ventasCol = collection(db, "ventas");
+    const ventaRef = doc(ventasCol);
 
-    ultimaVenta = null;
+    await setDoc(ventaRef, {
+      codigo,
+      nombre: prod.nombre,
+      vendedor: vendedorNombre,
+      cantidad: cantidadVenta,
+      fecha: new Date().toLocaleString(),
+      timestamp: Date.now()
+    });
 
-    mostrarMensaje("Venta revertida correctamente", "success");
+    ultimaVenta = {
+      id: ventaRef.id,
+      codigo,
+      cantidad: cantidadVenta
+    };
+
+    limpiarVenta();
+    mostrarMensaje("Venta registrada", "success");
   } catch (e) {
     console.error(e);
-    mostrarMensaje("Error al revertir venta", "error");
+    mostrarMensaje("Error al registrar venta", "error");
   }
 }
 
-
-  
-  
 
   /* ========================== BUSCADOR DE PRODUCTOS ========================== */
 
