@@ -224,6 +224,42 @@ async function registrarVenta() {
   }
 }
 
+async function revertirUltimaVenta() {
+  if (!ultimaVenta) {
+    mostrarMensaje("No hay ninguna venta para revertir", "error");
+    return;
+  }
+
+  try {
+    const prodRef = doc(db, "productos", ultimaVenta.codigo);
+    const prodSnap = await getDoc(prodRef);
+
+    if (!prodSnap.exists()) {
+      mostrarMensaje("Producto no encontrado", "error");
+      return;
+    }
+
+    const prod = prodSnap.data();
+
+    // devolvemos el stock
+    await setDoc(prodRef, {
+      ...prod,
+      cantidad: prod.cantidad + ultimaVenta.cantidad
+    });
+
+    // borramos la venta
+    await deleteDoc(doc(db, "ventas", ultimaVenta.id));
+
+    ultimaVenta = null;
+
+    mostrarMensaje("Última venta revertida", "success");
+  } catch (e) {
+    console.error(e);
+    mostrarMensaje("Error al revertir la venta", "error");
+  }
+}
+
+
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
   document.getElementById("ventaCantidad").value = 1;
@@ -442,3 +478,5 @@ window.eliminarCategoria=eliminarCategoria;
 window.crearUsuario=crearUsuario;
 window.resetearTodo=resetearTodo;
 window.filtrarProductos = filtrarProductos;
+window.revertirUltimaVenta = revertirUltimaVenta;
+
