@@ -201,14 +201,16 @@ async function registrarVenta() {
     const ventasCol = collection(db, "ventas");
     const ventaRef = doc(ventasCol);
 
-    await setDoc(ventaRef, {
+     await setDoc(ventaRef, {
       codigo,
       nombre: prod.nombre,
       vendedor: vendedorNombre,
       cantidad: cantidadVenta,
       fecha: new Date().toLocaleString(),
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      revertida: false
     });
+
 
     ultimaVenta = {
       id: ventaRef.id,
@@ -241,23 +243,28 @@ async function revertirUltimaVenta() {
 
     const prod = prodSnap.data();
 
-    // devolvemos el stock
+    // devolver stock
     await setDoc(prodRef, {
       ...prod,
       cantidad: prod.cantidad + ultimaVenta.cantidad
     });
 
-    // borramos la venta
-    await deleteDoc(doc(db, "ventas", ultimaVenta.id));
+    // marcar venta como revertida (NO borrar)
+    await setDoc(
+      doc(db, "ventas", ultimaVenta.id),
+      { revertida: true },
+      { merge: true }
+    );
 
     ultimaVenta = null;
 
-    mostrarMensaje("Última venta revertida", "success");
+    mostrarMensaje("Venta revertida correctamente", "success");
   } catch (e) {
     console.error(e);
     mostrarMensaje("Error al revertir la venta", "error");
   }
 }
+
 
 
 function limpiarVenta() {
@@ -339,7 +346,10 @@ function renderProductos(lista){
 /* ========================== DASHBOARD ========================== */
 function actualizarDashboard(){
   const hoy=new Date().toLocaleDateString();
-  const ventasHoy=ventas.filter(v=>v.fecha.includes(hoy));
+  const ventasHoy = ventas.filter(
+    v => !v.revertida && v.fecha.includes(hoy)
+  );
+
   
   const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.cantidad || 0), 0);
   document.getElementById("ventasHoy").textContent = totalHoy;
@@ -349,7 +359,12 @@ function actualizarDashboard(){
   document.getElementById("stockTotal").textContent=total;
 
   const ranking={};
-  ventas.forEach(v=>ranking[v.vendedor]=(ranking[v.vendedor]||0)+v.cantidad);
+  ventas
+  .filter(v => !v.revertida)
+  .forEach(v => {
+    ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
+  });
+
 
   let mejor="-", max=0;
   for(const v in ranking)if(ranking[v]>max){ max=ranking[v]; mejor=v; }
@@ -364,7 +379,9 @@ function actualizarDashboard(){
   });
 
   let html="<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>";
-  ventas.forEach(v=>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
+  ventas
+  .filter(v => !v.revertida)
+  .forEach(v =>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
   html+="</table>";
   document.getElementById("statsContent").innerHTML=html;
 
