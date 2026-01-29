@@ -169,11 +169,57 @@ async function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
   const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value);
 
-  if (isNaN(cantidadVenta) || cantidadVenta <= 0) {
-    mostrarMensaje("Cantidad inválida", "error");
+  if (!codigo || isNaN(cantidadVenta) || cantidadVenta <= 0) {
+    mostrarMensaje("Datos de venta inválidos", "error");
     return;
-    }
-};
+  }
+
+  const prod = productos.find(p => p.codigo === codigo);
+  if (!prod) {
+    mostrarMensaje("Producto no encontrado", "error");
+    return;
+  }
+
+  if (prod.cantidad < cantidadVenta) {
+    mostrarMensaje("Stock insuficiente", "error");
+    return;
+  }
+
+  const vendedorEmail =
+    document.getElementById("ventaVendedor").value || usuarioActual.user;
+  const vendedorNombre =
+    usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
+
+  // 🔻 actualizar stock
+  const prodRef = doc(db, "productos", codigo);
+  await setDoc(prodRef, {
+    ...prod,
+    cantidad: prod.cantidad - cantidadVenta
+  });
+
+  // 🔻 guardar venta
+  const ventasCol = collection(db, "ventas");
+  const ventaRef = doc(ventasCol);
+
+  await setDoc(ventaRef, {
+    codigo,
+    nombre: prod.nombre,
+    vendedor: vendedorNombre,
+    cantidad: cantidadVenta,
+    fecha: new Date().toLocaleString(),
+    timestamp: Date.now()
+  });
+
+  ultimaVenta = {
+    id: ventaRef.id,
+    codigo,
+    cantidad: cantidadVenta
+  };
+
+  mostrarMensaje("Venta registrada", "success");
+  limpiarVenta();
+}
+
 
 async function revertirUltimaVenta() {
   if (!ultimaVenta) {
@@ -214,80 +260,6 @@ async function revertirUltimaVenta() {
 
   /* ========================== BUSCADOR DE PRODUCTOS ========================== */
 
-  // Buscamos el producto
-  const prod = productos.find(p => p.codigo === codigo);
-  if (!prod) {
-    mostrarMensaje("Producto no encontrado", "error");
-    return;
-  }
-
-  if (prod.cantidad < cantidadVenta) {
-    mostrarMensaje("Stock insuficiente", "error");
-    return;
-  }
-
-  // Vendedor seleccionado
-  const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
-  const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
-
-  // Restamos stock y actualizamos Firestore
-  const prodRef = doc(db, "productos", codigo);
-  await setDoc(prodRef, {
-    ...prod,
-    cantidad: prod.cantidad - cantidadVenta
-  });
-
-  // Guardamos la venta en Firestore
-  const ventaRef = doc(ventasCol); // genera ID automático
-
-await setDoc(ventaRef, {
-  codigo,
-  nombre: prod.nombre,
-  vendedor: vendedorNombre,
-  cantidad: cantidadVenta,
-  fecha: new Date().toLocaleString(),
-  timestamp: Date.now()
-});
-
-// guardamos la última venta en memoria
-ultimaVenta = {
-  id: ventaRef.id,
-  codigo,
-  cantidad: cantidadVenta
-};
-
-
-// Limpia inputs de venta después de registrar
-function limpiarVenta() {
-  document.getElementById("ventaCodigo").value = "";
-  document.getElementById("ventaCantidad").value = 1;
-  document.getElementById("ventaVendedor").value = usuarioActual.user; // volver a seleccionar tu usuario
-}
-
-/* ========================== EXPORTAR CSV ========================== */
-function exportarVentasCSV() {
-  if (ventas.length === 0) { mostrarMensaje("No hay ventas para exportar", "error"); return; }
-
-  let csvContent = "data:text/csv;charset=utf-8,";
-  csvContent += "Vendedor,Producto,Cantidad,Fecha\r\n";
-
-  ventas.forEach(v => {
-    const row = [v.vendedor, v.nombre, v.cantidad, v.fecha].join(",");
-    csvContent += row + "\r\n";
-  });
-
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "ventas.csv");
-  document.body.appendChild(link); // requerido para Firefox
-  link.click();
-  document.body.removeChild(link);
-  mostrarMensaje("Ventas exportadas", "success");
-}
-
-// Exportamos la función
-window.exportarVentasCSV = exportarVentasCSV;
 
 /* ========================== CATEGORIAS ========================== */
 function cargarSelects(){
