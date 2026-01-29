@@ -224,6 +224,13 @@ async function registrarVenta() {
   }
 }
 
+function limpiarVenta() {
+  document.getElementById("ventaCodigo").value = "";
+  document.getElementById("ventaCantidad").value = 1;
+  document.getElementById("ventaVendedor").value = usuarioActual.user;
+}
+
+
 
   /* ========================== BUSCADOR DE PRODUCTOS ========================== */
 
