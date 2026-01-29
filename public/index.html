@@ -29,12 +29,13 @@
 
     <!-- NAV -->
     <nav>
-        <button onclick="showSection('dashboard')" class="active">Inicio</button>
-        <button onclick="showSection('stock')" class="active">Stock</button>
-        <button onclick="showSection('ventas')" class="active">Ventas</button>
-        <button onclick="showSection('stats')" class="active">Estadísticas</button>
-        <button id="btnAjustes" onclick="showSection('ajustes')" class="active">Ajustes</button>
+      <button onclick="showSection('dashboard', this)" class="active">Inicio</button>
+      <button onclick="showSection('stock', this)">Stock</button>
+      <button onclick="showSection('ventas', this)">Ventas</button>
+      <button onclick="showSection('stats', this)">Estadísticas</button>
+      <button onclick="showSection('ajustes', this)">Ajustes</button>
     </nav>
+
 
     <main>
       <!-- DASHBOARD -->
