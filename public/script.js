@@ -38,7 +38,6 @@ let categorias = ["Textil","Difusor","Aerosol","Sahumerio","Tarjeta","Hornito","
 let productos = [];
 let ventas = [];
 let usuarios = [];
-let ultimaVenta = null;
 
 /* ========================== LOGIN ========================== */
 async function login() {
@@ -174,40 +173,6 @@ async function registrarVenta() {
     return;
   }
 
-  async function revertirUltimaVenta() {
-  if (!ultimaVenta) {
-    mostrarMensaje("No hay venta para revertir", "error");
-    return;
-  }
-
-  try {
-    // buscamos el producto
-    const prod = productos.find(p => p.codigo === ultimaVenta.codigo);
-    if (!prod) {
-      mostrarMensaje("Producto no encontrado", "error");
-      return;
-    }
-
-    // devolvemos el stock
-    const prodRef = doc(db, "productos", ultimaVenta.codigo);
-    await setDoc(prodRef, {
-      ...prod,
-      cantidad: prod.cantidad + ultimaVenta.cantidad
-    });
-
-    // eliminamos la venta
-    await deleteDoc(doc(db, "ventas", ultimaVenta.id));
-
-    ultimaVenta = null;
-
-    mostrarMensaje("Venta revertida correctamente", "success");
-  } catch (e) {
-    console.error(e);
-    mostrarMensaje("Error al revertir venta", "error");
-  }
-}
-
-
   /* ========================== BUSCADOR DE PRODUCTOS ========================== */
 
   // Buscamos el producto
@@ -234,24 +199,18 @@ async function registrarVenta() {
   });
 
   // Guardamos la venta en Firestore
-const ventaRef = doc(ventasCol); // genera ID automático
+  const ventasCol = collection(db, "ventas");
+  await setDoc(doc(ventasCol), {
+    codigo,
+    nombre: prod.nombre,
+    vendedor: vendedorNombre,
+    cantidad: cantidadVenta,
+    fecha: new Date().toLocaleString()
+  });
 
-await setDoc(ventaRef, {
-  codigo,
-  nombre: prod.nombre,
-  vendedor: vendedorNombre,
-  cantidad: cantidadVenta,
-  fecha: new Date().toLocaleString(),
-  timestamp: Date.now()
-});
-
-// guardamos la última venta en memoria
-ultimaVenta = {
-  id: ventaRef.id,
-  codigo,
-  cantidad: cantidadVenta
-};
-
+  mostrarMensaje("Venta registrada", "success");
+  limpiarVenta();
+}
 
 // Limpia inputs de venta después de registrar
 function limpiarVenta() {
@@ -492,5 +451,3 @@ window.eliminarCategoria=eliminarCategoria;
 window.crearUsuario=crearUsuario;
 window.resetearTodo=resetearTodo;
 window.filtrarProductos = filtrarProductos;
-window.revertirUltimaVenta = revertirUltimaVenta;
-
