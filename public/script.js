@@ -143,27 +143,33 @@ function limpiarStock(){
 
 /* ========================== VENTAS ========================== */
 function cargarVendedores(){
-  const sel=document.getElementById("ventaVendedor");
-  sel.innerHTML="";
-  
-  // Primero agregamos el usuario actual si no está en la lista
-  if(!usuarios.some(u=>u.email === usuarioActual.user)){
-    usuarios.push({email: usuarioActual.user, rol: usuarioActual.rol, nombre: usuarioActual.user});
+  const sel = document.getElementById("ventaVendedor");
+  sel.innerHTML = "";
+
+  // aseguramos que el usuario actual esté en la lista
+  if(!usuarios.some(u => u.email === usuarioActual.user)){
+    usuarios.push({
+      email: usuarioActual.user,
+      rol: usuarioActual.rol,
+      nombre: usuarioActual.user
+    });
   }
 
-  // Filtramos vendedores (rol vendedor o tu mismo)
-  const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.email === usuarioActual.user);
-  
+  // vendedores + admins
+  const vendedores = usuarios.filter(
+    u => u.rol === "vendedor" || u.rol === "admin"
+  );
+
   vendedores.forEach(v=>{
-    const o=document.createElement("option");
-    o.value=v.email;
-    o.textContent=v.email;
+    const o = document.createElement("option");
+    o.value = v.email;
+    o.textContent = v.email;
     sel.appendChild(o);
   });
 
-  // Seleccionamos por defecto tu usuario
   sel.value = usuarioActual.user;
 }
+
 
 async function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
