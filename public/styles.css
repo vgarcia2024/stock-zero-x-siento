@@ -452,3 +452,14 @@ body:has(#loginScreen:not([style*="none"])) {
   display: block;
   width: 100%;
 }
+
+/* PRODUCTO SIN STOCK */
+.sin-stock {
+  background-color: #fee2e2;
+  font-weight: bold;
+}
+
+.sin-stock td {
+  color: #b91c1c;
+}
+
