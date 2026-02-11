@@ -336,17 +336,28 @@ function renderProductos(lista){
   const tbody = document.querySelector("#productosDisponibles tbody");
   tbody.innerHTML = "";
 
-  lista.forEach(p=>{
+  // 🔴 Ordenamos: primero sin stock
+  const ordenados = [...lista].sort((a, b) => a.cantidad - b.cantidad);
+
+  ordenados.forEach(p=>{
     const tr = document.createElement("tr");
+
+    // 🔴 Si no tiene stock, le agregamos clase
+    if(p.cantidad === 0){
+      tr.classList.add("sin-stock");
+    }
+
     tr.innerHTML = `
       <td>${p.codigo}</td>
       <td>${p.nombre}</td>
       <td>${p.categoria}</td>
       <td>${p.cantidad}</td>
     `;
+
     tbody.appendChild(tr);
   });
 }
+
 
 
 /* ========================== DASHBOARD ========================== */
