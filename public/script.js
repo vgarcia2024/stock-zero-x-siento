@@ -208,14 +208,15 @@ async function registrarVenta() {
     const ventaRef = doc(ventasCol);
 
      await setDoc(ventaRef, {
-      codigo,
-      nombre: prod.nombre,
-      vendedor: vendedorNombre,
-      cantidad: cantidadVenta,
-      fecha: new Date().toLocaleString(),
-      timestamp: Date.now(),
-      revertida: false
-    });
+  codigo,
+  nombre: prod.nombre,
+  categoria: prod.categoria, // 🔥 NUEVO
+  vendedor: vendedorNombre,
+  cantidad: cantidadVenta,
+  fecha: new Date().toLocaleString(),
+  timestamp: Date.now(),
+  revertida: false
+});
 
 
     ultimaVenta = {
@@ -362,47 +363,75 @@ function renderProductos(lista){
 
 /* ========================== DASHBOARD ========================== */
 function actualizarDashboard(){
-  const hoy=new Date().toLocaleDateString();
+
+  const hoy = new Date().toLocaleDateString();
+
   const ventasHoy = ventas.filter(
     v => !v.revertida && v.fecha.includes(hoy)
   );
 
-  
-  const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.cantidad || 0), 0);
+  const totalHoy = ventasHoy.reduce(
+    (sum, v) => sum + Number(v.cantidad || 0),
+    0
+  );
+
   document.getElementById("ventasHoy").textContent = totalHoy;
 
+  // Stock total
+  let total = productos.reduce((sum,p)=>sum+p.cantidad,0);
+  document.getElementById("stockTotal").textContent = total;
 
-  let total=productos.reduce((sum,p)=>sum+p.cantidad,0);
-  document.getElementById("stockTotal").textContent=total;
-
-  const ranking={};
+  // Ranking vendedores
+  const ranking = {};
   ventas
-  .filter(v => !v.revertida)
-  .forEach(v => {
-    ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
-  });
+    .filter(v => !v.revertida)
+    .forEach(v => {
+      ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
+    });
 
+  let mejor = "-", max = 0;
+  for(const v in ranking){
+    if(ranking[v] > max){
+      max = ranking[v];
+      mejor = v;
+    }
+  }
 
-  let mejor="-", max=0;
-  for(const v in ranking)if(ranking[v]>max){ max=ranking[v]; mejor=v; }
-  document.getElementById("mejorVendedor").textContent=mejor;
+  document.getElementById("mejorVendedor").textContent = mejor;
 
-  const tbody=document.querySelector("#productosDisponibles tbody");
-  tbody.innerHTML="";
-  productos.forEach(p=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td><td>${p.cantidad}</td>`;
-    tbody.appendChild(tr);
-  });
-
-  let html="<h3>Ventas</h3><table><tr><th>Vendedor</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>";
-  ventas
-  .filter(v => !v.revertida)
-  .forEach(v =>{ html+=`<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`; });
-  html+="</table>";
-  document.getElementById("statsContent").innerHTML=html;
-
+  // Tabla productos
   renderProductos(productos);
+
+  // 🔥 TABLA ESTADÍSTICAS CON CATEGORÍA
+  let html = `
+    <h3>Ventas</h3>
+    <table>
+      <tr>
+        <th>Vendedor</th>
+        <th>Producto</th>
+        <th>Categoría</th>
+        <th>Cantidad</th>
+        <th>Fecha</th>
+      </tr>
+  `;
+
+  ventas
+    .filter(v => !v.revertida)
+    .forEach(v =>{
+      html += `
+        <tr>
+          <td>${v.vendedor}</td>
+          <td>${v.nombre}</td>
+          <td>${v.categoria || "-"}</td>
+          <td>${v.cantidad}</td>
+          <td>${v.fecha}</td>
+        </tr>
+      `;
+    });
+
+  html += "</table>";
+
+  document.getElementById("statsContent").innerHTML = html;
 }
 
 /* ========================== USUARIOS ========================== */
