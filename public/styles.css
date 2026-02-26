@@ -245,15 +245,20 @@ tr:hover {
 
 /* LOGIN */
 
+
 body:has(#loginScreen:not([style*="none"])) {
   background: #111827;
-  min-height: 100vh;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .login-container {
-  max-width: 400px;
   width: 90%;
-  margin: 120px auto;
+  max-width: 400px;
   background: white;
   padding: 40px 35px;
   border-radius: 20px;
