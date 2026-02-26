@@ -153,13 +153,15 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
+  display: block;
 }
 
 th,
 td {
   padding: 12px;
   text-align: center;
+  white-space: nowrap;
 }
 
 th {
@@ -244,17 +246,6 @@ tr:hover {
 }
 
 /* LOGIN */
-
-
-body:has(#loginScreen:not([style*="none"])) {
-  background: #111827;
-  height: 100vh;
-  margin: 0;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 .login-container {
   width: 90%;
@@ -343,6 +334,43 @@ body:has(#loginScreen:not([style*="none"])) {
   font-weight: bold;
 }
 
+/* ================= MOBILE FIX ================= */
+
+@media (max-width: 768px) {
+
+  nav {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  nav button {
+    flex: 1 1 45%;
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  main {
+    margin: 15px;
+    padding: 10px;
+  }
+
+  section {
+    padding: 18px;
+  }
+
+}
+
 .sin-stock td {
   color: #b91c1c;
+}
+
+body.login-active {
+  background: #111827;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
