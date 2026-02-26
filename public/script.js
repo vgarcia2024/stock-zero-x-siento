@@ -65,6 +65,9 @@ async function login() {
 }
 
 async function registrarse() {
+
+  await signOut(auth);
+  
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
 
