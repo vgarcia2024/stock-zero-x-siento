@@ -64,6 +64,40 @@ async function login() {
   }
 }
 
+async function registrarse() {
+  const email = document.getElementById("loginUser").value.trim();
+  const pass = document.getElementById("loginPass").value.trim();
+
+  if (!email || !pass) {
+    mostrarMensaje("Completá email y contraseña", "error");
+    return;
+  }
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+
+    // 🔥 Rol por defecto: vendedor
+    await setDoc(doc(db, "usuarios", cred.user.uid), {
+      email: email,
+      rol: "vendedor",
+      nombre: email
+    });
+
+    mostrarMensaje("Cuenta creada correctamente", "success");
+
+  } catch (e) {
+    console.error(e);
+
+    if (e.code === "auth/email-already-in-use") {
+      mostrarMensaje("Mail ya existente", "error");
+    } else if (e.code === "auth/weak-password") {
+      mostrarMensaje("La contraseña debe tener al menos 6 caracteres", "error");
+    } else {
+      mostrarMensaje("Error al crear cuenta", "error");
+    }
+  }
+}
+
 async function logout() { await signOut(auth); location.reload(); }
 
 async function obtenerRol(user) {
@@ -542,4 +576,5 @@ window.crearUsuario=crearUsuario;
 window.resetearTodo=resetearTodo;
 window.filtrarProductos = filtrarProductos;
 window.revertirUltimaVenta = revertirUltimaVenta;
+window.registrarse = registrarse;
 
