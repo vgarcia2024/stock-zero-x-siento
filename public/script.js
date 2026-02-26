@@ -76,18 +76,17 @@ async function registrarse() {
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
 
-    // 🔥 Rol por defecto: vendedor
     await setDoc(doc(db, "usuarios", cred.user.uid), {
       email: email,
       rol: "vendedor",
       nombre: email
     });
 
-    mostrarMensaje("Cuenta creada correctamente", "success");
+    await signOut(auth); // 🔥 ESTA ES LA CLAVE
+
+    mostrarMensaje("Cuenta creada. Ahora iniciá sesión.", "success");
 
   } catch (e) {
-    console.error(e);
-
     if (e.code === "auth/email-already-in-use") {
       mostrarMensaje("Mail ya existente", "error");
     } else if (e.code === "auth/weak-password") {
