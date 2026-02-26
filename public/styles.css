@@ -1,19 +1,17 @@
 :root {
-  --bg: #fafafa;
+  --primary: #111827;       /* negro elegante */
+  --secondary: #1f2937;     /* gris oscuro */
+  --accent: #6366f1;        /* violeta moderno */
+  --bg: #f3f4f6;            /* gris claro */
   --card: #ffffff;
-  --border: #e5e7eb;
-  --text: #111111;
-  --muted: #6b7280;
-  --primary: #111111;
-  --danger: #ef4444;
-  --success: #22c55e;
+  --text: #111827;
 }
 
-/* RESET */
+/* GENERAL */
 
 * {
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 body {
@@ -25,124 +23,127 @@ body {
 /* HEADER */
 
 header {
-  background: white;
-  border-bottom: 1px solid var(--border);
+  background: var(--primary);
+  color: white;
   padding: 20px;
-  font-weight: 600;
-  font-size: 18px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  position: relative;
 }
 
 /* NAV */
 
 nav {
   display: flex;
-  gap: 10px;
-  padding: 15px 20px;
-  border-bottom: 1px solid var(--border);
-  background: white;
+  justify-content: center;
+  gap: 12px;
+  background: var(--secondary);
+  padding: 15px;
 }
 
 nav button {
-  background: transparent;
-  border: 1px solid var(--border);
-  padding: 8px 14px;
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 10px 18px;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: bold;
+  font-size: 14px;
   transition: all 0.2s ease;
 }
 
 nav button:hover {
-  background: #f3f4f6;
+  background: var(--accent);
 }
 
 nav button.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+  background: var(--accent);
 }
 
 /* MAIN */
 
 main {
   max-width: 1100px;
-  margin: 40px auto;
-  padding: 0 20px;
+  margin: 30px auto;
+  padding: 20px;
 }
 
 /* SECTION */
 
 section {
   display: none;
+  background: var(--card);
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
 }
 
 section.active {
   display: block;
 }
 
-/* CARD STYLE */
-
-.card-box {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 25px;
-  margin-bottom: 25px;
-}
-
 /* FORM */
 
 label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-top: 18px;
   display: block;
+  margin-top: 12px;
+  font-weight: bold;
 }
 
 input,
 select {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px;
   margin-top: 6px;
   border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid #d1d5db;
   font-size: 14px;
-  background: white;
-  transition: border 0.2s;
+  transition: border 0.2s, box-shadow 0.2s;
 }
 
 input:focus,
 select:focus {
   outline: none;
-  border-color: #111;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 /* BUTTONS */
 
 button.primary {
-  margin-top: 20px;
+  margin-top: 18px;
   background: var(--primary);
   color: white;
   border: none;
-  padding: 10px;
+  padding: 12px;
   width: 100%;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 500;
-  transition: opacity 0.2s ease;
+  font-weight: bold;
+  font-size: 15px;
+  transition: 0.2s ease;
 }
 
 button.primary:hover {
-  opacity: 0.85;
+  background: var(--accent);
 }
 
 .success {
-  background: var(--success);
+  background: #16a34a !important;
+}
+
+.success:hover {
+  background: #15803d !important;
 }
 
 .danger {
-  background: var(--danger);
+  background: #dc2626 !important;
+}
+
+.danger:hover {
+  background: #b91c1c !important;
 }
 
 /* TABLE */
@@ -151,27 +152,162 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
-  font-size: 14px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: center;
 }
 
 th {
-  text-align: left;
-  font-weight: 600;
-  color: var(--muted);
-  border-bottom: 1px solid var(--border);
-  padding: 12px 8px;
+  background: #e5e7eb;
+  font-weight: bold;
 }
 
-td {
-  border-bottom: 1px solid var(--border);
-  padding: 12px 8px;
-}
-
-tr:hover {
+tr:nth-child(even) {
   background: #f9fafb;
 }
 
-/* DASHBOARD CARDS */
+tr:hover {
+  background: #eef2ff;
+}
+
+/* TOAST */
+
+#toast {
+  position: fixed;
+  top: 20px;
+  right: -400px;
+  min-width: 250px;
+  max-width: 350px;
+  background: #111827;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.4s ease;
+  z-index: 9999;
+}
+
+#toast.show {
+  right: 20px;
+}
+
+#toast.success {
+  background: #16a34a;
+}
+
+#toast.error {
+  background: #dc2626;
+}
+
+#toast.info {
+  background: var(--accent);
+}
+
+/* MODAL */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  min-width: 300px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* LOGIN */
+
+body:has(#loginScreen:not([style*="none"])) {
+  background: #111827;
+  min-height: 100vh;
+}
+
+.login-container {
+  max-width: 400px;
+  width: 90%;
+  margin: 120px auto;
+  background: white;
+  padding: 40px 35px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  animation: aparecer 0.6s ease;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-container h2 {
+  margin-bottom: 25px;
+  color: var(--primary);
+  font-size: 28px;
+}
+
+.login-container input {
+  margin: 12px 0;
+}
+
+.login-container button {
+  margin-top: 18px;
+}
+
+/* USER BAR */
+
+.user-bar {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.user-bar button {
+  background: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* DASHBOARD */
 
 .cards {
   display: grid;
@@ -180,116 +316,28 @@ tr:hover {
 }
 
 .card {
-  background: white;
-  border: 1px solid var(--border);
-  padding: 25px;
-  border-radius: 14px;
-}
-
-.card h4 {
-  margin: 0;
-  font-size: 14px;
-  color: var(--muted);
-  font-weight: 500;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
 
 .card p {
   font-size: 30px;
-  margin: 10px 0 0;
-  font-weight: 600;
+  margin-top: 12px;
+  color: var(--accent);
 }
 
-/* LOGIN */
-
-body:has(#loginScreen:not([style*="none"])) {
-  background: white;
-}
-
-.login-container {
-  max-width: 380px;
-  margin: 120px auto;
-  padding: 40px;
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-}
-
-.login-container h2 {
-  margin-bottom: 25px;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.login-container input {
-  margin-bottom: 15px;
-}
-
-.login-container button {
-  margin-top: 15px;
-  background: black;
-  border-radius: 12px;
-}
-
-/* TOAST */
-
-#toast {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: #111;
-  color: white;
-  padding: 14px 18px;
-  border-radius: 12px;
-  font-size: 14px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.3s ease;
-  z-index: 9999;
-}
-
-#toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-#toast.success {
-  background: #111;
-}
-
-#toast.error {
-  background: var(--danger);
-}
-
-#toast.info {
-  background: #374151;
-}
-
-/* USER BAR */
-
-.user-bar {
-  position: absolute;
-  right: 20px;
-  top: 18px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.user-bar button {
-  border: 1px solid var(--border);
-  background: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* SIN STOCK */
+/* PRODUCTO SIN STOCK */
 
 .sin-stock {
-  background: #fff5f5;
+  background-color: #fee2e2 !important;
+  font-weight: bold;
 }
 
 .sin-stock td {
-  color: var(--danger);
-  font-weight: 500;
+  color: #b91c1c;
 }
