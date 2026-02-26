@@ -256,6 +256,8 @@ tr:hover {
 }
 
 .login-container {
+  display: flex;
+  flex-direction: column;
   width: 90%;
   max-width: 400px;
   background: white;
@@ -263,7 +265,6 @@ tr:hover {
   border-radius: 20px;
   text-align: center;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-  animation: aparecer 0.6s ease;
 }
 
 @keyframes aparecer {
