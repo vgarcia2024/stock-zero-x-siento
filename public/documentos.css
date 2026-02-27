@@ -326,21 +326,23 @@ body {
   letter-spacing: 0.5px;
 }
 
-.card h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.card p {
-  margin-top: 6px;
+#nuevoNombre,
+#nuevoApellido,
+#nuevoDni {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
   font-size: 14px;
-  color: #d1d5db;
+  outline: none;
+  margin-bottom: 10px;
 }
 
-/* por si hay conflictos de herencia */
-.card h3,
-.card p {
-  text-align: left;
+#nuevoNombre:focus,
+#nuevoApellido:focus,
+#nuevoDni:focus {
+  border: 1px solid #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
