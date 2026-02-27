@@ -123,6 +123,20 @@ body {
   align-items: center;
 }
 
+.top-panel button {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.top-panel button:hover {
+  background: #1d4ed8;
+}
+
 .top-panel h1 {
   margin-bottom: 15px;
   font-size: 22px;
@@ -223,6 +237,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .modal-content {
