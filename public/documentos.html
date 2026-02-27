@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentos de Clientes</title>
+    <link rel="stylesheet" href="documentos.css">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Saphirus POS</h2>
+        <nav>
+            <a href="index.html">Stock</a>
+            <a href="documentos.html" class="active">Documentos</a>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+
+        <header class="header">
+            <h1>Documentos de Clientes</h1>
+            <button onclick="crearNuevo()">+ Nueva Carpeta</button>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="dniInput" placeholder="Buscar o crear por DNI...">
+        </div>
+
+        <div id="gridDocumentos" class="grid"></div>
+
+    </main>
+
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="tituloModal"></h2>
+            <button onclick="cerrarModal()">X</button>
+        </div>
+
+        <textarea id="editorTexto"></textarea>
+
+        <div class="modal-footer">
+            <button onclick="guardarDocumento()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script src="documentos.js"></script>
+</body>
+</html>
