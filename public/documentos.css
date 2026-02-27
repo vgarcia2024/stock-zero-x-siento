@@ -219,6 +219,12 @@ body {
   display: none;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .modal-content {
   background: #1e293b;
   width: 600px;
