@@ -1,36 +1,20 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { auth, db } from "./firebase.js";
 import {
-  getAuth,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
 import {
-  getFirestore,
+  collection,
   doc,
   setDoc,
   getDoc,
-  collection,
   getDocs,
   deleteDoc,
   onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-/* 🔹 CONFIG FIREBASE */
-const firebaseConfig = {
-  apiKey: "AIzaSyCwBuxmHQgaqJAac_WiMZkpZUMFVzONFkA",
-  authDomain: "zero-x-siento-stock.firebaseapp.com",
-  projectId: "zero-x-siento-stock",
-  storageBucket: "zero-x-siento-stock.firebasestorage.app",
-  messagingSenderId: "764048708615",
-  appId: "1:764048708615:web:1287e135d38a3588b806a2"
-};
-
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
 /* ========================== ESTADO ========================== */
 let usuarioActual = null;
