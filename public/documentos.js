@@ -114,11 +114,25 @@ function crearCarpeta() {
 /* ===========================
    ELIMINAR CARPETA
 =========================== */
-function eliminarCarpeta(dni) {
-  if (!confirm("¿Seguro que querés eliminar esta carpeta?")) return;
+let dniAEliminar = null;
 
-  documentos = documentos.filter(d => d.dni !== dni);
+function eliminarCarpeta(dni) {
+  dniAEliminar = dni;
+  document.getElementById("textoEliminar").innerText =
+    "¿Seguro que querés eliminar la carpeta del DNI " + dni + "?";
+
+  document.getElementById("modalEliminar").classList.remove("hidden");
+}
+
+function cerrarModalEliminar() {
+  document.getElementById("modalEliminar").classList.add("hidden");
+}
+
+function confirmarEliminar() {
+  documentos = documentos.filter(d => d.dni !== dniAEliminar);
   localStorage.setItem("documentos", JSON.stringify(documentos));
+
+  cerrarModalEliminar();
   render();
 }
 
