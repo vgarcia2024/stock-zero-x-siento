@@ -330,11 +330,17 @@ body {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: white;
+  color: #ffffff;
 }
 
 .card p {
   margin-top: 6px;
   font-size: 14px;
-  color: #cbd5e1;
+  color: #d1d5db;
+}
+
+/* por si hay conflictos de herencia */
+.card h3,
+.card p {
+  text-align: left;
 }
