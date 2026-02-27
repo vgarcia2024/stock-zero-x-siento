@@ -1,6 +1,19 @@
-let documentos = JSON.parse(localStorage.getItem("documentos")) || [];
+import { db } from "./firebase.js";
+
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+let documentos = [];
 let vistaActual = "documentos";
 let carpetaActual = null;
+
+const clientesRef = collection(db, "clientes");
 
 /* ===========================
    CAMBIAR VISTA
@@ -45,29 +58,29 @@ function render() {
   const grid = document.getElementById("gridDocumentos");
   grid.innerHTML = "";
 
-  documentos.forEach(doc => {
+  documentos.forEach(docu => {
     const card = document.createElement("div");
     card.classList.add("card");
 
     card.innerHTML = `
-        <h3>${doc.nombre} ${doc.apellido}</h3>
-        <p>DNI: ${doc.dni}</p>
-      `;
+      <h3>${docu.nombre} ${docu.apellido}</h3>
+      <p>DNI: ${docu.dni}</p>
+    `;
 
     if (vistaActual === "gestion") {
       const btnEliminar = document.createElement("button");
       btnEliminar.classList.add("btn-eliminar");
       btnEliminar.innerText = "Eliminar";
-      btnEliminar.onclick = () => eliminarCarpeta(doc.dni);
+      btnEliminar.onclick = () => eliminarCarpeta(docu.dni);
       card.appendChild(btnEliminar);
     } else {
-      card.onclick = () => abrirDocumento(doc.dni);
+      card.onclick = () => abrirDocumento(docu.dni);
     }
 
     grid.appendChild(card);
   });
 
-  actualizarContador(); // 👈 AGREGAR ESTA LINEA
+  actualizarContador();
 }
 
 /* ===========================
@@ -85,11 +98,13 @@ function cerrarModal() {
   document.getElementById("modal").classList.add("hidden");
 }
 
-function guardarDocumento() {
+async function guardarDocumento() {
   const texto = document.getElementById("editorTexto").value;
-  const doc = documentos.find(d => d.dni === carpetaActual);
-  doc.texto = texto;
-  localStorage.setItem("documentos", JSON.stringify(documentos));
+
+  await updateDoc(doc(db, "clientes", carpetaActual), {
+    texto: texto
+  });
+
   cerrarModal();
 }
 
@@ -104,46 +119,29 @@ function cerrarModalCrear() {
   document.getElementById("modalCrear").classList.add("hidden");
 }
 
-function crearCarpeta() {
-  const nombreInput = document.getElementById("nuevoNombre");
-  const apellidoInput = document.getElementById("nuevoApellido");
-  const dniInput = document.getElementById("nuevoDni");
-
-  const nombre = nombreInput.value.trim();
-  const apellido = apellidoInput.value.trim();
-  const dni = dniInput.value.trim();
+async function crearCarpeta() {
+  const nombre = document.getElementById("nuevoNombre").value.trim();
+  const apellido = document.getElementById("nuevoApellido").value.trim();
+  const dni = document.getElementById("nuevoDni").value.trim();
 
   if (nombre === "" || apellido === "") {
     alert("Debe completar nombre y apellido.");
     return;
   }
 
-  // Validar solo números
   if (!/^\d{1,8}$/.test(dni)) {
     alert("El DNI debe contener solo números y hasta 8 caracteres.");
     return;
   }
 
-  if (documentos.some(d => d.dni === dni)) {
-    alert("Ese DNI ya existe.");
-    return;
-  }
-
-  documentos.push({ 
-    dni: dni, 
-    nombre: nombre, 
-    apellido: apellido, 
-    texto: "" 
+  await setDoc(doc(db, "clientes", dni), {
+    dni,
+    nombre,
+    apellido,
+    texto: ""
   });
 
-  localStorage.setItem("documentos", JSON.stringify(documentos));
-
-  nombreInput.value = "";
-  apellidoInput.value = "";
-  dniInput.value = "";
-
   cerrarModalCrear();
-  render();
 }
 
 /* ===========================
@@ -163,12 +161,10 @@ function cerrarModalEliminar() {
   document.getElementById("modalEliminar").classList.add("hidden");
 }
 
-function confirmarEliminar() {
-  documentos = documentos.filter(d => d.dni !== dniAEliminar);
-  localStorage.setItem("documentos", JSON.stringify(documentos));
+async function confirmarEliminar() {
+  await deleteDoc(doc(db, "clientes", dniAEliminar));
 
   cerrarModalEliminar();
-  render();
 }
 
 /* ===========================
@@ -196,4 +192,13 @@ document.getElementById("dniInput").addEventListener("input", function() {
     });
 });
 
-render();
+onSnapshot(clientesRef, (snapshot) => {
+  documentos = [];
+
+  snapshot.forEach((docSnap) => {
+    documentos.push(docSnap.data());
+  });
+
+  render();
+});
+
