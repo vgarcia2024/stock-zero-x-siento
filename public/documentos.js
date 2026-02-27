@@ -118,7 +118,12 @@ function crearCarpeta() {
     return;
   }
 
-  documentos.push({ dni: dni, texto: "" });
+  documentos.push({ 
+  dni: dni, 
+  nombre: nombre, 
+  apellido: apellido, 
+  texto: "" 
+});
   localStorage.setItem("documentos", JSON.stringify(documentos));
 
   dniInput.value = "";
