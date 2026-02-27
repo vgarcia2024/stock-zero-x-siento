@@ -267,3 +267,36 @@ body {
 .btn-eliminar:hover {
   background: #b91c1c;
 }
+/* ===============================
+   BOTON BASE
+================================ */
+.nav-btn {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #334155;
+  color: white;
+  transition: 0.2s;
+}
+
+/* DOCUMENTOS ACTIVO (azul) */
+.nav-btn.active {
+  background: #2563eb;
+}
+
+/* BOTON GESTION SIEMPRE ROJO */
+.nav-btn.danger {
+  background: #dc2626;
+}
+
+/* CUANDO GESTION ESTA ACTIVO */
+.nav-btn.danger.active {
+  background: #991b1b;
+  box-shadow: 0 0 0 2px rgba(220,38,38,0.4);
+}
+
+/* Hover */
+.nav-btn:hover {
+  opacity: 0.9;
+}
