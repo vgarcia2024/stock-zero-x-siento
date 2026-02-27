@@ -326,3 +326,8 @@ body {
 .search-area {
   margin-bottom: 15px;
 }
+
+#textoEliminar {
+  color: white;
+  font-size: 14px;
+}
