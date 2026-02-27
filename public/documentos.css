@@ -300,3 +300,29 @@ body {
 .nav-btn:hover {
   opacity: 0.9;
 }
+
+/* ===========================
+   ZONA CLIENTES (BLANCA)
+=========================== */
+.zona-clientes {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 10px;
+  min-height: 400px;
+}
+
+/* Las cards ahora oscuras sobre fondo blanco */
+.card {
+  background: #1e293b;
+  color: white;
+}
+
+/* Header y search siguen oscuros */
+.header {
+  margin-bottom: 15px;
+}
+
+.search-area {
+  margin-bottom: 15px;
+}
