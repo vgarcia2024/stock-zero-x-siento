@@ -14,11 +14,11 @@
     <div class="logo">
       <h2>Panel de documentación</h2>
     </div>
-
-    <nav>
-      <button class="btn-volver" onclick="window.location.href='index.html'">Volver</button>
-      <button class="nav-btn active">Documentos</button>
-    </nav>
+      <nav>
+        <button class="btn-volver" onclick="window.location.href='index.html'">Volver</button>
+        <button class="nav-btn active" onclick="mostrarVista('documentos')">Documentos</button>
+        <button class="nav-btn danger" onclick="mostrarVista('gestion')">Gestionar Documentos</button>
+      </nav>
   </aside>
 
   <!-- Main -->
@@ -51,6 +51,27 @@
 
     <div class="modal-footer">
       <button onclick="guardarDocumento()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear DNI -->
+<div id="modalCrear" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Nueva Carpeta</h2>
+      <button onclick="cerrarModalCrear()">X</button>
+    </div>
+
+    <input 
+      type="text" 
+      id="nuevoDni" 
+      placeholder="Ingrese DNI (8 números máximo)" 
+      maxlength="8"
+    >
+
+    <div class="modal-footer">
+      <button onclick="crearCarpeta()">Crear</button>
     </div>
   </div>
 </div>
