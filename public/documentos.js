@@ -112,6 +112,10 @@ window.guardarDocumento = async function() {
 =========================== */
 window.crearNuevo = function() {
   document.getElementById("modalCrear").classList.remove("hidden");
+
+  document.getElementById("nuevoNombre").value = "";
+  document.getElementById("nuevoApellido").value = "";
+  document.getElementById("nuevoDni").value = "";
 };
 
 window.cerrarModal = function() {
