@@ -325,3 +325,16 @@ body {
   color: rgba(255,255,255,0.6);
   letter-spacing: 0.5px;
 }
+
+.card h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+}
+
+.card p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
