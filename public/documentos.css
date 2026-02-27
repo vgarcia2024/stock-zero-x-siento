@@ -117,10 +117,6 @@ body {
   background: #1e293b;
   padding: 30px;
   color: white;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .top-panel button {
