@@ -70,10 +70,10 @@ body {
 /* MAIN */
 .main {
   flex: 1;
-  padding: 30px;
-  overflow-y: auto;
-  background: white;
-  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
 }
 
 /* HEADER */
@@ -365,4 +365,53 @@ body {
 /* Hover cuando Gestionar activo */
 .nav-btn.danger.active:hover {
   background: #7f1d1d;
+}
+
+/* ===============================
+   PANEL SUPERIOR AZUL
+================================ */
+.top-panel {
+  background: #1e293b; /* mismo tono que sidebar */
+  padding: 30px;
+  color: white;
+}
+
+.top-panel h1 {
+  color: white;
+}
+
+/* Buscador en fondo oscuro */
+#dniInput {
+  width: 300px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
+  outline: none;
+}
+
+#dniInput::placeholder {
+  color: #94a3b8;
+}
+
+#dniInput:focus {
+  border: 1px solid #2563eb;
+}
+
+/* ===============================
+   ZONA DNI (gris claro)
+================================ */
+.zona-dni {
+  flex: 1;
+  background: #f3f3f3;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Cards sobre gris */
+.card {
+  background: #1e293b;
+  color: white;
+  border: none;
 }
