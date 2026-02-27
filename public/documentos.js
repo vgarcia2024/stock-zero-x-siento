@@ -5,6 +5,19 @@ let carpetaActual = null;
 /* ===========================
    CAMBIAR VISTA
 =========================== */
+function actualizarContador() {
+  const total = documentos.length;
+  const contador = document.getElementById("contadorClientes");
+
+  if (!contador) return;
+
+  if (total === 1) {
+    contador.textContent = "1 cliente registrado";
+  } else {
+    contador.textContent = `${total} clientes registrados`;
+  }
+}
+
 function mostrarVista(vista) {
   vistaActual = vista;
 
@@ -52,6 +65,8 @@ function render() {
 
     grid.appendChild(card);
   });
+
+  actualizarContador(); // 👈 AGREGAR ESTA LINEA
 }
 
 /* ===========================
