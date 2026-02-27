@@ -1,4 +1,6 @@
-/* RESET */
+/* ===============================
+   RESET
+================================ */
 * {
   margin: 0;
   padding: 0;
@@ -11,19 +13,24 @@ body {
   color: white;
 }
 
-/* LAYOUT */
+/* ===============================
+   LAYOUT
+================================ */
 .layout {
   display: flex;
   height: 100vh;
 }
 
-/* SIDEBAR */
+/* ===============================
+   SIDEBAR
+================================ */
 .sidebar {
   width: 220px;
   background: #1e293b;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid #334155; /* línea divisoria */
 }
 
 .logo {
@@ -41,7 +48,8 @@ body {
   gap: 10px;
 }
 
-.sidebar button {
+/* Botón base */
+.nav-btn {
   padding: 10px;
   border: none;
   border-radius: 6px;
@@ -51,14 +59,39 @@ body {
   transition: 0.2s;
 }
 
-.sidebar button:hover {
+/* Hover botones grises */
+.nav-btn:not(.active):not(.danger):hover {
   background: #475569;
 }
 
+/* Documentos (azul) */
 .nav-btn.active {
   background: #2563eb;
 }
 
+.nav-btn.active:hover {
+  background: #1d4ed8;
+}
+
+/* Gestionar documentos (rojo) */
+.nav-btn.danger {
+  background: #dc2626;
+}
+
+.nav-btn.danger:hover {
+  background: #b91c1c;
+}
+
+.nav-btn.danger.active {
+  background: #991b1b;
+  box-shadow: 0 0 0 2px rgba(220,38,38,0.4);
+}
+
+.nav-btn.danger.active:hover {
+  background: #7f1d1d;
+}
+
+/* Botón volver */
 .btn-volver {
   background: #475569;
 }
@@ -67,61 +100,44 @@ body {
   background: #64748b;
 }
 
-/* MAIN */
+/* ===============================
+   MAIN
+================================ */
 .main {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0;
   overflow: hidden;
 }
 
-/* HEADER */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.header h1 {
-  font-size: 22px;
-  color: #1e293b;
-}
-
-.header button {
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  background: #2563eb;
+/* ===============================
+   PANEL SUPERIOR (AZUL)
+================================ */
+.top-panel {
+  background: #1e293b;
+  padding: 30px;
   color: white;
-  cursor: pointer;
-  transition: 0.2s;
 }
 
-.header button:hover {
-  background: #1d4ed8;
+.top-panel h1 {
+  margin-bottom: 15px;
+  font-size: 22px;
 }
 
-/* SEARCH AREA */
-.search-area {
-  margin-bottom: 20px;
-}
-
-/* INPUT DNI */
+/* Buscador */
 #dniInput {
   width: 300px;
   padding: 10px 14px;
   border-radius: 6px;
-  border: 1px solid #cbd5e1;
-  background: #f1f5f9;
-  color: #1e293b;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
   outline: none;
   transition: 0.2s;
 }
 
 #dniInput::placeholder {
-  color: #64748b;
+  color: #94a3b8;
 }
 
 #dniInput:focus {
@@ -129,29 +145,63 @@ body {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
-/* GRID */
+/* ===============================
+   ZONA DNI (GRIS CLARO)
+================================ */
+.zona-dni {
+  flex: 1;
+  background: #f3f3f3;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* ===============================
+   GRID
+================================ */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
 }
 
-/* CARD */
+/* ===============================
+   CARD CLIENTE
+================================ */
 .card {
   background: #1e293b;
+  color: white;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: 0.2s;
-  border: 1px solid #334155;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* sombra suave */
 }
 
 .card:hover {
+  transform: translateY(-4px);
   background: #334155;
-  transform: translateY(-3px);
 }
 
-/* MODAL */
+/* Botón eliminar dentro card */
+.btn-eliminar {
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #dc2626;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.btn-eliminar:hover {
+  background: #b91c1c;
+}
+
+/* ===============================
+   MODAL
+================================ */
 .modal {
   position: fixed;
   inset: 0;
@@ -176,7 +226,7 @@ body {
   gap: 15px;
 }
 
-/* MODAL HEADER */
+/* Modal header */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -192,7 +242,7 @@ body {
   color: white;
 }
 
-/* TEXTAREA */
+/* Textarea */
 #editorTexto {
   width: 100%;
   min-height: 200px;
@@ -210,7 +260,7 @@ body {
   border: 1px solid #2563eb;
 }
 
-/* MODAL FOOTER */
+/* Modal footer */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -223,22 +273,16 @@ body {
   border-radius: 6px;
   cursor: pointer;
   color: white;
+  transition: 0.2s;
 }
 
 .modal-footer button:hover {
   background: #1d4ed8;
 }
 
-/* BOTON ROJO */
-.danger {
-  background: #dc2626;
-}
-
-.danger:hover {
-  background: #b91c1c;
-}
-
-/* INPUT MODAL CREAR */
+/* ===============================
+   INPUT MODAL CREAR DNI
+================================ */
 #nuevoDni {
   width: 100%;
   padding: 12px;
@@ -255,163 +299,9 @@ body {
   box-shadow: 0 0 0 2px rgba(220,38,38,0.3);
 }
 
-/* BOTON ELIMINAR */
-.btn-eliminar {
-  margin-top: 10px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
-  background: #dc2626;
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.btn-eliminar:hover {
-  background: #b91c1c;
-}
-/* ===============================
-   BOTON BASE
-================================ */
-.nav-btn {
-  padding: 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #334155;
-  color: white;
-  transition: 0.2s;
-}
-
-/* DOCUMENTOS ACTIVO (azul) */
-.nav-btn.active {
-  background: #2563eb;
-}
-
-/* BOTON GESTION SIEMPRE ROJO */
-.nav-btn.danger {
-  background: #dc2626;
-}
-
-/* CUANDO GESTION ESTA ACTIVO */
-.nav-btn.danger.active {
-  background: #991b1b;
-  box-shadow: 0 0 0 2px rgba(220,38,38,0.4);
-}
-
-/* Hover */
-.nav-btn:hover {
-  opacity: 0.9;
-}
-
-/* ===========================
-   ZONA CLIENTES (BLANCA)
-=========================== */
-
-/* Las cards ahora oscuras sobre fondo blanco */
-.card {
-  background: #1e293b;
-  color: white;
-}
-
-/* Header y search siguen oscuros */
-.header {
-  margin-bottom: 15px;
-}
-
-.search-area {
-  margin-bottom: 15px;
-}
-
-#textoEliminar {
-  color: white;
-  font-size: 14px;
-}
-
-/* ===============================
-   HOVER CORRECTO PARA NAV
-================================ */
-
-/* Hover general solo para botones grises */
-.sidebar button:not(.active):not(.danger):hover {
-  background: #475569;
-}
-
-/* Documentos activo (azul) */
-.nav-btn.active {
-  background: #2563eb;
-}
-
-/* Hover cuando Documentos está activo */
-.nav-btn.active:hover {
-  background: #1d4ed8;
-}
-
-/* Gestionar (rojo base) */
-.nav-btn.danger {
-  background: #dc2626;
-}
-
-/* Hover Gestionar */
-.nav-btn.danger:hover {
-  background: #b91c1c;
-}
-
-/* Cuando Gestionar está activo */
-.nav-btn.danger.active {
-  background: #991b1b;
-}
-
-/* Hover cuando Gestionar activo */
-.nav-btn.danger.active:hover {
-  background: #7f1d1d;
-}
-
-/* ===============================
-   PANEL SUPERIOR AZUL
-================================ */
-.top-panel {
-  background: #1e293b; /* mismo tono que sidebar */
-  padding: 30px;
-  color: white;
-}
-
-.top-panel h1 {
-  color: white;
-}
-
-/* Buscador en fondo oscuro */
-#dniInput {
-  width: 300px;
-  padding: 10px 14px;
-  border-radius: 6px;
-  border: 1px solid #334155;
-  background: #0f172a;
-  color: white;
-  outline: none;
-}
-
-#dniInput::placeholder {
+.contador-clientes {
+  font-size: 13px;
   color: #94a3b8;
-}
-
-#dniInput:focus {
-  border: 1px solid #2563eb;
-}
-
-/* ===============================
-   ZONA DNI (gris claro)
-================================ */
-.zona-dni {
-  flex: 1;
-  background: #f3f3f3;
-  padding: 30px;
-  overflow-y: auto;
-}
-
-/* Cards sobre gris */
-.card {
-  background: #1e293b;
-  color: white;
-  border: none;
+  margin-top: 6px;
+  font-weight: 500;
 }
