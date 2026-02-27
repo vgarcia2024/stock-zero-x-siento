@@ -8,18 +8,25 @@ function guardarDatos(datos) {
     localStorage.setItem("documentos", JSON.stringify(datos));
 }
 
-function renderizar() {
-    const grid = document.getElementById("gridDocumentos");
-    const datos = obtenerDatos();
-    grid.innerHTML = "";
+function renderizar(filtro = "") {
+  const grid = document.getElementById("gridDocumentos");
+  const datos = obtenerDatos();
+  grid.innerHTML = "";
 
-    datos.forEach(cliente => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerText = "DNI " + cliente.dni;
-        card.onclick = () => abrirDocumento(cliente.dni);
-        grid.appendChild(card);
-    });
+  const filtrados = datos.filter(cliente =>
+    cliente.dni.includes(filtro)
+  );
+
+  filtrados.forEach(cliente => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <h3>DNI ${cliente.dni}</h3>
+      <p>Carpeta editable</p>
+    `;
+    card.onclick = () => abrirDocumento(cliente.dni);
+    grid.appendChild(card);
+  });
 }
 
 function abrirDocumento(dni) {
@@ -59,13 +66,9 @@ function crearNuevo() {
     abrirDocumento(dni);
 }
 
-document.getElementById("dniInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-        const dni = this.value.trim();
-        if (!dni) return;
-        abrirDocumento(dni);
-        this.value = "";
-    }
+document.getElementById("dniInput").addEventListener("input", function () {
+  const filtro = this.value.trim();
+  renderizar(filtro);
 });
 
 renderizar();
