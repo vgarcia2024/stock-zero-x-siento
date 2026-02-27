@@ -7,6 +7,21 @@ let carpetaActual = null;
 =========================== */
 function mostrarVista(vista) {
   vistaActual = vista;
+
+  const btnDoc = document.getElementById("btnDocumentos");
+  const btnGes = document.getElementById("btnGestion");
+
+  btnDoc.classList.remove("active");
+  btnGes.classList.remove("active");
+
+  if (vista === "documentos") {
+    btnDoc.classList.add("active");
+  }
+
+  if (vista === "gestion") {
+    btnGes.classList.add("active");
+  }
+
   render();
 }
 
