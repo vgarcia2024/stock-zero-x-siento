@@ -37,22 +37,24 @@
   <main class="main">
 
   <!-- BLOQUE SUPERIOR AZUL -->
-  <div class="top-panel">
-    <div class="header">
+<div class="top-panel">
+  <div class="header">
+    
+    <div>
       <h1>Documentos de Clientes</h1>
-        <div class="contador-clientes" id="contadorClientes">0 clientes registrados</div>
-      <button onclick="crearNuevo()">+ Nueva Carpeta</button>
+      <div class="contador-clientes" id="contadorClientes">
+        0 clientes registrados
+      </div>
     </div>
 
-    <div class="search-area">
-      <input type="text" id="dniInput" placeholder="Buscar por DNI...">
-    </div>
+    <button onclick="crearNuevo()">+ Nueva Carpeta</button>
+
   </div>
 
-  <!-- ZONA DNI -->
-  <div class="zona-dni">
-    <div id="gridDocumentos" class="grid"></div>
+  <div class="search-area">
+    <input type="text" id="dniInput" placeholder="Buscar por DNI...">
   </div>
+</div>
 
 </main>
 
