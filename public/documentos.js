@@ -18,20 +18,19 @@ const clientesRef = collection(db, "clientes");
 /* ===========================
    CAMBIAR VISTA
 =========================== */
-function actualizarContador() {
+window.actualizarContador = function() {
   const total = documentos.length;
   const contador = document.getElementById("contadorClientes");
 
   if (!contador) return;
 
-  if (total === 1) {
-    contador.textContent = "1 cliente registrado";
-  } else {
-    contador.textContent = `${total} clientes registrados`;
-  }
-}
+  contador.textContent =
+    total === 1
+      ? "1 cliente registrado"
+      : `${total} clientes registrados`;
+};
 
-function mostrarVista(vista) {
+window.mostrarVista = function(vista) {
   vistaActual = vista;
 
   const btnDoc = document.getElementById("btnDocumentos");
@@ -49,7 +48,7 @@ function mostrarVista(vista) {
   }
 
   render();
-}
+};
 
 /* ===========================
    RENDER GENERAL
@@ -94,32 +93,32 @@ function abrirDocumento(dni) {
   document.getElementById("modal").classList.remove("hidden");
 }
 
-function cerrarModal() {
-  document.getElementById("modal").classList.add("hidden");
-}
+window.cerrarModalCrear = function() {
+  document.getElementById("modalCrear").classList.add("hidden");
+};
 
-async function guardarDocumento() {
+window.guardarDocumento = async function() {
   const texto = document.getElementById("editorTexto").value;
 
-  await updateDoc(doc(db, "clientes", carpetaActual), {
-    texto: texto
-  });
+  await setDoc(doc(db, "clientes", carpetaActual), {
+  texto: texto
+}, { merge: true });
 
-  cerrarModal();
-}
+  window.cerrarModal();
+};
 
 /* ===========================
    CREAR CARPETA
 =========================== */
-function crearNuevo() {
+window.crearNuevo = function() {
   document.getElementById("modalCrear").classList.remove("hidden");
-}
+};
 
-function cerrarModalCrear() {
-  document.getElementById("modalCrear").classList.add("hidden");
-}
+window.cerrarModal = function() {
+  document.getElementById("modal").classList.add("hidden");
+};
 
-async function crearCarpeta() {
+window.crearCarpeta = async function() {
   const nombre = document.getElementById("nuevoNombre").value.trim();
   const apellido = document.getElementById("nuevoApellido").value.trim();
   const dni = document.getElementById("nuevoDni").value.trim();
@@ -142,31 +141,30 @@ async function crearCarpeta() {
   });
 
   cerrarModalCrear();
-}
+};
 
 /* ===========================
    ELIMINAR CARPETA
 =========================== */
 let dniAEliminar = null;
 
-function eliminarCarpeta(dni) {
+window.eliminarCarpeta = function(dni) {
   dniAEliminar = dni;
   document.getElementById("textoEliminar").innerText =
     "¿Seguro que querés eliminar la carpeta del DNI " + dni + "?";
 
   document.getElementById("modalEliminar").classList.remove("hidden");
-}
+};
 
-function cerrarModalEliminar() {
+window.cerrarModalEliminar = function() {
   document.getElementById("modalEliminar").classList.add("hidden");
-}
+};
 
-async function confirmarEliminar() {
+window.confirmarEliminar = async function() {
   await deleteDoc(doc(db, "clientes", dniAEliminar));
 
   cerrarModalEliminar();
-}
-
+};
 /* ===========================
    BUSCAR DNI
 =========================== */
