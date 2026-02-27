@@ -18,6 +18,15 @@ const clientesRef = collection(db, "clientes");
 /* ===========================
    CAMBIAR VISTA
 =========================== */
+function mostrarModalError(msg) {
+  document.getElementById("textoError").innerText = msg;
+  document.getElementById("modalError").classList.remove("hidden");
+}
+
+window.cerrarModalError = function() {
+  document.getElementById("modalError").classList.add("hidden");
+};
+
 window.actualizarContador = function() {
   const total = documentos.length;
   const contador = document.getElementById("contadorClientes");
@@ -137,7 +146,7 @@ window.crearCarpeta = async function() {
     return;
   }
 
-  // 👇 CHEQUEO SI YA EXISTE
+  // 👇 CHEQUEO SI YA EXISTE (esto va acá)
   const existe = documentos.some(d => d.dni === dni);
 
   if (existe) {
