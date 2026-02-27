@@ -50,8 +50,9 @@ function render() {
     card.classList.add("card");
 
     card.innerHTML = `
-      <h3>DNI: ${doc.dni}</h3>
-    `;
+        <h3>${doc.nombre} ${doc.apellido}</h3>
+        <p>DNI: ${doc.dni}</p>
+      `;
 
     if (vistaActual === "gestion") {
       const btnEliminar = document.createElement("button");
@@ -104,8 +105,18 @@ function cerrarModalCrear() {
 }
 
 function crearCarpeta() {
+  const nombreInput = document.getElementById("nuevoNombre");
+  const apellidoInput = document.getElementById("nuevoApellido");
   const dniInput = document.getElementById("nuevoDni");
+
+  const nombre = nombreInput.value.trim();
+  const apellido = apellidoInput.value.trim();
   const dni = dniInput.value.trim();
+
+  if (nombre === "" || apellido === "") {
+    alert("Debe completar nombre y apellido.");
+    return;
+  }
 
   // Validar solo números
   if (!/^\d{1,8}$/.test(dni)) {
@@ -119,14 +130,18 @@ function crearCarpeta() {
   }
 
   documentos.push({ 
-  dni: dni, 
-  nombre: nombre, 
-  apellido: apellido, 
-  texto: "" 
-});
+    dni: dni, 
+    nombre: nombre, 
+    apellido: apellido, 
+    texto: "" 
+  });
+
   localStorage.setItem("documentos", JSON.stringify(documentos));
 
+  nombreInput.value = "";
+  apellidoInput.value = "";
   dniInput.value = "";
+
   cerrarModalCrear();
   render();
 }
@@ -165,11 +180,17 @@ document.getElementById("dniInput").addEventListener("input", function() {
   grid.innerHTML = "";
 
   documentos
-    .filter(d => d.dni.includes(valor))
-    .forEach(doc => {
+    .filter(d =>
+     d.dni.includes(valor) ||
+     d.nombre.toLowerCase().includes(valor.toLowerCase()) ||
+     d.apellido.toLowerCase().includes(valor.toLowerCase())
+   ).forEach(doc => {
       const card = document.createElement("div");
       card.classList.add("card");
-      card.innerHTML = `<h3>DNI: ${doc.dni}</h3>`;
+      card.innerHTML = `
+        <h3>${doc.nombre} ${doc.apellido}</h3>
+        <p>DNI: ${doc.dni}</p>
+      `;
       card.onclick = () => abrirDocumento(doc.dni);
       grid.appendChild(card);
     });
