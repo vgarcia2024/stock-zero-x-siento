@@ -137,6 +137,15 @@ window.crearCarpeta = async function() {
     return;
   }
 
+  // 👇 CHEQUEO SI YA EXISTE
+  const existe = documentos.some(d => d.dni === dni);
+
+  if (existe) {
+    mostrarModalError("Ese DNI ya existe.");
+    return;
+  }
+
+  // si no existe, creamos
   await setDoc(doc(db, "clientes", dni), {
     dni,
     nombre,
