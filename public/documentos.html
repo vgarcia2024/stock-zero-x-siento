@@ -1,55 +1,58 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Documentos de Clientes</title>
-    <link rel="stylesheet" href="documentos.css">
+<meta charset="UTF-8">
+<title>Documentos - Saphirus</title>
+<link rel="stylesheet" href="documentos.css">
 </head>
 <body>
 
 <div class="layout">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <h2>Saphirus POS</h2>
-        <nav>
-            <a href="index.html">Stock</a>
-            <a href="documentos.html" class="active">Documentos</a>
-        </nav>
-    </aside>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>Saphirus Admin</h2>
+    </div>
 
-    <!-- Main -->
-    <main class="main">
+    <nav>
+      <button onclick="window.location.href='index.html'">← Volver</button>
+      <button class="active">Documentos</button>
+    </nav>
+  </aside>
 
-        <header class="header">
-            <h1>Documentos de Clientes</h1>
-            <button onclick="crearNuevo()">+ Nueva Carpeta</button>
-        </header>
+  <!-- Main -->
+  <main class="main">
 
-        <div class="search-box">
-            <input type="text" id="dniInput" placeholder="Buscar o crear por DNI...">
-        </div>
+    <header class="header">
+      <h1>Documentos de Clientes</h1>
+      <button onclick="crearNuevo()">+ Nueva Carpeta</button>
+    </header>
 
-        <div id="gridDocumentos" class="grid"></div>
+    <div class="search-area">
+      <input type="text" id="dniInput" placeholder="Buscar por DNI...">
+    </div>
 
-    </main>
+    <div id="gridDocumentos" class="grid"></div>
+
+  </main>
 
 </div>
 
 <!-- Modal -->
 <div id="modal" class="modal hidden">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="tituloModal"></h2>
-            <button onclick="cerrarModal()">X</button>
-        </div>
-
-        <textarea id="editorTexto"></textarea>
-
-        <div class="modal-footer">
-            <button onclick="guardarDocumento()">Guardar</button>
-        </div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="tituloModal"></h2>
+      <button onclick="cerrarModal()">X</button>
     </div>
+
+    <textarea id="editorTexto"></textarea>
+
+    <div class="modal-footer">
+      <button onclick="guardarDocumento()">Guardar</button>
+    </div>
+  </div>
 </div>
 
 <script src="documentos.js"></script>
