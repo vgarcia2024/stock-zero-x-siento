@@ -18,7 +18,7 @@ import {
 
 /* ========================== ESTADO ========================== */
 let usuarioActual = null;
-let categorias = ["Textil","Difusor","Aerosol","Sahumerio","Tarjeta","Hornito","Carita","Tecnologia/Varios"];
+let categorias = [];
 let productos = [];
 let ventas = [];
 let usuarios = [];
@@ -109,8 +109,7 @@ function iniciarApp(){
   document.getElementById("userName").textContent = usuarioActual.user + " (" + usuarioActual.rol + ")";
   document.getElementById("btnAjustes").style.display = usuarioActual.rol==="admin"?"block":"none";
 
-  cargarSelects();
-  cargarEliminarCategorias();
+  cargarCategorias();
   cargarVendedores();
   cargarUsuarios();
   cargarProductos();
@@ -142,6 +141,7 @@ function showSection(id, btn){
 
 /* ========================== PRODUCTOS ========================== */
 const productosCol = collection(db,"productos");
+const categoriasCol = collection(db,"categorias");
 
 async function agregarProducto(){
   const codigo=document.getElementById("codigo").value.trim();
@@ -306,6 +306,18 @@ function limpiarVenta() {
 
 
 /* ========================== CATEGORIAS ========================== */
+function cargarCategorias(){
+  onSnapshot(categoriasCol, snapshot=>{
+    categorias = [];
+    snapshot.forEach(docu=>{
+      categorias.push(docu.data().nombre);
+    });
+
+    cargarSelects();
+    cargarEliminarCategorias();
+  });
+}
+
 function cargarSelects(){
   const categoriaSel=document.getElementById("categoria");
   categoriaSel.innerHTML='<option value="">Elige</option>';
@@ -324,17 +336,34 @@ function cargarEliminarCategorias(){
   });
 }
 
-function agregarCategoria(){
-  const n=document.getElementById("nuevaCategoria").value.trim();
+async function agregarCategoria(){
+  const n = document.getElementById("nuevaCategoria").value.trim();
   if(!n) return;
-  if(categorias.includes(n)){ mostrarMensaje("Ya existe","error"); return; }
-  categorias.push(n); cargarSelects(); cargarEliminarCategorias(); mostrarMensaje("Categoría agregada","success");
+
+  try {
+    await setDoc(doc(categoriasCol, n), { nombre: n });
+    mostrarMensaje("Categoría agregada","success");
+    document.getElementById("nuevaCategoria").value="";
+  } catch(e){
+    console.error(e);
+    mostrarMensaje("Error al agregar categoría","error");
+  }
 }
 
-function eliminarCategoria(){
-  const cat=document.getElementById("categoriaEliminar").value;
-  if(!cat){ mostrarMensaje("Elegí una","error"); return; }
-  categorias=categorias.filter(c=>c!==cat); cargarSelects(); cargarEliminarCategorias(); mostrarMensaje("Categoría eliminada","success");
+async function eliminarCategoria(){
+  const cat = document.getElementById("categoriaEliminar").value;
+  if(!cat){ 
+    mostrarMensaje("Elegí una","error"); 
+    return; 
+  }
+
+  try {
+    await deleteDoc(doc(categoriasCol, cat));
+    mostrarMensaje("Categoría eliminada","success");
+  } catch(e){
+    console.error(e);
+    mostrarMensaje("Error al eliminar","error");
+  }
 }
 
 /* ========================== BUSCADOR DE PRODUCTOS ========================== */
