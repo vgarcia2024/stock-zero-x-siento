@@ -210,24 +210,24 @@
 
     <div id="toast"></div>
   </div>
-
-  <div id="modalEditar" class="modal-overlay">
-  <div class="modal-editar">
-    <h3>Editar cantidad</h3>
-    
-    <p id="modalProductoNombre"></p>
-
-    <input 
-      type="number" 
-      id="modalNuevaCantidad" 
-      min="0"
-    />
-
-    <div class="modal-buttons">
-      <button onclick="cerrarModal()">Cancelar</button>
-      <button onclick="guardarCantidad()">Guardar</button>
+  
+    <div id="modalEditar" class="modal-overlay">
+    <div class="modal-editar">
+      <h3>Editar cantidad</h3>
+      
+      <p id="modalProductoNombre"></p>
+  
+      <input 
+        type="number" 
+        id="modalNuevaCantidad" 
+        min="0"
+      />
+  
+      <div class="modal-buttons">
+        <button class="danger" onclick="cerrarModal()">Cancelar</button>
+        <button class="primary success" onclick="guardarCantidad()">Guardar</button>
+      </div>
     </div>
   </div>
-</div>
 </body>
 </html>
