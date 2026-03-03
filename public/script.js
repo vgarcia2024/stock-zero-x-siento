@@ -24,6 +24,7 @@ let ventas = [];
 let usuarios = [];
 let ultimaVenta = null;
 let productoEditando = null;
+let productoEditandoCodigo = null;
 
 /* ========================== LOGIN ========================== */
 async function login() {
@@ -418,24 +419,46 @@ function renderProductos(lista){
 
 } // 🔥 cerramos función
 
-function abrirEditarCantidad(codigo){
+function abrirEditarCantidad(codigo) {
   const producto = productos.find(p => p.codigo === codigo);
-  if(!producto) return;
 
-  productoEditando = producto;
+  if (!producto) return;
 
-  document.getElementById("modalProductoNombre").innerText =
-    producto.nombre;
+  productoEditandoCodigo = codigo;
 
-  document.getElementById("modalNuevaCantidad").value =
-    producto.cantidad;
+  document.getElementById("modalNuevoNombre").value = producto.nombre;
+  document.getElementById("modalNuevaCantidad").value = producto.cantidad;
 
   document.getElementById("modalEditar").classList.add("show");
 }
 
+function guardarProducto() {
+  const nuevoNombre = document.getElementById("modalNuevoNombre").value.trim();
+  const nuevaCantidad = parseInt(document.getElementById("modalNuevaCantidad").value);
+
+  const producto = productos.find(p => p.codigo === productoEditandoCodigo);
+
+  if (!producto) return;
+
+  if (nuevoNombre === "") {
+    alert("El nombre no puede estar vacío");
+    return;
+  }
+
+  producto.nombre = nuevoNombre;
+  producto.cantidad = isNaN(nuevaCantidad) ? 0 : nuevaCantidad;
+
+  renderProductos(productos);
+  cerrarModal();
+}
+
 function cerrarModal(){
   document.getElementById("modalEditar").classList.remove("show");
-  productoEditando = null;
+  
+  document.getElementById("modalNuevoNombre").value = "";
+  document.getElementById("modalNuevaCantidad").value = "";
+
+  productoEditandoCodigo = null;
 }
 
 async function guardarCantidad(){
