@@ -448,3 +448,19 @@ tr:hover {
   }
 }
 
+.btn-editar {
+  margin-left: 8px;
+  background: var(--accent);
+  border: none;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.btn-editar:hover {
+  background: #4f46e5;
+  transform: scale(1.05);
+}
