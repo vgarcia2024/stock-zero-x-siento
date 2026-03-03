@@ -432,7 +432,7 @@ function abrirEditarCantidad(codigo) {
   document.getElementById("modalEditar").classList.add("show");
 }
 
-function guardarProducto() {
+async function guardarProducto() {
   const nuevoNombre = document.getElementById("modalNuevoNombre").value.trim();
   const nuevaCantidad = parseInt(document.getElementById("modalNuevaCantidad").value);
 
@@ -445,11 +445,26 @@ function guardarProducto() {
     return;
   }
 
-  producto.nombre = nuevoNombre;
-  producto.cantidad = isNaN(nuevaCantidad) ? 0 : nuevaCantidad;
+  try {
+    await setDoc(
+      doc(db, "productos", productoEditandoCodigo),
+      {
+        ...producto,
+        nombre: nuevoNombre,
+        cantidad: isNaN(nuevaCantidad) ? 0 : nuevaCantidad
+      }
+    );
 
-  renderProductos(productos);
-  cerrarModal();
+    // 🔥 TOAST DE CONFIRMACIÓN
+    mostrarMensaje("Editado correctamente", "success");
+
+    renderProductos(productos);
+    cerrarModal();
+
+  } catch (e) {
+    console.error(e);
+    mostrarMensaje("Error al actualizar", "error");
+  }
 }
 
 function cerrarModal(){
