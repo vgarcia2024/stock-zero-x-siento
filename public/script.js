@@ -441,11 +441,12 @@ async function guardarProducto() {
   if (!producto) return;
 
   if (nuevoNombre === "") {
-    alert("El nombre no puede estar vacío");
+    mostrarMensaje("El nombre no puede estar vacío", "error");
     return;
   }
 
   try {
+    // 🔥 Guardamos en Firebase
     await setDoc(
       doc(db, "productos", productoEditandoCodigo),
       {
@@ -455,10 +456,8 @@ async function guardarProducto() {
       }
     );
 
-    // 🔥 TOAST DE CONFIRMACIÓN
     mostrarMensaje("Editado correctamente", "success");
 
-    renderProductos(productos);
     cerrarModal();
 
   } catch (e) {
