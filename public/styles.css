@@ -464,3 +464,14 @@ tr:hover {
   background: #4f46e5;
   transform: scale(1.05);
 }
+
+.btn-modal {
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  min-width: 90px;
+  transition: 0.2s ease;
+}
