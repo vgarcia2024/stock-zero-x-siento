@@ -390,7 +390,7 @@ function renderProductos(lista){
   // 🔴 Ordenamos: primero sin stock
   const ordenados = [...lista].sort((a, b) => a.cantidad - b.cantidad);
 
-  ordenados.forEach(p=>{
+  ordenados.forEach(p => {
     const tr = document.createElement("tr");
 
     // 🔴 Si no tiene stock, le agregamos clase
@@ -398,21 +398,25 @@ function renderProductos(lista){
       tr.classList.add("sin-stock");
     }
 
-      tr.innerHTML = `
-    <td>${p.codigo}</td>
-    <td>${p.nombre}</td>
-    <td>${p.categoria}</td>
-    <td class="cantidad-cell">
-      ${p.cantidad}
-      <button class="btn-editar">✏️</button>
-    </td>
-  `;
-  
-  const btnEditar = tr.querySelector(".btn-editar");
-  btnEditar.addEventListener("click", () => {
-    abrirEditarCantidad(p.codigo);
-  });
-}
+    tr.innerHTML = `
+      <td>${p.codigo}</td>
+      <td>${p.nombre}</td>
+      <td>${p.categoria}</td>
+      <td class="cantidad-cell">
+        ${p.cantidad}
+        <button class="btn-editar">✏️</button>
+      </td>
+    `;
+
+    const btnEditar = tr.querySelector(".btn-editar");
+    btnEditar.addEventListener("click", () => {
+      abrirEditarCantidad(p.codigo);
+    });
+
+    tbody.appendChild(tr); // 🔥 ESTO ES CLAVE
+  }); // 🔥 cerramos forEach
+
+} // 🔥 cerramos función
 
 function abrirEditarCantidad(codigo){
   const producto = productos.find(p => p.codigo === codigo);
