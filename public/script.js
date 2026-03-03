@@ -23,6 +23,7 @@ let productos = [];
 let ventas = [];
 let usuarios = [];
 let ultimaVenta = null;
+let productoEditando = null;
 
 /* ========================== LOGIN ========================== */
 async function login() {
@@ -401,11 +402,68 @@ function renderProductos(lista){
       <td>${p.codigo}</td>
       <td>${p.nombre}</td>
       <td>${p.categoria}</td>
-      <td>${p.cantidad}</td>
+      <td class="cantidad-cell">
+      ${p.cantidad}
+      <button class="btn-editar"
+        onclick="abrirEditarCantidad('${p.codigo}')">
+        ✏️
+      </button>
+    </td>
     `;
 
     tbody.appendChild(tr);
   });
+}
+
+function abrirEditarCantidad(codigo){
+  const producto = productos.find(p => p.codigo === codigo);
+  if(!producto) return;
+
+  productoEditando = producto;
+
+  document.getElementById("modalProductoNombre").innerText =
+    producto.nombre;
+
+  document.getElementById("modalNuevaCantidad").value =
+    producto.cantidad;
+
+  document.getElementById("modalEditar").style.display = "flex";
+}
+
+function cerrarModal(){
+  document.getElementById("modalEditar").style.display = "none";
+  productoEditando = null;
+}
+
+async function guardarCantidad(){
+
+  if(!productoEditando) return;
+
+  const nuevaCantidad = Number(
+    document.getElementById("modalNuevaCantidad").value
+  );
+
+  if(isNaN(nuevaCantidad) || nuevaCantidad < 0){
+    mostrarMensaje("Cantidad inválida","error");
+    return;
+  }
+
+  try{
+    await setDoc(
+      doc(db,"productos",productoEditando.codigo),
+      {
+        ...productoEditando,
+        cantidad: nuevaCantidad
+      }
+    );
+
+    mostrarMensaje("Cantidad actualizada","success");
+    cerrarModal();
+
+  }catch(e){
+    console.error(e);
+    mostrarMensaje("Error al actualizar","error");
+  }
 }
 
 
@@ -592,4 +650,7 @@ window.resetearTodo=resetearTodo;
 window.filtrarProductos = filtrarProductos;
 window.revertirUltimaVenta = revertirUltimaVenta;
 window.registrarse = registrarse;
+window.abrirEditarCantidad = abrirEditarCantidad;
+window.cerrarModal = cerrarModal;
+window.guardarCantidad = guardarCantidad;
 
