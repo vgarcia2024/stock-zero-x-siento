@@ -679,4 +679,5 @@ window.registrarse = registrarse;
 window.abrirEditarCantidad = abrirEditarCantidad;
 window.cerrarModal = cerrarModal;
 window.guardarCantidad = guardarCantidad;
+window.guardarProducto = guardarProducto;
 
