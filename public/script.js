@@ -398,20 +398,19 @@ function renderProductos(lista){
       tr.classList.add("sin-stock");
     }
 
-    tr.innerHTML = `
-      <td>${p.codigo}</td>
-      <td>${p.nombre}</td>
-      <td>${p.categoria}</td>
-      <td class="cantidad-cell">
+      tr.innerHTML = `
+    <td>${p.codigo}</td>
+    <td>${p.nombre}</td>
+    <td>${p.categoria}</td>
+    <td class="cantidad-cell">
       ${p.cantidad}
-      <button class="btn-editar"
-        onclick="abrirEditarCantidad('${p.codigo}')">
-        ✏️
-      </button>
+      <button class="btn-editar">✏️</button>
     </td>
-    `;
-
-    tbody.appendChild(tr);
+  `;
+  
+  const btnEditar = tr.querySelector(".btn-editar");
+  btnEditar.addEventListener("click", () => {
+    abrirEditarCantidad(p.codigo);
   });
 }
 
