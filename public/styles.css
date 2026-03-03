@@ -389,7 +389,7 @@ tr:hover {
   display: flex;
 }
 
-.modal {
+.modal-editar {
   background: white;
   padding: 20px;
   border-radius: 10px;
