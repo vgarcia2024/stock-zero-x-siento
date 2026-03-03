@@ -427,11 +427,11 @@ function abrirEditarCantidad(codigo){
   document.getElementById("modalNuevaCantidad").value =
     producto.cantidad;
 
-  document.getElementById("modalEditar").style.display = "flex";
+  document.getElementById("modalEditar").classList.add("show");
 }
 
 function cerrarModal(){
-  document.getElementById("modalEditar").style.display = "none";
+  document.getElementById("modalEditar").classList.remove("show");
   productoEditando = null;
 }
 
