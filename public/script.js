@@ -162,6 +162,40 @@ function limpiarStock(){
   document.getElementById("nombre").value="";
   document.getElementById("categoria").value="";
 }
+/* ========================== CAPITALIZAR ========================== */
+function capitalizar(texto) {
+  if (!texto) return "";
+  return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+}
+
+async function capitalizarProductos() {
+  if (usuarioActual.rol !== "admin") {
+    mostrarMensaje("No autorizado", "error");
+    return;
+  }
+
+  try {
+    const snap = await getDocs(productosCol);
+
+    snap.forEach(async (docu) => {
+      const data = docu.data();
+      const nuevoNombre = capitalizar(data.nombre);
+
+      if (data.nombre !== nuevoNombre) {
+        await setDoc(doc(db, "productos", docu.id), {
+          ...data,
+          nombre: nuevoNombre
+        });
+      }
+    });
+
+    mostrarMensaje("Nombres capitalizados correctamente", "success");
+  } catch (e) {
+    console.error(e);
+    mostrarMensaje("Error al capitalizar", "error");
+  }
+}
+
 
 /* ========================== VENTAS ========================== */
 function cargarVendedores(){
@@ -694,4 +728,4 @@ window.abrirEditarCantidad = abrirEditarCantidad;
 window.cerrarModal = cerrarModal;
 window.guardarCantidad = guardarCantidad;
 window.guardarProducto = guardarProducto;
-
+window.capitalizarProductos = capitalizarProductos;
