@@ -597,8 +597,9 @@ function actualizarDashboard(){
   `;
 
   ventas
-    .filter(v => !v.revertida)
-    .forEach(v =>{
+  .filter(v => !v.revertida)
+  .sort((a, b) => b.timestamp - a.timestamp) // 🔥 AQUÍ VA
+  .forEach(v =>{
       html += `
         <tr>
           <td>${v.vendedor}</td>
