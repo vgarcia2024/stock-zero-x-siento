@@ -56,6 +56,7 @@
       <button onclick="showSection('stats')">Estadísticas</button>
       <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
       <button onclick="window.location.href='documentos.html'">Documentos</button>
+      <button onclick="showSection('recibos')">Recibos</button>
     </nav>
 
     <main>
@@ -211,6 +212,28 @@
           </table>
         </div>
       </section>
+
+      <section id="recibos">
+  <div class="card-box">
+    <h2>Generar Recibo</h2>
+
+    <label>Nombre</label>
+    <input id="reciboNombre" />
+
+    <label>Apellido</label>
+    <input id="reciboApellido" />
+
+    <label>Monto</label>
+    <input type="number" id="reciboMonto" />
+
+    <label>Comentario</label>
+    <input id="reciboComentario" />
+
+    <button class="primary success" onclick="crearRecibo()">
+      Generar Recibo
+    </button>
+  </div>
+</section>
 
     </main>
 
