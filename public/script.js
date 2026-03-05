@@ -730,3 +730,4 @@ window.cerrarModal = cerrarModal;
 window.guardarCantidad = guardarCantidad;
 window.guardarProducto = guardarProducto;
 window.capitalizarProductos = capitalizarProductos;
+window.mostrarMensaje = mostrarMensaje;
