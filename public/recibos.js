@@ -84,24 +84,58 @@ function generarPDF(numero, nombre, apellido, monto, comentario) {
 
   const fecha = new Date().toLocaleDateString();
 
-  docPDF.setFontSize(20);
-  docPDF.text("RECIBO", 85, 20);
+  /* ======= ENCABEZADO ======= */
+
+  docPDF.setFontSize(22);
+  docPDF.setFont("helvetica", "bold");
+  docPDF.text("ZERO X SIENTO", 20, 20);
+
+  docPDF.setFontSize(16);
+  docPDF.text("RECIBO", 160, 20);
 
   docPDF.setFontSize(12);
+  docPDF.setFont("helvetica", "normal");
+  docPDF.text(`N° ${numero.toString().padStart(6, "0")}`, 160, 30);
+  docPDF.text(`Fecha: ${fecha}`, 160, 38);
 
-  docPDF.text(`Número: ${numero}`, 20, 40);
-  docPDF.text(`Fecha: ${fecha}`, 20, 50);
+  /* ======= LINEA SEPARADORA ======= */
+  docPDF.line(20, 45, 190, 45);
 
-  docPDF.text(`Cliente: ${nombre} ${apellido}`, 20, 65);
+  /* ======= CUERPO ======= */
 
-  docPDF.setFontSize(14);
-  docPDF.text(`Monto: $${monto}`, 20, 80);
+  docPDF.setFontSize(13);
+  docPDF.text("Recibí de:", 20, 60);
+
+  docPDF.setFont("helvetica", "bold");
+  docPDF.text(`${nombre} ${apellido}`, 20, 70);
+
+  docPDF.setFont("helvetica", "normal");
+  docPDF.text("La suma de:", 20, 85);
+
+  docPDF.setFontSize(18);
+  docPDF.setFont("helvetica", "bold");
+  docPDF.text(`$ ${monto.toLocaleString()}`, 20, 100);
 
   docPDF.setFontSize(12);
-  docPDF.text("Comentario:", 20, 100);
-  docPDF.text(comentario || "-", 20, 110);
+  docPDF.setFont("helvetica", "normal");
 
-  docPDF.save(`Recibo_${numero}.pdf`);
+  /* ======= COMENTARIO EN CAJA ======= */
+
+  docPDF.rect(20, 115, 170, 30);
+  docPDF.text("Concepto:", 25, 125);
+  docPDF.text(comentario || "-", 25, 135);
+
+  /* ======= FIRMA ======= */
+
+  docPDF.line(120, 170, 180, 170);
+  docPDF.text("Firma", 145, 178);
+
+  /* ======= PIE ======= */
+
+  docPDF.setFontSize(10);
+  docPDF.text("Gracias por su confianza.", 20, 190);
+
+  docPDF.save(`Recibo_${numero.toString().padStart(6, "0")}.pdf`);
 }
 
 /* ========================== LIMPIAR FORMULARIO ========================== */
