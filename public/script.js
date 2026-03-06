@@ -444,9 +444,12 @@ function renderProductos(lista){
     `;
 
     const btnEditar = tr.querySelector(".btn-editar");
-    btnEditar.addEventListener("click", () => {
-      abrirEditarCantidad(p.codigo);
-    });
+
+    if (btnEditar) {
+      btnEditar.addEventListener("click", () => {
+        abrirEditarCantidad(p.codigo);
+      });
+    }
 
     tbody.appendChild(tr); // 🔥 ESTO ES CLAVE
   }); // 🔥 cerramos forEach
