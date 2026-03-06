@@ -454,6 +454,12 @@ function renderProductos(lista){
 } // 🔥 cerramos función
 
 function abrirEditarCantidad(codigo) {
+
+  if(usuarioActual.rol !== "admin"){
+    mostrarMensaje("No autorizado","error");
+    return;
+  }
+
   const producto = productos.find(p => p.codigo === codigo);
 
   if (!producto) return;
