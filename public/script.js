@@ -439,7 +439,7 @@ function renderProductos(lista){
       <td>${p.categoria}</td>
       <td class="cantidad-cell">
         ${p.cantidad}
-        <button class="btn-editar">✏️</button>
+        ${usuarioActual.rol === "admin" ? '<button class="btn-editar">✏️</button>' : ''}
       </td>
     `;
 
