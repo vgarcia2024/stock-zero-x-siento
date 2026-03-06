@@ -80,60 +80,76 @@ async function crearRecibo() {
 function generarPDF(numero, nombre, apellido, monto, comentario) {
 
   const { jsPDF } = window.jspdf;
-  const docPDF = new jsPDF();
+
+  // 🔥 FORMATO TICKET TERMICO 80mm
+  const docPDF = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: [80, 180]
+  });
 
   const fecha = new Date().toLocaleDateString();
 
   /* ======= ENCABEZADO ======= */
 
-  docPDF.setFontSize(22);
   docPDF.setFont("helvetica", "bold");
-  docPDF.text("ZERO X SIENTO", 20, 20);
-
   docPDF.setFontSize(16);
-  docPDF.text("RECIBO", 160, 20);
+  docPDF.text("ZERO X SIENTO", 40, 12, { align: "center" });
 
-  docPDF.setFontSize(12);
-  docPDF.setFont("helvetica", "normal");
-  docPDF.text(`N° ${numero.toString().padStart(6, "0")}`, 160, 30);
-  docPDF.text(`Fecha: ${fecha}`, 160, 38);
+  docPDF.setFontSize(14);
+  docPDF.text("RECIBO", 40, 20, { align: "center" });
 
-  /* ======= LINEA SEPARADORA ======= */
-  docPDF.line(20, 45, 190, 45);
-
-  /* ======= CUERPO ======= */
+  /* ======= NUMERO Y FECHA (MAS GRANDES) ======= */
 
   docPDF.setFontSize(13);
-  docPDF.text("Recibí de:", 20, 60);
-
   docPDF.setFont("helvetica", "bold");
-  docPDF.text(`${nombre} ${apellido}`, 20, 70);
-
-  docPDF.setFont("helvetica", "normal");
-  docPDF.text("La suma de:", 20, 85);
-
-  docPDF.setFontSize(18);
-  docPDF.setFont("helvetica", "bold");
-  docPDF.text(`$ ${monto.toLocaleString()}`, 20, 100);
+  docPDF.text(`N° ${numero.toString().padStart(6, "0")}`, 40, 30, { align: "center" });
 
   docPDF.setFontSize(12);
   docPDF.setFont("helvetica", "normal");
+  docPDF.text(`Fecha: ${fecha}`, 40, 38, { align: "center" });
 
-  /* ======= COMENTARIO EN CAJA ======= */
+  /* ======= LINEA ======= */
 
-  docPDF.rect(20, 115, 170, 30);
-  docPDF.text("Concepto:", 25, 125);
-  docPDF.text(comentario || "-", 25, 135);
+  docPDF.line(5, 45, 75, 45);
+
+  /* ======= CLIENTE ======= */
+
+  docPDF.setFontSize(11);
+  docPDF.text("Recibí de:", 5, 55);
+
+  docPDF.setFont("helvetica", "bold");
+  docPDF.setFontSize(13);
+  docPDF.text(`${nombre} ${apellido}`, 5, 63);
+
+  /* ======= MONTO ======= */
+
+  docPDF.setFont("helvetica", "normal");
+  docPDF.setFontSize(11);
+  docPDF.text("La suma de:", 5, 75);
+
+  docPDF.setFont("helvetica", "bold");
+  docPDF.setFontSize(18);
+  docPDF.text(`$ ${monto.toLocaleString()}`, 5, 88);
+
+  /* ======= CONCEPTO ======= */
+
+  docPDF.setFont("helvetica", "normal");
+  docPDF.setFontSize(11);
+  docPDF.text("Concepto:", 5, 102);
+
+  docPDF.rect(5, 106, 70, 20);
+  docPDF.text(comentario || "-", 7, 116);
 
   /* ======= FIRMA ======= */
 
-  docPDF.line(120, 170, 180, 170);
-  docPDF.text("Firma", 145, 178);
+  docPDF.line(40, 145, 75, 145);
+  docPDF.text("Firma", 55, 150);
 
   /* ======= PIE ======= */
 
   docPDF.setFontSize(10);
-  docPDF.text("Gracias por su confianza.", 20, 190);
+  docPDF.text("Gracias por su confianza", 40, 165, { align: "center" });
 
   docPDF.save(`Recibo_${numero.toString().padStart(6, "0")}.pdf`);
 }
