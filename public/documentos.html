@@ -81,44 +81,13 @@
       <button class="modal-close" onclick="cerrarModal()">✕</button>
     </div>
 
-    <!-- Tabs -->
-    <div class="modal-tabs">
-      <button class="tab-btn active" id="tab-texto" onclick="switchTab('texto')">📝 Notas</button>
-      <button class="tab-btn" id="tab-archivos" onclick="switchTab('archivos')">📎 Archivos</button>
-    </div>
-
-    <!-- Tab: Texto -->
-    <div class="modal-body" id="panel-texto">
+    <div class="modal-body">
       <textarea id="editorTexto" placeholder="Escribí acá la información del cliente: qué tiene que pagar, vencimientos, notas importantes..."></textarea>
-    </div>
-
-    <!-- Tab: Archivos -->
-    <div class="modal-body hidden" id="panel-archivos">
-
-      <!-- Drop zone -->
-      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
-           ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropArchivo(event)">
-        <div class="drop-zone-icon">📂</div>
-        <div class="drop-zone-text">Hacé click o arrastrá archivos acá</div>
-        <div class="drop-zone-sub">PDF, imágenes, Word, Excel y más — sin límite de tipo</div>
-      </div>
-      <input type="file" id="fileInput" multiple onchange="subirArchivos(this.files)">
-
-      <!-- Progress -->
-      <div id="upload-progress-container"></div>
-
-      <!-- Lista archivos -->
-      <div class="archivos-lista" id="archivos-lista">
-        <div style="font-size:12px; color:var(--gray-500); text-align:center; padding:1rem 0;">
-          No hay archivos adjuntos todavía.
-        </div>
-      </div>
-
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn btn-blue" onclick="guardarDocumento()">Guardar notas</button>
+      <button class="btn btn-blue" onclick="guardarDocumento()">Guardar</button>
     </div>
 
   </div>
