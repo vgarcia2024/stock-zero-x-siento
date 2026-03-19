@@ -95,6 +95,12 @@ async function agregarProducto() {
   const categoria= document.getElementById("categoria").value;
   const cantidad = Number(document.getElementById("cantidad").value);
   if (!codigo || !nombre || !categoria || cantidad <= 0) { mostrarMensaje("Completa todos los datos", "error"); return; }
+  
+  // Validar código duplicado
+  if (productos.some(p => p.codigo === codigo)) {
+    mostrarMensaje(`El código "${codigo}" ya existe. Usá otro o editá el producto existente.`, "error");
+    return;
+  }
   await setDoc(doc(productosCol, codigo), { codigo, nombre, categoria, cantidad });
   mostrarMensaje("Producto guardado", "success");
   document.getElementById("codigo").value = "";
@@ -119,6 +125,69 @@ async function capitalizarProductos() {
     mostrarMensaje("Nombres capitalizados correctamente", "success");
   } catch(e) { console.error(e); mostrarMensaje("Error al capitalizar", "error"); }
 }
+
+/* ========================== AUTOCOMPLETE VENTAS ========================== */
+window.autocompleteVenta = function() {
+  const q   = document.getElementById("ventaBuscador").value.trim().toLowerCase();
+  const drop = document.getElementById("autocompleteDropdown");
+
+  // Limpiar selección previa
+  document.getElementById("ventaCodigo").value = "";
+  document.getElementById("ventaProductoSeleccionado").classList.add("hidden");
+
+  if (!q || q.length < 1) { drop.classList.add("hidden"); return; }
+
+  const filtrados = productos.filter(p =>
+    p.codigo.toLowerCase().includes(q) || p.nombre.toLowerCase().includes(q)
+  ).slice(0, 8);
+
+  if (filtrados.length === 0) { drop.classList.add("hidden"); return; }
+
+  drop.innerHTML = filtrados.map(p => `
+    <div class="autocomplete-item" onclick="seleccionarProductoVenta('${p.codigo}')">
+      <div>
+        <div class="autocomplete-item-nombre">${p.nombre}</div>
+        <div class="autocomplete-item-meta">Cód: ${p.codigo} · ${p.categoria}</div>
+      </div>
+      <span class="autocomplete-item-stock ${p.cantidad > 0 ? 'ok' : 'low'}">
+        ${p.cantidad} en stock
+      </span>
+    </div>
+  `).join("");
+  drop.classList.remove("hidden");
+};
+
+window.seleccionarProductoVenta = function(codigo) {
+  const prod = productos.find(p => p.codigo === codigo);
+  if (!prod) return;
+  document.getElementById("ventaCodigo").value = codigo;
+  document.getElementById("ventaBuscador").value = "";
+  document.getElementById("autocompleteDropdown").classList.add("hidden");
+  const sel = document.getElementById("ventaProductoSeleccionado");
+  sel.innerHTML = `
+    <div>
+      <div class="producto-seleccionado-nombre">${prod.nombre}</div>
+      <div class="producto-seleccionado-meta">Cód: ${prod.codigo} · ${prod.cantidad} en stock</div>
+    </div>
+    <button class="producto-seleccionado-clear" onclick="limpiarSeleccionVenta()" title="Quitar">✕</button>
+  `;
+  sel.classList.remove("hidden");
+  document.getElementById("ventaCantidad").focus();
+};
+
+window.limpiarSeleccionVenta = function() {
+  document.getElementById("ventaCodigo").value = "";
+  document.getElementById("ventaBuscador").value = "";
+  document.getElementById("ventaProductoSeleccionado").classList.add("hidden");
+  document.getElementById("ventaBuscador").focus();
+};
+
+// Cerrar dropdown al hacer click afuera
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".autocomplete-wrap")) {
+    document.getElementById("autocompleteDropdown")?.classList.add("hidden");
+  }
+});
 
 /* ========================== VENTAS ========================== */
 function cargarVendedores() {
@@ -152,7 +221,8 @@ async function registrarVenta() {
       fecha: new Date().toLocaleString(), timestamp: Date.now(), revertida: false
     });
     ultimaVenta = { id: ventaRef.id, codigo, cantidad: cantidadVenta };
-    document.getElementById("ventaCodigo").value = "";
+    // Limpiar form ventas
+    window.limpiarSeleccionVenta();
     document.getElementById("ventaCantidad").value = 1;
     mostrarMensaje("Venta registrada", "success");
   } catch(e) { console.error(e); mostrarMensaje("Error al registrar venta", "error"); }
@@ -286,13 +356,98 @@ function actualizarDashboard() {
   for (const v in ranking) { if (ranking[v] > max) { max = ranking[v]; mejor = v; } }
   document.getElementById("mejorVendedor").textContent = mejor;
   renderProductos(productos);
-  let html = `<table><thead><tr><th>Vendedor</th><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Fecha</th></tr></thead><tbody>`;
-  ventas.filter(v => !v.revertida).sort((a, b) => b.timestamp - a.timestamp).forEach(v => {
+  actualizarFiltroVendedores();
+  renderStats();
+}
+
+function actualizarFiltroVendedores() {
+  const sel = document.getElementById("filtroVendedor");
+  if (!sel) return;
+  const actual = sel.value;
+  const vendedoresUnicos = [...new Set(ventas.filter(v => !v.revertida).map(v => v.vendedor))];
+  sel.innerHTML = '<option value="">Todos</option>' +
+    vendedoresUnicos.map(v => `<option value="${v}"${v === actual ? " selected" : ""}>${v}</option>`).join("");
+}
+
+window.renderStats = function() {
+  const filtroFecha    = document.getElementById("filtroFecha")?.value || "todo";
+  const filtroVendedor = document.getElementById("filtroVendedor")?.value || "";
+
+  const ahora  = new Date();
+  const hoyStr = ahora.toLocaleDateString();
+
+  let ventasFiltradas = ventas.filter(v => !v.revertida);
+
+  // Filtro fecha
+  if (filtroFecha === "hoy") {
+    ventasFiltradas = ventasFiltradas.filter(v => v.fecha.includes(hoyStr));
+  } else if (filtroFecha === "semana") {
+    const lunes = new Date(ahora);
+    lunes.setDate(ahora.getDate() - ((ahora.getDay() + 6) % 7));
+    lunes.setHours(0, 0, 0, 0);
+    ventasFiltradas = ventasFiltradas.filter(v => v.timestamp >= lunes.getTime());
+  } else if (filtroFecha === "mes") {
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1).getTime();
+    ventasFiltradas = ventasFiltradas.filter(v => v.timestamp >= inicioMes);
+  }
+
+  // Filtro vendedor
+  if (filtroVendedor) {
+    ventasFiltradas = ventasFiltradas.filter(v => v.vendedor === filtroVendedor);
+  }
+
+  ventasFiltradas.sort((a, b) => b.timestamp - a.timestamp);
+
+  // Resumen chips
+  const totalUnidades = ventasFiltradas.reduce((s, v) => s + Number(v.cantidad || 0), 0);
+  const resumen = document.getElementById("statsResumen");
+  if (resumen) {
+    resumen.innerHTML = `
+      <span class="stats-chip">📦 ${ventasFiltradas.length} ventas</span>
+      <span class="stats-chip">🔢 ${totalUnidades} unidades</span>
+    `;
+  }
+
+  const cont = document.getElementById("statsContent");
+  if (!cont) return;
+
+  if (ventasFiltradas.length === 0) {
+    cont.innerHTML = `<div style="text-align:center; padding:2rem; color:var(--text-soft); font-size:14px;">No hay ventas para los filtros seleccionados.</div>`;
+    return;
+  }
+
+  // Tabla desktop
+  let html = `
+    <div class="table-wrap stats-tabla">
+      <table>
+        <thead><tr><th>Vendedor</th><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Fecha</th></tr></thead>
+        <tbody>
+  `;
+  ventasFiltradas.forEach(v => {
     html += `<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.categoria || "-"}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`;
   });
-  html += "</tbody></table>";
-  document.getElementById("statsContent").innerHTML = html;
-}
+  html += `</tbody></table></div>`;
+
+  // Cards mobile
+  html += `<div class="venta-cards">`;
+  ventasFiltradas.forEach(v => {
+    html += `
+      <div class="venta-card">
+        <div class="venta-card-header">
+          <div class="venta-card-producto">${v.nombre}</div>
+          <div class="venta-card-cantidad">×${v.cantidad}</div>
+        </div>
+        <div class="venta-card-meta">
+          <span class="venta-card-tag">👤 ${v.vendedor}</span>
+          <span class="venta-card-tag">📂 ${v.categoria || "-"}</span>
+          <span class="venta-card-tag">🕐 ${v.fecha}</span>
+        </div>
+      </div>`;
+  });
+  html += `</div>`;
+
+  cont.innerHTML = html;
+};
 
 /* ========================== USUARIOS ========================== */
 const usuariosCol = collection(db, "usuarios");
