@@ -1,58 +1,34 @@
 import { auth, db } from "./firebase.js";
 import {
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword
+  signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  deleteDoc,
-  onSnapshot
+  collection, doc, setDoc, getDoc, getDocs, deleteDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ========================== ESTADO ========================== */
 let usuarioActual = null;
-let categorias = [];
-let productos = [];
-let ventas = [];
-let usuarios = [];
-let ultimaVenta = null;
-let productoEditando = null;
-let productoEditandoCodigo = null;
+let categorias = [], productos = [], ventas = [], usuarios = [];
+let ultimaVenta = null, productoEditandoCodigo = null;
 
 /* ========================== LOGIN ========================== */
 async function login() {
   const email = document.getElementById("loginUser").value.trim();
-  const pass = document.getElementById("loginPass").value.trim();
-  const errorEl = document.getElementById("loginError");
-  errorEl.textContent = "";
-
+  const pass  = document.getElementById("loginPass").value.trim();
+  document.getElementById("loginError").textContent = "";
   if (!email || !pass) { mostrarMensaje("Completá los datos", "error"); return; }
-
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
-    const rol = await obtenerRol(cred.user);
-    usuarioActual = { user: cred.user.email, rol };
+    usuarioActual = { user: cred.user.email, rol: await obtenerRol(cred.user) };
     iniciarApp();
-  } catch(e) {
-    console.error(e);
-    mostrarMensaje("Usuario o contraseña incorrecta", "error");
-  }
+  } catch(e) { console.error(e); mostrarMensaje("Usuario o contraseña incorrecta", "error"); }
 }
 
 async function registrarse() {
   await signOut(auth);
   const email = document.getElementById("loginUser").value.trim();
-  const pass = document.getElementById("loginPass").value.trim();
-
+  const pass  = document.getElementById("loginPass").value.trim();
   if (!email || !pass) { mostrarMensaje("Completá email y contraseña", "error"); return; }
-
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, "usuarios", cred.user.uid), { email, rol: "vendedor", nombre: email });
@@ -70,15 +46,13 @@ async function logout() { await signOut(auth); location.reload(); }
 async function obtenerRol(user) {
   try {
     const snap = await getDoc(doc(db, "usuarios", user.uid));
-    if (snap.exists()) return snap.data().rol;
-    return "vendedor";
-  } catch(e) { console.error("Error rol:", e); return "vendedor"; }
+    return snap.exists() ? snap.data().rol : "vendedor";
+  } catch(e) { return "vendedor"; }
 }
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const rol = await obtenerRol(user);
-    usuarioActual = { user: user.email, rol };
+    usuarioActual = { user: user.email, rol: await obtenerRol(user) };
     iniciarApp();
   }
 });
@@ -89,21 +63,15 @@ function iniciarApp() {
   document.getElementById("app").style.display = "block";
   document.getElementById("userName").textContent = usuarioActual.user + " (" + usuarioActual.rol + ")";
   document.getElementById("btnAjustes").style.display = usuarioActual.rol === "admin" ? "block" : "none";
-
-  cargarCategorias();
-  cargarVendedores();
-  cargarUsuarios();
-  cargarProductos();
-  cargarVentas();
-  actualizarDashboard();
+  cargarCategorias(); cargarVendedores(); cargarUsuarios();
+  cargarProductos(); cargarVentas(); actualizarDashboard();
   docIniciar();
 }
 
 /* ========================== TOAST ========================== */
 function mostrarMensaje(t, tipo = "info") {
   const toast = document.getElementById("toast");
-  toast.textContent = t;
-  toast.className = "";
+  toast.textContent = t; toast.className = "";
   toast.classList.add("show", tipo);
   setTimeout(() => toast.classList.remove("show"), 3500);
 }
@@ -112,12 +80,8 @@ function mostrarMensaje(t, tipo = "info") {
 function showSection(id) {
   document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-  // Marcar botón activo buscando el que llama a esta sección
   document.querySelectorAll("nav button").forEach(b => {
-    if (b.getAttribute("onclick") && b.getAttribute("onclick").includes(`'${id}'`)) {
-      b.classList.add("active");
-    }
+    b.classList.toggle("active", b.getAttribute("onclick")?.includes(`'${id}'`));
   });
 }
 
@@ -126,24 +90,18 @@ const productosCol = collection(db, "productos");
 const categoriasCol = collection(db, "categorias");
 
 async function agregarProducto() {
-  const codigo = document.getElementById("codigo").value.trim();
-  const nombre = document.getElementById("nombre").value.trim();
-  const categoria = document.getElementById("categoria").value;
+  const codigo   = document.getElementById("codigo").value.trim();
+  const nombre   = document.getElementById("nombre").value.trim();
+  const categoria= document.getElementById("categoria").value;
   const cantidad = Number(document.getElementById("cantidad").value);
   if (!codigo || !nombre || !categoria || cantidad <= 0) { mostrarMensaje("Completa todos los datos", "error"); return; }
-
   await setDoc(doc(productosCol, codigo), { codigo, nombre, categoria, cantidad });
   mostrarMensaje("Producto guardado", "success");
-  limpiarStock();
-}
-
-function limpiarStock() {
   document.getElementById("codigo").value = "";
   document.getElementById("nombre").value = "";
   document.getElementById("categoria").value = "";
 }
 
-/* ========================== CAPITALIZAR ========================== */
 function capitalizar(texto) {
   if (!texto) return "";
   return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
@@ -156,9 +114,7 @@ async function capitalizarProductos() {
     snap.forEach(async (docu) => {
       const data = docu.data();
       const nuevoNombre = capitalizar(data.nombre);
-      if (data.nombre !== nuevoNombre) {
-        await setDoc(doc(db, "productos", docu.id), { ...data, nombre: nuevoNombre });
-      }
+      if (data.nombre !== nuevoNombre) await setDoc(doc(db, "productos", docu.id), { ...data, nombre: nuevoNombre });
     });
     mostrarMensaje("Nombres capitalizados correctamente", "success");
   } catch(e) { console.error(e); mostrarMensaje("Error al capitalizar", "error"); }
@@ -168,14 +124,11 @@ async function capitalizarProductos() {
 function cargarVendedores() {
   const sel = document.getElementById("ventaVendedor");
   sel.innerHTML = "";
-  if (!usuarios.some(u => u.email === usuarioActual.user)) {
+  if (!usuarios.some(u => u.email === usuarioActual.user))
     usuarios.push({ email: usuarioActual.user, rol: usuarioActual.rol, nombre: usuarioActual.user });
-  }
-  const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.rol === "admin");
-  vendedores.forEach(v => {
+  usuarios.filter(u => u.rol === "vendedor" || u.rol === "admin").forEach(v => {
     const o = document.createElement("option");
-    o.value = v.email; o.textContent = v.email;
-    sel.appendChild(o);
+    o.value = v.email; o.textContent = v.email; sel.appendChild(o);
   });
   sel.value = usuarioActual.user;
 }
@@ -184,25 +137,23 @@ async function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
   const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value);
   if (!codigo || isNaN(cantidadVenta) || cantidadVenta <= 0) { mostrarMensaje("Datos inválidos", "error"); return; }
-
   const prod = productos.find(p => p.codigo === codigo);
   if (!prod) { mostrarMensaje("Producto no encontrado", "error"); return; }
   if (prod.cantidad < cantidadVenta) { mostrarMensaje("Stock insuficiente", "error"); return; }
-
-  const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
+  const vendedorEmail  = document.getElementById("ventaVendedor").value || usuarioActual.user;
   const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
-
   try {
     await setDoc(doc(db, "productos", codigo), { ...prod, cantidad: prod.cantidad - cantidadVenta });
     const ventasCol = collection(db, "ventas");
-    const ventaRef = doc(ventasCol);
+    const ventaRef  = doc(ventasCol);
     await setDoc(ventaRef, {
       codigo, nombre: prod.nombre, categoria: prod.categoria,
       vendedor: vendedorNombre, cantidad: cantidadVenta,
       fecha: new Date().toLocaleString(), timestamp: Date.now(), revertida: false
     });
     ultimaVenta = { id: ventaRef.id, codigo, cantidad: cantidadVenta };
-    limpiarVenta();
+    document.getElementById("ventaCodigo").value = "";
+    document.getElementById("ventaCantidad").value = 1;
     mostrarMensaje("Venta registrada", "success");
   } catch(e) { console.error(e); mostrarMensaje("Error al registrar venta", "error"); }
 }
@@ -210,7 +161,7 @@ async function registrarVenta() {
 async function revertirUltimaVenta() {
   if (!ultimaVenta) { mostrarMensaje("No hay ninguna venta para revertir", "error"); return; }
   try {
-    const prodRef = doc(db, "productos", ultimaVenta.codigo);
+    const prodRef  = doc(db, "productos", ultimaVenta.codigo);
     const prodSnap = await getDoc(prodRef);
     if (!prodSnap.exists()) { mostrarMensaje("Producto no encontrado", "error"); return; }
     const prod = prodSnap.data();
@@ -221,37 +172,17 @@ async function revertirUltimaVenta() {
   } catch(e) { console.error(e); mostrarMensaje("Error al revertir la venta", "error"); }
 }
 
-function limpiarVenta() {
-  document.getElementById("ventaCodigo").value = "";
-  document.getElementById("ventaCantidad").value = 1;
-  document.getElementById("ventaVendedor").value = usuarioActual.user;
-}
-
 /* ========================== CATEGORIAS ========================== */
 function cargarCategorias() {
   onSnapshot(categoriasCol, snapshot => {
     categorias = [];
     snapshot.forEach(docu => categorias.push(docu.data().nombre));
-    cargarSelects();
-    cargarEliminarCategorias();
-  });
-}
-
-function cargarSelects() {
-  const sel = document.getElementById("categoria");
-  sel.innerHTML = '<option value="">Elegí una categoría</option>';
-  categorias.forEach(c => {
-    const o = document.createElement("option");
-    o.value = c; o.textContent = c; sel.appendChild(o);
-  });
-}
-
-function cargarEliminarCategorias() {
-  const sel = document.getElementById("categoriaEliminar");
-  sel.innerHTML = '<option value="">Seleccionar categoría</option>';
-  categorias.forEach(c => {
-    const o = document.createElement("option");
-    o.value = c; o.textContent = c; sel.appendChild(o);
+    const sel = document.getElementById("categoria");
+    sel.innerHTML = '<option value="">Elegí una categoría</option>';
+    categorias.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; sel.appendChild(o); });
+    const selElim = document.getElementById("categoriaEliminar");
+    selElim.innerHTML = '<option value="">Seleccionar categoría</option>';
+    categorias.forEach(c => { const o = document.createElement("option"); o.value = c; o.textContent = c; selElim.appendChild(o); });
   });
 }
 
@@ -262,7 +193,7 @@ async function agregarCategoria() {
     await setDoc(doc(categoriasCol, n), { nombre: n });
     mostrarMensaje("Categoría agregada", "success");
     document.getElementById("nuevaCategoria").value = "";
-  } catch(e) { console.error(e); mostrarMensaje("Error al agregar categoría", "error"); }
+  } catch(e) { mostrarMensaje("Error al agregar categoría", "error"); }
 }
 
 async function eliminarCategoria() {
@@ -271,38 +202,30 @@ async function eliminarCategoria() {
   try {
     await deleteDoc(doc(categoriasCol, cat));
     mostrarMensaje("Categoría eliminada", "success");
-  } catch(e) { console.error(e); mostrarMensaje("Error al eliminar", "error"); }
+  } catch(e) { mostrarMensaje("Error al eliminar", "error"); }
 }
 
-/* ========================== BUSCADOR DE PRODUCTOS ========================== */
+/* ========================== PRODUCTOS RENDER ========================== */
 function filtrarProductos() {
   const q = document.getElementById("busquedaProducto").value.toLowerCase();
-  const filtrados = productos.filter(p =>
-    p.codigo.toLowerCase().includes(q) ||
-    p.nombre.toLowerCase().includes(q) ||
-    p.categoria.toLowerCase().includes(q)
-  );
-  renderProductos(filtrados);
+  renderProductos(productos.filter(p =>
+    p.codigo.toLowerCase().includes(q) || p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)
+  ));
 }
 
 function renderProductos(lista) {
   const tbody = document.querySelector("#productosDisponibles tbody");
   tbody.innerHTML = "";
-  const ordenados = [...lista].sort((a, b) => a.cantidad - b.cantidad);
-  ordenados.forEach(p => {
+  [...lista].sort((a, b) => a.cantidad - b.cantidad).forEach(p => {
     const tr = document.createElement("tr");
     if (p.cantidad === 0) tr.classList.add("sin-stock");
     tr.innerHTML = `
-      <td>${p.codigo}</td>
-      <td>${p.nombre}</td>
-      <td>${p.categoria}</td>
-      <td class="cantidad-cell">
-        ${p.cantidad}
+      <td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td>
+      <td class="cantidad-cell">${p.cantidad}
         ${usuarioActual.rol === "admin" ? '<button class="btn-editar">✏️</button>' : ''}
-      </td>
-    `;
-    const btnEditar = tr.querySelector(".btn-editar");
-    if (btnEditar) btnEditar.addEventListener("click", () => abrirEditarCantidad(p.codigo));
+      </td>`;
+    const btn = tr.querySelector(".btn-editar");
+    if (btn) btn.addEventListener("click", () => abrirEditarCantidad(p.codigo));
     tbody.appendChild(tr);
   });
 }
@@ -312,25 +235,24 @@ function abrirEditarCantidad(codigo) {
   const producto = productos.find(p => p.codigo === codigo);
   if (!producto) return;
   productoEditandoCodigo = codigo;
-  document.getElementById("modalNuevoNombre").value = producto.nombre;
+  document.getElementById("modalNuevoNombre").value   = producto.nombre;
   document.getElementById("modalNuevaCantidad").value = producto.cantidad;
   document.getElementById("modalEditar").classList.add("show");
 }
 
 async function guardarProducto() {
-  const nuevoNombre = document.getElementById("modalNuevoNombre").value.trim();
+  const nuevoNombre   = document.getElementById("modalNuevoNombre").value.trim();
   const nuevaCantidad = parseInt(document.getElementById("modalNuevaCantidad").value);
   const producto = productos.find(p => p.codigo === productoEditandoCodigo);
   if (!producto) return;
-  if (nuevoNombre === "") { mostrarMensaje("El nombre no puede estar vacío", "error"); return; }
+  if (!nuevoNombre) { mostrarMensaje("El nombre no puede estar vacío", "error"); return; }
   try {
     await setDoc(doc(db, "productos", productoEditandoCodigo), {
-      ...producto, nombre: nuevoNombre,
-      cantidad: isNaN(nuevaCantidad) ? 0 : nuevaCantidad
+      ...producto, nombre: nuevoNombre, cantidad: isNaN(nuevaCantidad) ? 0 : nuevaCantidad
     });
     mostrarMensaje("Editado correctamente", "success");
     cerrarModal();
-  } catch(e) { console.error(e); mostrarMensaje("Error al actualizar", "error"); }
+  } catch(e) { mostrarMensaje("Error al actualizar", "error"); }
 }
 
 function cerrarModal() {
@@ -341,41 +263,30 @@ function cerrarModal() {
 }
 
 async function guardarCantidad() {
-  if (!productoEditando) return;
+  if (!productoEditandoCodigo) return;
   const nuevaCantidad = Number(document.getElementById("modalNuevaCantidad").value);
   if (isNaN(nuevaCantidad) || nuevaCantidad < 0) { mostrarMensaje("Cantidad inválida", "error"); return; }
+  const producto = productos.find(p => p.codigo === productoEditandoCodigo);
   try {
-    await setDoc(doc(db, "productos", productoEditando.codigo), { ...productoEditando, cantidad: nuevaCantidad });
+    await setDoc(doc(db, "productos", productoEditandoCodigo), { ...producto, cantidad: nuevaCantidad });
     mostrarMensaje("Cantidad actualizada", "success");
     cerrarModal();
-  } catch(e) { console.error(e); mostrarMensaje("Error al actualizar", "error"); }
+  } catch(e) { mostrarMensaje("Error al actualizar", "error"); }
 }
 
 /* ========================== DASHBOARD ========================== */
 function actualizarDashboard() {
   const hoy = new Date().toLocaleDateString();
-  const ventasHoy = ventas.filter(v => !v.revertida && v.fecha.includes(hoy));
-  const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.cantidad || 0), 0);
-  document.getElementById("ventasHoy").textContent = totalHoy;
-
-  let total = productos.reduce((sum, p) => sum + p.cantidad, 0);
-  document.getElementById("stockTotal").textContent = total;
-
+  const totalHoy = ventas.filter(v => !v.revertida && v.fecha.includes(hoy)).reduce((s, v) => s + Number(v.cantidad || 0), 0);
+  document.getElementById("ventasHoy").textContent   = totalHoy;
+  document.getElementById("stockTotal").textContent  = productos.reduce((s, p) => s + p.cantidad, 0);
   const ranking = {};
-  ventas.filter(v => !v.revertida).forEach(v => {
-    ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
-  });
+  ventas.filter(v => !v.revertida).forEach(v => { ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad; });
   let mejor = "-", max = 0;
   for (const v in ranking) { if (ranking[v] > max) { max = ranking[v]; mejor = v; } }
   document.getElementById("mejorVendedor").textContent = mejor;
-
   renderProductos(productos);
-
-  let html = `
-    <table>
-      <thead><tr><th>Vendedor</th><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Fecha</th></tr></thead>
-      <tbody>
-  `;
+  let html = `<table><thead><tr><th>Vendedor</th><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Fecha</th></tr></thead><tbody>`;
   ventas.filter(v => !v.revertida).sort((a, b) => b.timestamp - a.timestamp).forEach(v => {
     html += `<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.categoria || "-"}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`;
   });
@@ -389,8 +300,8 @@ const usuariosCol = collection(db, "usuarios");
 async function crearUsuario() {
   if (usuarioActual.rol !== "admin") { mostrarMensaje("No autorizado", "error"); return; }
   const email = document.getElementById("nuevoUsuarioEmail").value.trim();
-  const pass = document.getElementById("nuevoUsuarioClave").value.trim();
-  const rol = document.getElementById("nuevoUsuarioRol").value;
+  const pass  = document.getElementById("nuevoUsuarioClave").value.trim();
+  const rol   = document.getElementById("nuevoUsuarioRol").value;
   if (!email || !pass) { mostrarMensaje("Email y clave requeridos", "error"); return; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
@@ -398,7 +309,7 @@ async function crearUsuario() {
     mostrarMensaje(`Usuario ${email} creado`, "success");
     document.getElementById("nuevoUsuarioEmail").value = "";
     document.getElementById("nuevoUsuarioClave").value = "";
-  } catch(e) { console.error(e); mostrarMensaje("Error al crear usuario", "error"); }
+  } catch(e) { mostrarMensaje("Error al crear usuario", "error"); }
 }
 
 async function cargarUsuarios() {
@@ -412,12 +323,11 @@ async function cargarUsuarios() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${data.email}</td>
-        <td><select class="rolSelect" style="width:auto; padding:5px 8px; margin:0; font-size:13px;">
-          <option value="vendedor"${data.rol === "vendedor" ? " selected" : ""}>Vendedor</option>
-          <option value="admin"${data.rol === "admin" ? " selected" : ""}>Admin</option>
+        <td><select class="rolSelect" style="width:auto;padding:5px 8px;margin:0;font-size:13px;">
+          <option value="vendedor"${data.rol==="vendedor"?" selected":""}>Vendedor</option>
+          <option value="admin"${data.rol==="admin"?" selected":""}>Admin</option>
         </select></td>
-        <td><button class="primary danger btnEliminarUsuario" style="width:auto; margin:0; padding:6px 12px; font-size:12px;">Eliminar</button></td>
-      `;
+        <td><button class="primary danger btnEliminarUsuario" style="width:auto;margin:0;padding:6px 12px;font-size:12px;">Eliminar</button></td>`;
       tbody.appendChild(tr);
       tr.querySelector(".rolSelect").addEventListener("change", async e => {
         await setDoc(doc(db, "usuarios", docu.id), { email: data.email, rol: e.target.value });
@@ -458,13 +368,14 @@ async function resetearTodo() {
     const productosSnapshot = await getDocs(productosCol);
     const ventasCol = collection(db, "ventas");
     const ventasSnapshot = await getDocs(ventasCol);
-    const borrarProductos = productosSnapshot.docs.map(d => deleteDoc(doc(db, "productos", d.id)));
-    const borrarVentas = ventasSnapshot.docs.map(d => deleteDoc(doc(db, "ventas", d.id)));
-    await Promise.all([...borrarProductos, ...borrarVentas]);
+    await Promise.all([
+      ...productosSnapshot.docs.map(d => deleteDoc(doc(db, "productos", d.id))),
+      ...ventasSnapshot.docs.map(d => deleteDoc(doc(db, "ventas", d.id)))
+    ]);
     productos = []; ventas = [];
     actualizarDashboard();
     mostrarMensaje("Stock y ventas reseteados correctamente", "success");
-  } catch(e) { console.error(e); mostrarMensaje("Error al resetear", "error"); }
+  } catch(e) { mostrarMensaje("Error al resetear", "error"); }
 }
 
 /* ========================== DOCUMENTOS (integrado) ========================== */
@@ -478,9 +389,7 @@ function docIniciar() {
   onSnapshot(clientesRef, snapshot => {
     docDocumentos = [];
     snapshot.forEach(snap => docDocumentos.push(snap.data()));
-    docDocumentos.sort((a, b) =>
-      `${a.apellido}${a.nombre}`.localeCompare(`${b.apellido}${b.nombre}`)
-    );
+    docDocumentos.sort((a, b) => `${a.apellido}${a.nombre}`.localeCompare(`${b.apellido}${b.nombre}`));
     docRender();
   });
 }
@@ -488,6 +397,7 @@ function docIniciar() {
 function docRender() {
   const grid = document.getElementById("docGrid");
   const cont = document.getElementById("docContador");
+  if (!grid) return;
   const total = docDocumentos.length;
   if (cont) cont.textContent = `${total} cliente${total !== 1 ? "s" : ""} registrado${total !== 1 ? "s" : ""}`;
 
@@ -495,10 +405,7 @@ function docRender() {
   const q = buscador ? buscador.value.trim().toLowerCase() : "";
   const filtrados = q
     ? docDocumentos.filter(d =>
-        d.dni.includes(q) ||
-        d.nombre.toLowerCase().includes(q) ||
-        d.apellido.toLowerCase().includes(q)
-      )
+        d.dni.includes(q) || d.nombre.toLowerCase().includes(q) || d.apellido.toLowerCase().includes(q))
     : docDocumentos;
 
   if (filtrados.length === 0) {
@@ -508,30 +415,34 @@ function docRender() {
 
   grid.innerHTML = filtrados.map(d => {
     const iniciales = `${d.nombre[0]}${d.apellido[0]}`.toUpperCase();
+    const accion = docVistaActual === "gestion"
+      ? `window.docEliminarCarpeta('${d.dni}')`
+      : `window.docAbrirDocumento('${d.dni}')`;
     return `
-      <div class="doc-card" onclick="${docVistaActual === 'gestion' ? `docEliminarCarpeta('${d.dni}')` : `docAbrirDocumento('${d.dni}')`}">
+      <div class="doc-card" onclick="${accion}">
         <div class="doc-card-avatar">${iniciales}</div>
         <h3>${d.nombre} ${d.apellido}</h3>
         <p>DNI: ${d.dni}</p>
-        ${docVistaActual === 'gestion' ? `<button class="btn-eliminar" onclick="event.stopPropagation(); docEliminarCarpeta('${d.dni}')">🗑️ Eliminar</button>` : ''}
-      </div>
-    `;
-  }).join('');
+        ${docVistaActual === "gestion"
+          ? `<button class="btn-eliminar" onclick="event.stopPropagation(); window.docEliminarCarpeta('${d.dni}')">🗑️ Eliminar</button>`
+          : ""}
+      </div>`;
+  }).join("");
 }
 
 window.docFiltrar = function() { docRender(); };
 
 window.docMostrarVista = function(vista) {
   docVistaActual = vista;
-  document.getElementById("btnVistaDocs").classList.toggle("active", vista === "documentos");
+  document.getElementById("btnVistaDocs").classList.toggle("active",    vista === "documentos");
   document.getElementById("btnVistaGestion").classList.toggle("active", vista === "gestion");
   docRender();
 };
 
 window.docCrearNuevo = function() {
-  document.getElementById("docNuevoNombre").value = "";
+  document.getElementById("docNuevoNombre").value   = "";
   document.getElementById("docNuevoApellido").value = "";
-  document.getElementById("docNuevoDni").value = "";
+  document.getElementById("docNuevoDni").value      = "";
   document.getElementById("modalDocCrear").classList.add("show");
 };
 
@@ -543,24 +454,22 @@ window.docCrearCarpeta = async function() {
   const nombre   = document.getElementById("docNuevoNombre").value.trim();
   const apellido = document.getElementById("docNuevoApellido").value.trim();
   const dni      = document.getElementById("docNuevoDni").value.trim();
-
   if (!nombre || !apellido) { mostrarMensaje("Completá nombre y apellido", "error"); return; }
   if (!/^\d{1,8}$/.test(dni)) { mostrarMensaje("El DNI debe tener solo números (máx. 8)", "error"); return; }
   if (docDocumentos.some(d => d.dni === dni)) { mostrarMensaje("Ese DNI ya existe", "error"); return; }
-
   await setDoc(doc(db, "clientes", dni), { dni, nombre, apellido, texto: "" });
-  docCerrarCrear();
+  window.docCerrarCrear();
   mostrarMensaje("Carpeta creada ✓", "success");
 };
 
-function docAbrirDocumento(dni) {
+window.docAbrirDocumento = function(dni) {
   docCarpetaActual = dni;
   const docu = docDocumentos.find(d => d.dni === dni);
   document.getElementById("docModalTitulo").innerText    = `${docu.nombre} ${docu.apellido}`;
   document.getElementById("docModalSubtitulo").innerText = `DNI: ${dni}`;
   document.getElementById("docEditorTexto").value        = docu.texto || "";
   document.getElementById("modalDocumento").classList.add("show");
-}
+};
 
 window.docCerrarModal = function() {
   document.getElementById("modalDocumento").classList.remove("show");
@@ -571,7 +480,7 @@ window.docGuardar = async function() {
   const texto = document.getElementById("docEditorTexto").value;
   await setDoc(doc(db, "clientes", docCarpetaActual), { texto }, { merge: true });
   mostrarMensaje("Guardado ✓", "success");
-  docCerrarModal();
+  window.docCerrarModal();
 };
 
 window.docEliminarCarpeta = function(dni) {
@@ -588,26 +497,26 @@ window.docCerrarEliminar = function() {
 
 window.docConfirmarEliminar = async function() {
   await deleteDoc(doc(db, "clientes", docDniAEliminar));
-  docCerrarEliminar();
-  mostrarMensaje("Carpeta eliminada.", "default");
+  window.docCerrarEliminar();
+  mostrarMensaje("Carpeta eliminada.", "success");
 };
 
 /* ========================== EXPORTS ========================== */
-window.login = login;
-window.logout = logout;
-window.showSection = showSection;
-window.agregarProducto = agregarProducto;
-window.registrarVenta = registrarVenta;
-window.agregarCategoria = agregarCategoria;
-window.eliminarCategoria = eliminarCategoria;
-window.crearUsuario = crearUsuario;
-window.resetearTodo = resetearTodo;
-window.filtrarProductos = filtrarProductos;
+window.login               = login;
+window.logout              = logout;
+window.showSection         = showSection;
+window.agregarProducto     = agregarProducto;
+window.registrarVenta      = registrarVenta;
+window.agregarCategoria    = agregarCategoria;
+window.eliminarCategoria   = eliminarCategoria;
+window.crearUsuario        = crearUsuario;
+window.resetearTodo        = resetearTodo;
+window.filtrarProductos    = filtrarProductos;
 window.revertirUltimaVenta = revertirUltimaVenta;
-window.registrarse = registrarse;
+window.registrarse         = registrarse;
 window.abrirEditarCantidad = abrirEditarCantidad;
-window.cerrarModal = cerrarModal;
-window.guardarCantidad = guardarCantidad;
-window.guardarProducto = guardarProducto;
-window.capitalizarProductos = capitalizarProductos;
-window.mostrarMensaje = mostrarMensaje;
+window.cerrarModal         = cerrarModal;
+window.guardarCantidad     = guardarCantidad;
+window.guardarProducto     = guardarProducto;
+window.capitalizarProductos= capitalizarProductos;
+window.mostrarMensaje      = mostrarMensaje;
