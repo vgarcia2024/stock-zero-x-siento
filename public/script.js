@@ -301,6 +301,7 @@ function renderProductos(lista) {
   [...lista].sort((a, b) => a.cantidad - b.cantidad).forEach(p => {
     const tr = document.createElement("tr");
     if (p.cantidad === 0) tr.classList.add("sin-stock");
+    else if (p.cantidad <= UMBRAL_STOCK_BAJO) tr.classList.add("stock-bajo");
     tr.innerHTML = `
       <td>${p.codigo}</td><td>${p.nombre}</td><td>${p.categoria}</td>
       <td class="cantidad-cell">${p.cantidad}
@@ -356,6 +357,51 @@ async function guardarCantidad() {
   } catch(e) { mostrarMensaje("Error al actualizar", "error"); }
 }
 
+/* ========================== STOCK BAJO ========================== */
+const UMBRAL_STOCK_BAJO = 2;
+
+function actualizarAlertaStock() {
+  const bajos    = productos.filter(p => p.cantidad > 0 && p.cantidad <= UMBRAL_STOCK_BAJO);
+  const agotados = productos.filter(p => p.cantidad === 0);
+  const todos    = [...agotados, ...bajos];
+
+  // Badge en nav
+  const badge = document.getElementById("navBadgeStock");
+  if (badge) {
+    if (todos.length > 0) {
+      badge.textContent = todos.length;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  }
+
+  // Alerta en dashboard
+  const alerta = document.getElementById("alertaStockBajo");
+  if (!alerta) return;
+
+  if (todos.length === 0) {
+    alerta.classList.add("hidden");
+    return;
+  }
+
+  alerta.classList.remove("hidden");
+  alerta.innerHTML = `
+    <div class="alerta-stock-icon">⚠️</div>
+    <div style="flex:1;">
+      <div class="alerta-stock-titulo">
+        ${agotados.length > 0 ? `${agotados.length} producto${agotados.length > 1 ? "s" : ""} agotado${agotados.length > 1 ? "s" : ""}` : ""}
+        ${agotados.length > 0 && bajos.length > 0 ? " · " : ""}
+        ${bajos.length > 0 ? `${bajos.length} con stock bajo (≤${UMBRAL_STOCK_BAJO})` : ""}
+      </div>
+      <div class="alerta-stock-lista">
+        ${agotados.map(p => `<span class="alerta-stock-item agotado">❌ ${p.nombre}</span>`).join("")}
+        ${bajos.map(p => `<span class="alerta-stock-item">⚡ ${p.nombre} (${p.cantidad})</span>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
 /* ========================== DASHBOARD ========================== */
 function actualizarDashboard() {
   const hoy = new Date().toLocaleDateString();
@@ -368,6 +414,7 @@ function actualizarDashboard() {
   for (const v in ranking) { if (ranking[v] > max) { max = ranking[v]; mejor = v; } }
   document.getElementById("mejorVendedor").textContent = mejor;
   renderProductos(productos);
+  actualizarAlertaStock();
   actualizarFiltroVendedores();
   renderStats();
 }
