@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>Zero X Siento - Stock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <script type="module" src="script.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -11,259 +13,321 @@
 </head>
 <body>
 
-  <!-- LOGIN -->
-<!-- LOGIN -->
+<!-- ══════════════ LOGIN ══════════════ -->
 <div id="loginScreen">
   <div class="login-container">
-
+    <div class="login-logo">ZX</div>
     <h2>Zero X Siento</h2>
-    <p style="color:#6b7280; margin-bottom:25px;">
-      Panel de gestión de stock
-    </p>
-
+    <p class="login-sub">Panel de gestión de stock</p>
     <input id="loginUser" type="email" placeholder="Email" />
     <input id="loginPass" type="password" placeholder="Contraseña" />
-
     <button onclick="login()" class="primary">Entrar</button>
-    <button onclick="registrarse()" class="primary success">
-      Crear cuenta
-    </button>
-
+    <button onclick="registrarse()" class="primary success">Crear cuenta</button>
     <p id="loginError"></p>
-
   </div>
 </div>
-  <!-- APP -->
-  <div id="app" style="display: none">
 
-    <header>
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+<!-- ══════════════ APP ══════════════ -->
+<div id="app" style="display:none;">
+
+  <header>
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="header-logo">ZX</div>
         <div>
-          <h1 style="margin:0; font-size:18px;">Zero X Siento</h1>
-          <span style="font-size:13px; color:#6b7280;">Sistema de Stock</span>
-        </div>
-
-        <div class="user-bar">
-          <span id="userName"></span>
-          <button onclick="logout()">Salir</button>
+          <div class="header-title">Zero X Siento</div>
+          <div class="header-sub">Sistema de Stock</div>
         </div>
       </div>
-    </header>
+      <div class="user-bar">
+        <span id="userName"></span>
+        <button onclick="logout()">Salir</button>
+      </div>
+    </div>
+  </header>
 
-    <!-- NAV -->
-    <nav>
-      <button onclick="showSection('dashboard')" class="active">Inicio</button>
-      <button onclick="showSection('stock')">Stock</button>
-      <button onclick="showSection('ventas')">Ventas</button>
-      <button onclick="showSection('stats')">Estadísticas</button>
-      <button id="btnAjustes" onclick="showSection('ajustes')">Ajustes</button>
-      <button onclick="window.location.href='documentos.html'">Documentos</button>
-      <button onclick="showSection('recibos')">Recibos</button>
-    </nav>
+  <nav>
+    <button onclick="showSection('dashboard')" class="active">🏠 Inicio</button>
+    <button onclick="showSection('stock')">📦 Stock</button>
+    <button onclick="showSection('ventas')">💰 Ventas</button>
+    <button onclick="showSection('stats')">📊 Estadísticas</button>
+    <button onclick="showSection('documentos')">📁 Documentos</button>
+    <button onclick="showSection('recibos')">🧾 Recibos</button>
+    <button id="btnAjustes" onclick="showSection('ajustes')">⚙️ Ajustes</button>
+  </nav>
 
-    <main>
+  <main>
 
-      <!-- DASHBOARD -->
-      <section id="dashboard" class="active">
-        <div class="cards">
-          <div class="card">
-            <h4>Ventas Hoy</h4>
-            <p id="ventasHoy">0</p>
-          </div>
-
-          <div class="card">
-            <h4>Stock Total</h4>
-            <p id="stockTotal">0</p>
-          </div>
-
-          <div class="card">
-            <h4>Mejor Vendedor</h4>
-            <p id="mejorVendedor">-</p>
-          </div>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="active">
+      <div class="section-header">
+        <h2>Inicio</h2>
+        <span class="section-sub">Resumen del día</span>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">💰</div>
+          <h4>Ventas Hoy</h4>
+          <p id="ventasHoy">0</p>
         </div>
-
-        <div class="card-box">
-          <input
-            type="text"
-            id="busquedaProducto"
-            placeholder="Buscar producto..."
-            oninput="filtrarProductos()"
-          />
-
-          <table id="productosDisponibles">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Producto</th>
-                <th>Categoría</th>
-                <th>Cantidad</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        <div class="card">
+          <div class="card-icon">📦</div>
+          <h4>Stock Total</h4>
+          <p id="stockTotal">0</p>
         </div>
-      </section>
+        <div class="card">
+          <div class="card-icon">🏆</div>
+          <h4>Mejor Vendedor</h4>
+          <p id="mejorVendedor" style="font-size:18px;">-</p>
+        </div>
+      </div>
+      <div class="card-box">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="busquedaProducto" placeholder="Buscar producto por nombre, código o categoría..." oninput="filtrarProductos()" />
+        </div>
+        <table id="productosDisponibles">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Cantidad</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
 
-      <!-- STOCK -->
-      <section id="stock">
-        <div class="card-box">
-          <h2>Agregar Producto</h2>
-
+    <!-- STOCK -->
+    <section id="stock">
+      <div class="section-header">
+        <h2>Stock</h2>
+        <span class="section-sub">Agregar productos al inventario</span>
+      </div>
+      <div class="card-box form-box">
+        <div class="input-group">
           <label>Código</label>
-          <input id="codigo" />
-
+          <input id="codigo" placeholder="Ej: SAP001" />
+        </div>
+        <div class="input-group">
           <label>Producto</label>
-          <input id="nombre" />
-
+          <input id="nombre" placeholder="Nombre del producto" />
+        </div>
+        <div class="input-group">
           <label>Categoría</label>
           <select id="categoria"></select>
-
-          <label>Cantidad</label>
-          <input type="number" id="cantidad" />
-
-          <button class="primary" onclick="agregarProducto()">
-            Guardar
-          </button>
         </div>
-      </section>
+        <div class="input-group">
+          <label>Cantidad</label>
+          <input type="number" id="cantidad" placeholder="0" />
+        </div>
+        <button class="primary" onclick="agregarProducto()">Guardar producto</button>
+      </div>
+    </section>
 
-      <!-- VENTAS -->
-      <section id="ventas">
-        <div class="card-box">
-          <h2>Registrar Venta</h2>
-
-          <label>Código</label>
-          <input id="ventaCodigo" />
-
+    <!-- VENTAS -->
+    <section id="ventas">
+      <div class="section-header">
+        <h2>Ventas</h2>
+        <span class="section-sub">Registrar una nueva venta</span>
+      </div>
+      <div class="card-box form-box">
+        <div class="input-group">
+          <label>Código del producto</label>
+          <input id="ventaCodigo" placeholder="Código" />
+        </div>
+        <div class="input-group">
           <label>Vendedor</label>
           <select id="ventaVendedor"></select>
-
+        </div>
+        <div class="input-group">
           <label>Cantidad</label>
           <input type="number" id="ventaCantidad" value="1" />
-
-          <button class="primary success" onclick="registrarVenta()">
-            Registrar venta
-          </button>
-
-          <button class="primary danger" onclick="revertirUltimaVenta()">
-            Revertir venta
-          </button>
         </div>
-      </section>
+        <button class="primary success" onclick="registrarVenta()">✓ Registrar venta</button>
+        <button class="primary danger" onclick="revertirUltimaVenta()">↩ Revertir última venta</button>
+      </div>
+    </section>
 
-      <!-- ESTADÍSTICAS -->
-      <section id="stats">
-        <div class="card-box">
-          <h2>Estadísticas</h2>
-          <div id="statsContent"></div>
+    <!-- ESTADÍSTICAS -->
+    <section id="stats">
+      <div class="section-header">
+        <h2>Estadísticas</h2>
+        <span class="section-sub">Historial de ventas</span>
+      </div>
+      <div class="card-box">
+        <div id="statsContent"></div>
+      </div>
+    </section>
+
+    <!-- DOCUMENTOS -->
+    <section id="documentos">
+      <div class="section-header">
+        <div>
+          <h2>Documentos</h2>
+          <span class="section-sub" id="docContador">0 clientes registrados</span>
         </div>
-      </section>
+        <button class="primary" style="width:auto; margin:0; padding:10px 20px;" onclick="docCrearNuevo()">+ Nueva carpeta</button>
+      </div>
 
-      <!-- AJUSTES -->
-      <section id="ajustes">
-        <div class="card-box">
-          <h2>Panel Admin</h2>
+      <div class="doc-toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="docBuscador" placeholder="Buscar por nombre, apellido o DNI..." oninput="docFiltrar()" />
+        </div>
+        <div class="doc-vista-btns">
+          <button id="btnVistaDocs" class="vista-btn active" onclick="docMostrarVista('documentos')" title="Vista documentos">📁</button>
+          <button id="btnVistaGestion" class="vista-btn" onclick="docMostrarVista('gestion')" title="Gestionar">🗑️</button>
+        </div>
+      </div>
 
-          <button class="primary danger" onclick="resetearTodo()">
-            Resetear Stock y Ventas
-          </button>
+      <div id="docGrid" class="doc-grid">
+        <div class="empty-state">Cargando documentos...</div>
+      </div>
+    </section>
 
-          <hr style="margin:30px 0; border:none; border-top:1px solid #e5e7eb;" />
+    <!-- RECIBOS -->
+    <section id="recibos">
+      <div class="section-header">
+        <h2>Recibos</h2>
+        <span class="section-sub">Generar comprobante de pago</span>
+      </div>
+      <div class="card-box form-box">
+        <div class="input-group">
+          <label>Nombre</label>
+          <input id="reciboNombre" placeholder="Juan" />
+        </div>
+        <div class="input-group">
+          <label>Apellido</label>
+          <input id="reciboApellido" placeholder="García" />
+        </div>
+        <div class="input-group">
+          <label>Monto</label>
+          <input type="number" id="reciboMonto" placeholder="0.00" />
+        </div>
+        <div class="input-group">
+          <label>Comentario</label>
+          <input id="reciboComentario" placeholder="Detalle del pago..." />
+        </div>
+        <button class="primary success" onclick="crearRecibo()">🧾 Generar Recibo</button>
+      </div>
+    </section>
 
-          <h3>Categorías</h3>
+    <!-- AJUSTES -->
+    <section id="ajustes">
+      <div class="section-header">
+        <h2>Ajustes</h2>
+        <span class="section-sub">Panel de administración</span>
+      </div>
+      <div class="card-box">
+        <div class="ajuste-bloque">
+          <h3>⚠️ Zona de peligro</h3>
+          <button class="primary danger" onclick="resetearTodo()">Resetear Stock y Ventas</button>
+        </div>
 
-          <input id="nuevaCategoria" placeholder="Nueva categoría" />
-          <button class="primary" onclick="agregarCategoria()">Agregar</button>
+        <div class="ajuste-bloque">
+          <h3>📂 Categorías</h3>
+          <div class="input-row">
+            <input id="nuevaCategoria" placeholder="Nueva categoría" />
+            <button class="primary" style="width:auto; margin:0;" onclick="agregarCategoria()">Agregar</button>
+          </div>
+          <div class="input-row" style="margin-top:10px;">
+            <select id="categoriaEliminar"></select>
+            <button class="primary danger" style="width:auto; margin:0;" onclick="eliminarCategoria()">Eliminar</button>
+          </div>
+        </div>
 
-          <select id="categoriaEliminar"></select>
-          <button class="primary danger" onclick="eliminarCategoria()">
-            Eliminar
-          </button>
+        <div class="ajuste-bloque">
+          <h3>🔧 Herramientas</h3>
+          <button class="primary" onclick="capitalizarProductos()">Capitalizar nombres de productos</button>
+        </div>
 
-          <hr style="margin:30px 0; border:none; border-top:1px solid #e5e7eb;" />
-
-          <h3>Herramientas</h3>
-
-          <button class="primary" onclick="capitalizarProductos()">
-            Capitalizar nombres de productos
-          </button>
-          
-          <h3>Usuarios</h3>
-
-          <input id="nuevoUsuarioEmail" type="email" placeholder="Email" />
-          <input id="nuevoUsuarioClave" type="password" placeholder="Contraseña" />
-
-          <select id="nuevoUsuarioRol">
-            <option value="vendedor">Vendedor</option>
-            <option value="admin">Admin</option>
-          </select>
-
-          <button class="primary" onclick="crearUsuario()">
-            Crear Usuario
-          </button>
-
+        <div class="ajuste-bloque">
+          <h3>👥 Usuarios</h3>
+          <div class="input-group"><label>Email</label><input id="nuevoUsuarioEmail" type="email" placeholder="Email" /></div>
+          <div class="input-group"><label>Contraseña</label><input id="nuevoUsuarioClave" type="password" placeholder="Contraseña" /></div>
+          <div class="input-group">
+            <label>Rol</label>
+            <select id="nuevoUsuarioRol">
+              <option value="vendedor">Vendedor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
           <table id="tablaUsuarios">
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Email</th><th>Rol</th><th>Acción</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section id="recibos">
-  <div class="card-box">
-    <h2>Generar Recibo</h2>
+  </main>
 
-    <label>Nombre</label>
-    <input id="reciboNombre" />
+  <div id="toast"></div>
+</div>
 
-    <label>Apellido</label>
-    <input id="reciboApellido" />
-
-    <label>Monto</label>
-    <input type="number" id="reciboMonto" />
-
-    <label>Comentario</label>
-    <input id="reciboComentario" />
-
-    <button class="primary success" onclick="crearRecibo()">
-      Generar Recibo
-    </button>
-  </div>
-</section>
-
-    </main>
-
-    <div id="toast"></div>
-  </div>
-  
-    <div id="modalEditar" class="modal-overlay">
+<!-- ══════ MODAL EDITAR PRODUCTO ══════ -->
+<div id="modalEditar" class="modal-overlay">
   <div class="modal-editar">
     <h3>Editar producto</h3>
-
-    <label>Nombre</label>
-    <input 
-      type="text" 
-      id="modalNuevoNombre"
-    />
-
-    <label>Cantidad</label>
-    <input 
-      type="number" 
-      id="modalNuevaCantidad" 
-      min="0"
-    />
-
+    <div class="input-group"><label>Nombre</label><input type="text" id="modalNuevoNombre" /></div>
+    <div class="input-group"><label>Cantidad</label><input type="number" id="modalNuevaCantidad" min="0" /></div>
     <div class="modal-buttons">
       <button class="btn-modal danger" onclick="cerrarModal()">Cancelar</button>
       <button class="btn-modal success" onclick="guardarProducto()">Guardar</button>
     </div>
   </div>
 </div>
+
+<!-- ══════ MODAL VER DOCUMENTO ══════ -->
+<div id="modalDocumento" class="modal-overlay">
+  <div class="modal-editar" style="width:560px; max-width:95%;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+      <div>
+        <h3 id="docModalTitulo" style="margin:0;"></h3>
+        <p id="docModalSubtitulo" style="margin:4px 0 0; font-size:13px; color:#6b7280; font-weight:400;"></p>
+      </div>
+      <button class="btn-modal" onclick="docCerrarModal()" style="background:#f3f4f6; color:#374151; padding:6px 10px;">✕</button>
+    </div>
+    <textarea id="docEditorTexto" placeholder="Escribí la información del cliente: qué tiene que pagar, vencimientos, notas..." style="width:100%; min-height:200px; padding:14px; border-radius:10px; border:1px solid #d1d5db; font-size:14px; font-family:inherit; resize:vertical; outline:none; line-height:1.6;"></textarea>
+    <div class="modal-buttons" style="margin-top:14px;">
+      <button class="btn-modal danger" onclick="docCerrarModal()">Cancelar</button>
+      <button class="btn-modal success" onclick="docGuardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL CREAR CARPETA ══════ -->
+<div id="modalDocCrear" class="modal-overlay">
+  <div class="modal-editar">
+    <h3>Nueva carpeta</h3>
+    <div class="input-group"><label>Nombre</label><input type="text" id="docNuevoNombre" placeholder="Juan" /></div>
+    <div class="input-group"><label>Apellido</label><input type="text" id="docNuevoApellido" placeholder="García" /></div>
+    <div class="input-group"><label>DNI (máx. 8 dígitos)</label><input type="text" id="docNuevoDni" placeholder="12345678" maxlength="8" /></div>
+    <div class="modal-buttons">
+      <button class="btn-modal danger" onclick="docCerrarCrear()">Cancelar</button>
+      <button class="btn-modal success" onclick="docCrearCarpeta()">Crear</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL ELIMINAR CARPETA ══════ -->
+<div id="modalDocEliminar" class="modal-overlay">
+  <div class="modal-editar">
+    <h3>Eliminar carpeta</h3>
+    <p id="docTextoEliminar" style="font-size:14px; color:#374151; line-height:1.6; margin-bottom:8px;"></p>
+    <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:10px 14px; font-size:13px; color:#dc2626; margin-bottom:4px;">
+      ⚠️ Esta acción no se puede deshacer.
+    </div>
+    <div class="modal-buttons">
+      <button class="btn-modal" onclick="docCerrarEliminar()" style="background:#f3f4f6; color:#374151;">Cancelar</button>
+      <button class="btn-modal danger" onclick="docConfirmarEliminar()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
