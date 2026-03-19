@@ -33,56 +33,35 @@ async function login() {
   const errorEl = document.getElementById("loginError");
   errorEl.textContent = "";
 
-  if (!email || !pass) { 
-    mostrarMensaje("Completá los datos","error"); 
-    return; 
-  }
+  if (!email || !pass) { mostrarMensaje("Completá los datos", "error"); return; }
 
-  // 🔹 BLOQUE TRY-CATCH para login
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const rol = await obtenerRol(cred.user);
     usuarioActual = { user: cred.user.email, rol };
     iniciarApp();
-  } catch(e){ 
-    console.error(e); 
-    mostrarMensaje("Usuario o contraseña incorrecta", "error"); // aquí usamos el toast corredizo
+  } catch(e) {
+    console.error(e);
+    mostrarMensaje("Usuario o contraseña incorrecta", "error");
   }
 }
 
 async function registrarse() {
-
   await signOut(auth);
-  
   const email = document.getElementById("loginUser").value.trim();
   const pass = document.getElementById("loginPass").value.trim();
 
-  if (!email || !pass) {
-    mostrarMensaje("Completá email y contraseña", "error");
-    return;
-  }
+  if (!email || !pass) { mostrarMensaje("Completá email y contraseña", "error"); return; }
 
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-    await setDoc(doc(db, "usuarios", cred.user.uid), {
-      email: email,
-      rol: "vendedor",
-      nombre: email
-    });
-
-    await signOut(auth); // 🔥 ESTA ES LA CLAVE
-
+    await setDoc(doc(db, "usuarios", cred.user.uid), { email, rol: "vendedor", nombre: email });
+    await signOut(auth);
     mostrarMensaje("Cuenta creada. Ahora iniciá sesión.", "success");
-
-  } catch (e) {
-    if (e.code === "auth/email-already-in-use") {
-      mostrarMensaje("Mail ya existente", "error");
-    } else if (e.code === "auth/weak-password") {
-      mostrarMensaje("La contraseña debe tener al menos 6 caracteres", "error");
-    } else {
-      mostrarMensaje("Error al crear cuenta", "error");
-    }
+  } catch(e) {
+    if (e.code === "auth/email-already-in-use") mostrarMensaje("Mail ya existente", "error");
+    else if (e.code === "auth/weak-password") mostrarMensaje("La contraseña debe tener al menos 6 caracteres", "error");
+    else mostrarMensaje("Error al crear cuenta", "error");
   }
 }
 
@@ -93,11 +72,11 @@ async function obtenerRol(user) {
     const snap = await getDoc(doc(db, "usuarios", user.uid));
     if (snap.exists()) return snap.data().rol;
     return "vendedor";
-  } catch(e){ console.error("Error rol:", e); return "vendedor"; }
+  } catch(e) { console.error("Error rol:", e); return "vendedor"; }
 }
 
-onAuthStateChanged(auth, async (user)=>{
-  if(user){
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
     const rol = await obtenerRol(user);
     usuarioActual = { user: user.email, rol };
     iniciarApp();
@@ -105,11 +84,11 @@ onAuthStateChanged(auth, async (user)=>{
 });
 
 /* ========================== INICIAR APP ========================== */
-function iniciarApp(){
+function iniciarApp() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
   document.getElementById("userName").textContent = usuarioActual.user + " (" + usuarioActual.rol + ")";
-  document.getElementById("btnAjustes").style.display = usuarioActual.rol==="admin"?"block":"none";
+  document.getElementById("btnAjustes").style.display = usuarioActual.rol === "admin" ? "block" : "none";
 
   cargarCategorias();
   cargarVendedores();
@@ -117,51 +96,53 @@ function iniciarApp(){
   cargarProductos();
   cargarVentas();
   actualizarDashboard();
+  docIniciar();
 }
 
-// public/script.js
-
-
 /* ========================== TOAST ========================== */
-function mostrarMensaje(t,tipo="info"){
+function mostrarMensaje(t, tipo = "info") {
   const toast = document.getElementById("toast");
-  toast.textContent=t;
-  toast.className="";
-  toast.classList.add("show",tipo);
-  setTimeout(()=>toast.classList.remove("show"),3500);
+  toast.textContent = t;
+  toast.className = "";
+  toast.classList.add("show", tipo);
+  setTimeout(() => toast.classList.remove("show"), 3500);
 }
 
 /* ========================== NAV ========================== */
-function showSection(id, btn){
-  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+function showSection(id) {
+  document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-
-  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-  if(btn) btn.classList.add("active");
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  // Marcar botón activo buscando el que llama a esta sección
+  document.querySelectorAll("nav button").forEach(b => {
+    if (b.getAttribute("onclick") && b.getAttribute("onclick").includes(`'${id}'`)) {
+      b.classList.add("active");
+    }
+  });
 }
 
-
 /* ========================== PRODUCTOS ========================== */
-const productosCol = collection(db,"productos");
-const categoriasCol = collection(db,"categorias");
+const productosCol = collection(db, "productos");
+const categoriasCol = collection(db, "categorias");
 
-async function agregarProducto(){
-  const codigo=document.getElementById("codigo").value.trim();
-  const nombre=document.getElementById("nombre").value.trim();
-  const categoria=document.getElementById("categoria").value;
-  const cantidad=Number(document.getElementById("cantidad").value);
-  if(!codigo||!nombre||!categoria||cantidad<=0){ mostrarMensaje("Completa todos los datos","error"); return; }
+async function agregarProducto() {
+  const codigo = document.getElementById("codigo").value.trim();
+  const nombre = document.getElementById("nombre").value.trim();
+  const categoria = document.getElementById("categoria").value;
+  const cantidad = Number(document.getElementById("cantidad").value);
+  if (!codigo || !nombre || !categoria || cantidad <= 0) { mostrarMensaje("Completa todos los datos", "error"); return; }
 
-  await setDoc(doc(productosCol,codigo),{codigo,nombre,categoria,cantidad});
-  mostrarMensaje("Producto guardado","success");
+  await setDoc(doc(productosCol, codigo), { codigo, nombre, categoria, cantidad });
+  mostrarMensaje("Producto guardado", "success");
   limpiarStock();
 }
 
-function limpiarStock(){
-  document.getElementById("codigo").value="";
-  document.getElementById("nombre").value="";
-  document.getElementById("categoria").value="";
+function limpiarStock() {
+  document.getElementById("codigo").value = "";
+  document.getElementById("nombre").value = "";
+  document.getElementById("categoria").value = "";
 }
+
 /* ========================== CAPITALIZAR ========================== */
 function capitalizar(texto) {
   if (!texto) return "";
@@ -169,166 +150,76 @@ function capitalizar(texto) {
 }
 
 async function capitalizarProductos() {
-  if (usuarioActual.rol !== "admin") {
-    mostrarMensaje("No autorizado", "error");
-    return;
-  }
-
+  if (usuarioActual.rol !== "admin") { mostrarMensaje("No autorizado", "error"); return; }
   try {
     const snap = await getDocs(productosCol);
-
     snap.forEach(async (docu) => {
       const data = docu.data();
       const nuevoNombre = capitalizar(data.nombre);
-
       if (data.nombre !== nuevoNombre) {
-        await setDoc(doc(db, "productos", docu.id), {
-          ...data,
-          nombre: nuevoNombre
-        });
+        await setDoc(doc(db, "productos", docu.id), { ...data, nombre: nuevoNombre });
       }
     });
-
     mostrarMensaje("Nombres capitalizados correctamente", "success");
-  } catch (e) {
-    console.error(e);
-    mostrarMensaje("Error al capitalizar", "error");
-  }
+  } catch(e) { console.error(e); mostrarMensaje("Error al capitalizar", "error"); }
 }
-
 
 /* ========================== VENTAS ========================== */
-function cargarVendedores(){
+function cargarVendedores() {
   const sel = document.getElementById("ventaVendedor");
   sel.innerHTML = "";
-
-  // aseguramos que el usuario actual esté en la lista
-  if(!usuarios.some(u => u.email === usuarioActual.user)){
-    usuarios.push({
-      email: usuarioActual.user,
-      rol: usuarioActual.rol,
-      nombre: usuarioActual.user
-    });
+  if (!usuarios.some(u => u.email === usuarioActual.user)) {
+    usuarios.push({ email: usuarioActual.user, rol: usuarioActual.rol, nombre: usuarioActual.user });
   }
-
-  // vendedores + admins
-  const vendedores = usuarios.filter(
-    u => u.rol === "vendedor" || u.rol === "admin"
-  );
-
-  vendedores.forEach(v=>{
+  const vendedores = usuarios.filter(u => u.rol === "vendedor" || u.rol === "admin");
+  vendedores.forEach(v => {
     const o = document.createElement("option");
-    o.value = v.email;
-    o.textContent = v.email;
+    o.value = v.email; o.textContent = v.email;
     sel.appendChild(o);
   });
-
   sel.value = usuarioActual.user;
 }
-
 
 async function registrarVenta() {
   const codigo = document.getElementById("ventaCodigo").value.trim();
   const cantidadVenta = parseInt(document.getElementById("ventaCantidad").value);
-
-  if (!codigo || isNaN(cantidadVenta) || cantidadVenta <= 0) {
-    mostrarMensaje("Datos inválidos", "error");
-    return;
-  }
+  if (!codigo || isNaN(cantidadVenta) || cantidadVenta <= 0) { mostrarMensaje("Datos inválidos", "error"); return; }
 
   const prod = productos.find(p => p.codigo === codigo);
-  if (!prod) {
-    mostrarMensaje("Producto no encontrado", "error");
-    return;
-  }
+  if (!prod) { mostrarMensaje("Producto no encontrado", "error"); return; }
+  if (prod.cantidad < cantidadVenta) { mostrarMensaje("Stock insuficiente", "error"); return; }
 
-  if (prod.cantidad < cantidadVenta) {
-    mostrarMensaje("Stock insuficiente", "error");
-    return;
-  }
-
-  const vendedorEmail =
-    document.getElementById("ventaVendedor").value || usuarioActual.user;
-  const vendedorNombre =
-    usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
+  const vendedorEmail = document.getElementById("ventaVendedor").value || usuarioActual.user;
+  const vendedorNombre = usuarios.find(u => u.email === vendedorEmail)?.nombre || vendedorEmail;
 
   try {
-    // actualizar stock
-    await setDoc(doc(db, "productos", codigo), {
-      ...prod,
-      cantidad: prod.cantidad - cantidadVenta
-    });
-
-    // guardar venta
+    await setDoc(doc(db, "productos", codigo), { ...prod, cantidad: prod.cantidad - cantidadVenta });
     const ventasCol = collection(db, "ventas");
     const ventaRef = doc(ventasCol);
-
-     await setDoc(ventaRef, {
-  codigo,
-  nombre: prod.nombre,
-  categoria: prod.categoria, // 🔥 NUEVO
-  vendedor: vendedorNombre,
-  cantidad: cantidadVenta,
-  fecha: new Date().toLocaleString(),
-  timestamp: Date.now(),
-  revertida: false
-});
-
-
-    ultimaVenta = {
-      id: ventaRef.id,
-      codigo,
-      cantidad: cantidadVenta
-    };
-
+    await setDoc(ventaRef, {
+      codigo, nombre: prod.nombre, categoria: prod.categoria,
+      vendedor: vendedorNombre, cantidad: cantidadVenta,
+      fecha: new Date().toLocaleString(), timestamp: Date.now(), revertida: false
+    });
+    ultimaVenta = { id: ventaRef.id, codigo, cantidad: cantidadVenta };
     limpiarVenta();
     mostrarMensaje("Venta registrada", "success");
-  } catch (e) {
-    console.error(e);
-    mostrarMensaje("Error al registrar venta", "error");
-  }
+  } catch(e) { console.error(e); mostrarMensaje("Error al registrar venta", "error"); }
 }
 
 async function revertirUltimaVenta() {
-  if (!ultimaVenta) {
-    mostrarMensaje("No hay ninguna venta para revertir", "error");
-    return;
-  }
-
+  if (!ultimaVenta) { mostrarMensaje("No hay ninguna venta para revertir", "error"); return; }
   try {
     const prodRef = doc(db, "productos", ultimaVenta.codigo);
     const prodSnap = await getDoc(prodRef);
-
-    if (!prodSnap.exists()) {
-      mostrarMensaje("Producto no encontrado", "error");
-      return;
-    }
-
+    if (!prodSnap.exists()) { mostrarMensaje("Producto no encontrado", "error"); return; }
     const prod = prodSnap.data();
-
-    // devolver stock
-    await setDoc(prodRef, {
-      ...prod,
-      cantidad: prod.cantidad + ultimaVenta.cantidad
-    });
-
-    // marcar venta como revertida (NO borrar)
-    await setDoc(
-      doc(db, "ventas", ultimaVenta.id),
-      { revertida: true },
-      { merge: true }
-    );
-
+    await setDoc(prodRef, { ...prod, cantidad: prod.cantidad + ultimaVenta.cantidad });
+    await setDoc(doc(db, "ventas", ultimaVenta.id), { revertida: true }, { merge: true });
     ultimaVenta = null;
-
     mostrarMensaje("Venta revertida correctamente", "success");
-  } catch (e) {
-    console.error(e);
-    mostrarMensaje("Error al revertir la venta", "error");
-  }
+  } catch(e) { console.error(e); mostrarMensaje("Error al revertir la venta", "error"); }
 }
-
-
 
 function limpiarVenta() {
   document.getElementById("ventaCodigo").value = "";
@@ -336,103 +227,71 @@ function limpiarVenta() {
   document.getElementById("ventaVendedor").value = usuarioActual.user;
 }
 
-
-
-  /* ========================== BUSCADOR DE PRODUCTOS ========================== */
-
-
 /* ========================== CATEGORIAS ========================== */
-function cargarCategorias(){
-  onSnapshot(categoriasCol, snapshot=>{
+function cargarCategorias() {
+  onSnapshot(categoriasCol, snapshot => {
     categorias = [];
-    snapshot.forEach(docu=>{
-      categorias.push(docu.data().nombre);
-    });
-
+    snapshot.forEach(docu => categorias.push(docu.data().nombre));
     cargarSelects();
     cargarEliminarCategorias();
   });
 }
 
-function cargarSelects(){
-  const categoriaSel=document.getElementById("categoria");
-  categoriaSel.innerHTML='<option value="">Elige</option>';
-  categorias.forEach(c=>{
-    const o=document.createElement("option");
-    o.value=c; o.textContent=c; categoriaSel.appendChild(o);
+function cargarSelects() {
+  const sel = document.getElementById("categoria");
+  sel.innerHTML = '<option value="">Elegí una categoría</option>';
+  categorias.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c; o.textContent = c; sel.appendChild(o);
   });
 }
 
-function cargarEliminarCategorias(){
-  const catElim=document.getElementById("categoriaEliminar");
-  catElim.innerHTML='<option value="">Seleccionar</option>';
-  categorias.forEach(c=>{
-    const o=document.createElement("option");
-    o.value=c; o.textContent=c; catElim.appendChild(o);
+function cargarEliminarCategorias() {
+  const sel = document.getElementById("categoriaEliminar");
+  sel.innerHTML = '<option value="">Seleccionar categoría</option>';
+  categorias.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c; o.textContent = c; sel.appendChild(o);
   });
 }
 
-async function agregarCategoria(){
+async function agregarCategoria() {
   const n = document.getElementById("nuevaCategoria").value.trim();
-  if(!n) return;
-
+  if (!n) return;
   try {
     await setDoc(doc(categoriasCol, n), { nombre: n });
-    mostrarMensaje("Categoría agregada","success");
-    document.getElementById("nuevaCategoria").value="";
-  } catch(e){
-    console.error(e);
-    mostrarMensaje("Error al agregar categoría","error");
-  }
+    mostrarMensaje("Categoría agregada", "success");
+    document.getElementById("nuevaCategoria").value = "";
+  } catch(e) { console.error(e); mostrarMensaje("Error al agregar categoría", "error"); }
 }
 
-async function eliminarCategoria(){
+async function eliminarCategoria() {
   const cat = document.getElementById("categoriaEliminar").value;
-  if(!cat){ 
-    mostrarMensaje("Elegí una","error"); 
-    return; 
-  }
-
+  if (!cat) { mostrarMensaje("Elegí una", "error"); return; }
   try {
     await deleteDoc(doc(categoriasCol, cat));
-    mostrarMensaje("Categoría eliminada","success");
-  } catch(e){
-    console.error(e);
-    mostrarMensaje("Error al eliminar","error");
-  }
+    mostrarMensaje("Categoría eliminada", "success");
+  } catch(e) { console.error(e); mostrarMensaje("Error al eliminar", "error"); }
 }
 
 /* ========================== BUSCADOR DE PRODUCTOS ========================== */
-function filtrarProductos(){
-  const q = document
-    .getElementById("busquedaProducto")
-    .value
-    .toLowerCase();
-
+function filtrarProductos() {
+  const q = document.getElementById("busquedaProducto").value.toLowerCase();
   const filtrados = productos.filter(p =>
     p.codigo.toLowerCase().includes(q) ||
     p.nombre.toLowerCase().includes(q) ||
     p.categoria.toLowerCase().includes(q)
   );
-
   renderProductos(filtrados);
 }
 
-function renderProductos(lista){
+function renderProductos(lista) {
   const tbody = document.querySelector("#productosDisponibles tbody");
   tbody.innerHTML = "";
-
-  // 🔴 Ordenamos: primero sin stock
   const ordenados = [...lista].sort((a, b) => a.cantidad - b.cantidad);
-
   ordenados.forEach(p => {
     const tr = document.createElement("tr");
-
-    // 🔴 Si no tiene stock, le agregamos clase
-    if(p.cantidad === 0){
-      tr.classList.add("sin-stock");
-    }
-
+    if (p.cantidad === 0) tr.classList.add("sin-stock");
     tr.innerHTML = `
       <td>${p.codigo}</td>
       <td>${p.nombre}</td>
@@ -442,295 +301,307 @@ function renderProductos(lista){
         ${usuarioActual.rol === "admin" ? '<button class="btn-editar">✏️</button>' : ''}
       </td>
     `;
-
     const btnEditar = tr.querySelector(".btn-editar");
-
-    if (btnEditar) {
-      btnEditar.addEventListener("click", () => {
-        abrirEditarCantidad(p.codigo);
-      });
-    }
-
-    tbody.appendChild(tr); // 🔥 ESTO ES CLAVE
-  }); // 🔥 cerramos forEach
-
-} // 🔥 cerramos función
+    if (btnEditar) btnEditar.addEventListener("click", () => abrirEditarCantidad(p.codigo));
+    tbody.appendChild(tr);
+  });
+}
 
 function abrirEditarCantidad(codigo) {
-
-  if(usuarioActual.rol !== "admin"){
-    mostrarMensaje("No autorizado","error");
-    return;
-  }
-
+  if (usuarioActual.rol !== "admin") { mostrarMensaje("No autorizado", "error"); return; }
   const producto = productos.find(p => p.codigo === codigo);
-
   if (!producto) return;
-
   productoEditandoCodigo = codigo;
-
   document.getElementById("modalNuevoNombre").value = producto.nombre;
   document.getElementById("modalNuevaCantidad").value = producto.cantidad;
-
   document.getElementById("modalEditar").classList.add("show");
 }
 
 async function guardarProducto() {
   const nuevoNombre = document.getElementById("modalNuevoNombre").value.trim();
   const nuevaCantidad = parseInt(document.getElementById("modalNuevaCantidad").value);
-
   const producto = productos.find(p => p.codigo === productoEditandoCodigo);
-
   if (!producto) return;
-
-  if (nuevoNombre === "") {
-    mostrarMensaje("El nombre no puede estar vacío", "error");
-    return;
-  }
-
+  if (nuevoNombre === "") { mostrarMensaje("El nombre no puede estar vacío", "error"); return; }
   try {
-    // 🔥 Guardamos en Firebase
-    await setDoc(
-      doc(db, "productos", productoEditandoCodigo),
-      {
-        ...producto,
-        nombre: nuevoNombre,
-        cantidad: isNaN(nuevaCantidad) ? 0 : nuevaCantidad
-      }
-    );
-
+    await setDoc(doc(db, "productos", productoEditandoCodigo), {
+      ...producto, nombre: nuevoNombre,
+      cantidad: isNaN(nuevaCantidad) ? 0 : nuevaCantidad
+    });
     mostrarMensaje("Editado correctamente", "success");
-
     cerrarModal();
-
-  } catch (e) {
-    console.error(e);
-    mostrarMensaje("Error al actualizar", "error");
-  }
+  } catch(e) { console.error(e); mostrarMensaje("Error al actualizar", "error"); }
 }
 
-function cerrarModal(){
+function cerrarModal() {
   document.getElementById("modalEditar").classList.remove("show");
-  
   document.getElementById("modalNuevoNombre").value = "";
   document.getElementById("modalNuevaCantidad").value = "";
-
   productoEditandoCodigo = null;
 }
 
-async function guardarCantidad(){
-
-  if(!productoEditando) return;
-
-  const nuevaCantidad = Number(
-    document.getElementById("modalNuevaCantidad").value
-  );
-
-  if(isNaN(nuevaCantidad) || nuevaCantidad < 0){
-    mostrarMensaje("Cantidad inválida","error");
-    return;
-  }
-
-  try{
-    await setDoc(
-      doc(db,"productos",productoEditando.codigo),
-      {
-        ...productoEditando,
-        cantidad: nuevaCantidad
-      }
-    );
-
-    mostrarMensaje("Cantidad actualizada","success");
+async function guardarCantidad() {
+  if (!productoEditando) return;
+  const nuevaCantidad = Number(document.getElementById("modalNuevaCantidad").value);
+  if (isNaN(nuevaCantidad) || nuevaCantidad < 0) { mostrarMensaje("Cantidad inválida", "error"); return; }
+  try {
+    await setDoc(doc(db, "productos", productoEditando.codigo), { ...productoEditando, cantidad: nuevaCantidad });
+    mostrarMensaje("Cantidad actualizada", "success");
     cerrarModal();
-
-  }catch(e){
-    console.error(e);
-    mostrarMensaje("Error al actualizar","error");
-  }
+  } catch(e) { console.error(e); mostrarMensaje("Error al actualizar", "error"); }
 }
 
-
-
 /* ========================== DASHBOARD ========================== */
-function actualizarDashboard(){
-
+function actualizarDashboard() {
   const hoy = new Date().toLocaleDateString();
-
-  const ventasHoy = ventas.filter(
-    v => !v.revertida && v.fecha.includes(hoy)
-  );
-
-  const totalHoy = ventasHoy.reduce(
-    (sum, v) => sum + Number(v.cantidad || 0),
-    0
-  );
-
+  const ventasHoy = ventas.filter(v => !v.revertida && v.fecha.includes(hoy));
+  const totalHoy = ventasHoy.reduce((sum, v) => sum + Number(v.cantidad || 0), 0);
   document.getElementById("ventasHoy").textContent = totalHoy;
 
-  // Stock total
-  let total = productos.reduce((sum,p)=>sum+p.cantidad,0);
+  let total = productos.reduce((sum, p) => sum + p.cantidad, 0);
   document.getElementById("stockTotal").textContent = total;
 
-  // Ranking vendedores
   const ranking = {};
-  ventas
-    .filter(v => !v.revertida)
-    .forEach(v => {
-      ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
-    });
-
+  ventas.filter(v => !v.revertida).forEach(v => {
+    ranking[v.vendedor] = (ranking[v.vendedor] || 0) + v.cantidad;
+  });
   let mejor = "-", max = 0;
-  for(const v in ranking){
-    if(ranking[v] > max){
-      max = ranking[v];
-      mejor = v;
-    }
-  }
-
+  for (const v in ranking) { if (ranking[v] > max) { max = ranking[v]; mejor = v; } }
   document.getElementById("mejorVendedor").textContent = mejor;
 
-  // Tabla productos
   renderProductos(productos);
 
-  // 🔥 TABLA ESTADÍSTICAS CON CATEGORÍA
   let html = `
-    <h3>Ventas</h3>
     <table>
-      <tr>
-        <th>Vendedor</th>
-        <th>Producto</th>
-        <th>Categoría</th>
-        <th>Cantidad</th>
-        <th>Fecha</th>
-      </tr>
+      <thead><tr><th>Vendedor</th><th>Producto</th><th>Categoría</th><th>Cantidad</th><th>Fecha</th></tr></thead>
+      <tbody>
   `;
-
-  ventas
-  .filter(v => !v.revertida)
-  .sort((a, b) => b.timestamp - a.timestamp) // 🔥 AQUÍ VA
-  .forEach(v =>{
-      html += `
-        <tr>
-          <td>${v.vendedor}</td>
-          <td>${v.nombre}</td>
-          <td>${v.categoria || "-"}</td>
-          <td>${v.cantidad}</td>
-          <td>${v.fecha}</td>
-        </tr>
-      `;
-    });
-
-  html += "</table>";
-
+  ventas.filter(v => !v.revertida).sort((a, b) => b.timestamp - a.timestamp).forEach(v => {
+    html += `<tr><td>${v.vendedor}</td><td>${v.nombre}</td><td>${v.categoria || "-"}</td><td>${v.cantidad}</td><td>${v.fecha}</td></tr>`;
+  });
+  html += "</tbody></table>";
   document.getElementById("statsContent").innerHTML = html;
 }
 
 /* ========================== USUARIOS ========================== */
-const usuariosCol = collection(db,"usuarios");
-async function crearUsuario(){
-  if(usuarioActual.rol!=="admin"){ mostrarMensaje("No autorizado","error"); return; }
-  const email=document.getElementById("nuevoUsuarioEmail").value.trim();
-  const pass=document.getElementById("nuevoUsuarioClave").value.trim();
-  const rol=document.getElementById("nuevoUsuarioRol").value;
-  if(!email||!pass){ mostrarMensaje("Email y clave requeridos","error"); return; }
+const usuariosCol = collection(db, "usuarios");
 
-  try{
-    const cred=await createUserWithEmailAndPassword(auth,email,pass);
-    await setDoc(doc(db,"usuarios",cred.user.uid),{email,rol});
-    mostrarMensaje(`Usuario ${email} creado`,"success");
-    document.getElementById("nuevoUsuarioEmail").value="";
-    document.getElementById("nuevoUsuarioClave").value="";
-  }catch(e){ console.error(e); mostrarMensaje("Error al crear usuario","error"); }
+async function crearUsuario() {
+  if (usuarioActual.rol !== "admin") { mostrarMensaje("No autorizado", "error"); return; }
+  const email = document.getElementById("nuevoUsuarioEmail").value.trim();
+  const pass = document.getElementById("nuevoUsuarioClave").value.trim();
+  const rol = document.getElementById("nuevoUsuarioRol").value;
+  if (!email || !pass) { mostrarMensaje("Email y clave requeridos", "error"); return; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, "usuarios", cred.user.uid), { email, rol });
+    mostrarMensaje(`Usuario ${email} creado`, "success");
+    document.getElementById("nuevoUsuarioEmail").value = "";
+    document.getElementById("nuevoUsuarioClave").value = "";
+  } catch(e) { console.error(e); mostrarMensaje("Error al crear usuario", "error"); }
 }
 
-/* ========================== FIRESTORE EN TIEMPO REAL ========================== */
-async function cargarUsuarios(){
-  const tbody=document.querySelector("#tablaUsuarios tbody");
-  onSnapshot(usuariosCol, snapshot=>{
-    usuarios=[];
-    tbody.innerHTML="";
-    snapshot.forEach(docu=>{
-      const data=docu.data();
-      if(usuarios.find(u=>u.email===data.email)) return;
-      usuarios.push({email:data.email,rol:data.rol,id:docu.id,nombre:data.nombre});
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${data.email}</td>
-      <td><select class="rolSelect"><option value="vendedor"${data.rol==="vendedor"?" selected":""}>Vendedor</option><option value="admin"${data.rol==="admin"?" selected":""}>Admin</option></select></td>
-      <td><button class="primary danger btnEliminarUsuario">Eliminar</button></td>`;
+async function cargarUsuarios() {
+  const tbody = document.querySelector("#tablaUsuarios tbody");
+  onSnapshot(usuariosCol, snapshot => {
+    usuarios = []; tbody.innerHTML = "";
+    snapshot.forEach(docu => {
+      const data = docu.data();
+      if (usuarios.find(u => u.email === data.email)) return;
+      usuarios.push({ email: data.email, rol: data.rol, id: docu.id, nombre: data.nombre });
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${data.email}</td>
+        <td><select class="rolSelect" style="width:auto; padding:5px 8px; margin:0; font-size:13px;">
+          <option value="vendedor"${data.rol === "vendedor" ? " selected" : ""}>Vendedor</option>
+          <option value="admin"${data.rol === "admin" ? " selected" : ""}>Admin</option>
+        </select></td>
+        <td><button class="primary danger btnEliminarUsuario" style="width:auto; margin:0; padding:6px 12px; font-size:12px;">Eliminar</button></td>
+      `;
       tbody.appendChild(tr);
-
-      tr.querySelector(".rolSelect").addEventListener("change", async e=>{
-        await setDoc(doc(db,"usuarios",docu.id),{email:data.email,rol:e.target.value});
-        mostrarMensaje(`Rol de ${data.email} cambiado a ${e.target.value}`,"success");
+      tr.querySelector(".rolSelect").addEventListener("change", async e => {
+        await setDoc(doc(db, "usuarios", docu.id), { email: data.email, rol: e.target.value });
+        mostrarMensaje(`Rol de ${data.email} cambiado a ${e.target.value}`, "success");
         cargarVendedores();
       });
-
-      tr.querySelector(".btnEliminarUsuario").addEventListener("click", async ()=>{
-        mostrarMensaje(`Eliminando usuario ${data.email}...`,"info");
-        await deleteDoc(doc(db,"usuarios",docu.id));
-        mostrarMensaje(`Usuario ${data.email} eliminado`,"success");
+      tr.querySelector(".btnEliminarUsuario").addEventListener("click", async () => {
+        await deleteDoc(doc(db, "usuarios", docu.id));
+        mostrarMensaje(`Usuario ${data.email} eliminado`, "success");
       });
     });
     cargarVendedores();
   });
 }
 
-function cargarProductos(){
-  onSnapshot(productosCol, snapshot=>{
-    productos=[];
-    snapshot.forEach(docu=>{
-      productos.push(docu.data());
-    });
+function cargarProductos() {
+  onSnapshot(productosCol, snapshot => {
+    productos = [];
+    snapshot.forEach(docu => productos.push(docu.data()));
     actualizarDashboard();
   });
 }
 
-function cargarVentas(){
-  const ventasCol = collection(db,"ventas");
-  onSnapshot(ventasCol, snapshot=>{
-    ventas=[];
-    snapshot.forEach(docu=>{
-      ventas.push(docu.data());
-    });
+function cargarVentas() {
+  const ventasCol = collection(db, "ventas");
+  onSnapshot(ventasCol, snapshot => {
+    ventas = [];
+    snapshot.forEach(docu => ventas.push(docu.data()));
     actualizarDashboard();
   });
 }
 
 /* ========================== RESET TOTAL ========================== */
 async function resetearTodo() {
-  if(usuarioActual.rol!=="admin"){ mostrarMensaje("No autorizado","error"); return; }
-
-  mostrarMensaje("Reseteando stock y ventas...","info");
-
+  if (usuarioActual.rol !== "admin") { mostrarMensaje("No autorizado", "error"); return; }
+  mostrarMensaje("Reseteando stock y ventas...", "info");
   try {
     const productosSnapshot = await getDocs(productosCol);
-    const ventasCol = collection(db,"ventas");
+    const ventasCol = collection(db, "ventas");
     const ventasSnapshot = await getDocs(ventasCol);
-
-    const borrarProductos = productosSnapshot.docs.map(d=>deleteDoc(doc(db,"productos",d.id)));
-    const borrarVentas = ventasSnapshot.docs.map(d=>deleteDoc(doc(db,"ventas",d.id)));
-    await Promise.all([...borrarProductos,...borrarVentas]);
-
-    productos = [];
-    ventas = [];
+    const borrarProductos = productosSnapshot.docs.map(d => deleteDoc(doc(db, "productos", d.id)));
+    const borrarVentas = ventasSnapshot.docs.map(d => deleteDoc(doc(db, "ventas", d.id)));
+    await Promise.all([...borrarProductos, ...borrarVentas]);
+    productos = []; ventas = [];
     actualizarDashboard();
-    mostrarMensaje("Stock y ventas reseteados correctamente","success");
-  } catch(e){
-    console.error(e);
-    mostrarMensaje("Error al resetear","error");
-  }
+    mostrarMensaje("Stock y ventas reseteados correctamente", "success");
+  } catch(e) { console.error(e); mostrarMensaje("Error al resetear", "error"); }
 }
 
+/* ========================== DOCUMENTOS (integrado) ========================== */
+const clientesRef = collection(db, "clientes");
+let docDocumentos    = [];
+let docVistaActual   = "documentos";
+let docCarpetaActual = null;
+let docDniAEliminar  = null;
+
+function docIniciar() {
+  onSnapshot(clientesRef, snapshot => {
+    docDocumentos = [];
+    snapshot.forEach(snap => docDocumentos.push(snap.data()));
+    docDocumentos.sort((a, b) =>
+      `${a.apellido}${a.nombre}`.localeCompare(`${b.apellido}${b.nombre}`)
+    );
+    docRender();
+  });
+}
+
+function docRender() {
+  const grid = document.getElementById("docGrid");
+  const cont = document.getElementById("docContador");
+  const total = docDocumentos.length;
+  if (cont) cont.textContent = `${total} cliente${total !== 1 ? "s" : ""} registrado${total !== 1 ? "s" : ""}`;
+
+  const buscador = document.getElementById("docBuscador");
+  const q = buscador ? buscador.value.trim().toLowerCase() : "";
+  const filtrados = q
+    ? docDocumentos.filter(d =>
+        d.dni.includes(q) ||
+        d.nombre.toLowerCase().includes(q) ||
+        d.apellido.toLowerCase().includes(q)
+      )
+    : docDocumentos;
+
+  if (filtrados.length === 0) {
+    grid.innerHTML = `<div class="empty-state">${q ? `Sin resultados para "${buscador.value}".` : "No hay carpetas. Creá la primera con el botón de arriba."}</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtrados.map(d => {
+    const iniciales = `${d.nombre[0]}${d.apellido[0]}`.toUpperCase();
+    return `
+      <div class="doc-card" onclick="${docVistaActual === 'gestion' ? `docEliminarCarpeta('${d.dni}')` : `docAbrirDocumento('${d.dni}')`}">
+        <div class="doc-card-avatar">${iniciales}</div>
+        <h3>${d.nombre} ${d.apellido}</h3>
+        <p>DNI: ${d.dni}</p>
+        ${docVistaActual === 'gestion' ? `<button class="btn-eliminar" onclick="event.stopPropagation(); docEliminarCarpeta('${d.dni}')">🗑️ Eliminar</button>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+window.docFiltrar = function() { docRender(); };
+
+window.docMostrarVista = function(vista) {
+  docVistaActual = vista;
+  document.getElementById("btnVistaDocs").classList.toggle("active", vista === "documentos");
+  document.getElementById("btnVistaGestion").classList.toggle("active", vista === "gestion");
+  docRender();
+};
+
+window.docCrearNuevo = function() {
+  document.getElementById("docNuevoNombre").value = "";
+  document.getElementById("docNuevoApellido").value = "";
+  document.getElementById("docNuevoDni").value = "";
+  document.getElementById("modalDocCrear").classList.add("show");
+};
+
+window.docCerrarCrear = function() {
+  document.getElementById("modalDocCrear").classList.remove("show");
+};
+
+window.docCrearCarpeta = async function() {
+  const nombre   = document.getElementById("docNuevoNombre").value.trim();
+  const apellido = document.getElementById("docNuevoApellido").value.trim();
+  const dni      = document.getElementById("docNuevoDni").value.trim();
+
+  if (!nombre || !apellido) { mostrarMensaje("Completá nombre y apellido", "error"); return; }
+  if (!/^\d{1,8}$/.test(dni)) { mostrarMensaje("El DNI debe tener solo números (máx. 8)", "error"); return; }
+  if (docDocumentos.some(d => d.dni === dni)) { mostrarMensaje("Ese DNI ya existe", "error"); return; }
+
+  await setDoc(doc(db, "clientes", dni), { dni, nombre, apellido, texto: "" });
+  docCerrarCrear();
+  mostrarMensaje("Carpeta creada ✓", "success");
+};
+
+function docAbrirDocumento(dni) {
+  docCarpetaActual = dni;
+  const docu = docDocumentos.find(d => d.dni === dni);
+  document.getElementById("docModalTitulo").innerText    = `${docu.nombre} ${docu.apellido}`;
+  document.getElementById("docModalSubtitulo").innerText = `DNI: ${dni}`;
+  document.getElementById("docEditorTexto").value        = docu.texto || "";
+  document.getElementById("modalDocumento").classList.add("show");
+}
+
+window.docCerrarModal = function() {
+  document.getElementById("modalDocumento").classList.remove("show");
+  docCarpetaActual = null;
+};
+
+window.docGuardar = async function() {
+  const texto = document.getElementById("docEditorTexto").value;
+  await setDoc(doc(db, "clientes", docCarpetaActual), { texto }, { merge: true });
+  mostrarMensaje("Guardado ✓", "success");
+  docCerrarModal();
+};
+
+window.docEliminarCarpeta = function(dni) {
+  docDniAEliminar = dni;
+  const docu = docDocumentos.find(d => d.dni === dni);
+  document.getElementById("docTextoEliminar").innerText =
+    `¿Eliminás la carpeta de ${docu.nombre} ${docu.apellido} (DNI ${dni})?`;
+  document.getElementById("modalDocEliminar").classList.add("show");
+};
+
+window.docCerrarEliminar = function() {
+  document.getElementById("modalDocEliminar").classList.remove("show");
+};
+
+window.docConfirmarEliminar = async function() {
+  await deleteDoc(doc(db, "clientes", docDniAEliminar));
+  docCerrarEliminar();
+  mostrarMensaje("Carpeta eliminada.", "default");
+};
+
 /* ========================== EXPORTS ========================== */
-window.login=login;
-window.logout=logout;
-window.showSection=showSection;
-window.agregarProducto=agregarProducto;
-window.registrarVenta=registrarVenta;
-window.agregarCategoria=agregarCategoria;
-window.eliminarCategoria=eliminarCategoria;
-window.crearUsuario=crearUsuario;
-window.resetearTodo=resetearTodo;
+window.login = login;
+window.logout = logout;
+window.showSection = showSection;
+window.agregarProducto = agregarProducto;
+window.registrarVenta = registrarVenta;
+window.agregarCategoria = agregarCategoria;
+window.eliminarCategoria = eliminarCategoria;
+window.crearUsuario = crearUsuario;
+window.resetearTodo = resetearTodo;
 window.filtrarProductos = filtrarProductos;
 window.revertirUltimaVenta = revertirUltimaVenta;
 window.registrarse = registrarse;
