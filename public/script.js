@@ -375,31 +375,6 @@ function actualizarAlertaStock() {
       badge.classList.add("hidden");
     }
   }
-
-  // Alerta en dashboard
-  const alerta = document.getElementById("alertaStockBajo");
-  if (!alerta) return;
-
-  if (todos.length === 0) {
-    alerta.classList.add("hidden");
-    return;
-  }
-
-  alerta.classList.remove("hidden");
-  alerta.innerHTML = `
-    <div class="alerta-stock-icon">⚠️</div>
-    <div style="flex:1;">
-      <div class="alerta-stock-titulo">
-        ${agotados.length > 0 ? `${agotados.length} producto${agotados.length > 1 ? "s" : ""} agotado${agotados.length > 1 ? "s" : ""}` : ""}
-        ${agotados.length > 0 && bajos.length > 0 ? " · " : ""}
-        ${bajos.length > 0 ? `${bajos.length} con stock bajo (≤${UMBRAL_STOCK_BAJO})` : ""}
-      </div>
-      <div class="alerta-stock-lista">
-        ${agotados.map(p => `<span class="alerta-stock-item agotado">❌ ${p.nombre}</span>`).join("")}
-        ${bajos.map(p => `<span class="alerta-stock-item">⚡ ${p.nombre} (${p.cantidad})</span>`).join("")}
-      </div>
-    </div>
-  `;
 }
 
 /* ========================== DASHBOARD ========================== */
