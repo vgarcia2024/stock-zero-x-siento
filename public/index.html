@@ -86,6 +86,7 @@
           <span class="search-icon">🔍</span>
           <input type="text" id="busquedaProducto" placeholder="Buscar producto por nombre, código o categoría..." oninput="filtrarProductos()" />
         </div>
+        <div class="table-wrap">
         <table id="productosDisponibles">
           <thead>
             <tr>
@@ -97,6 +98,7 @@
           </thead>
           <tbody></tbody>
         </table>
+        </div>
       </div>
     </section>
 
@@ -133,8 +135,13 @@
       </div>
       <div class="card-box form-box">
         <div class="input-group">
-          <label>Código del producto</label>
-          <input id="ventaCodigo" placeholder="Código" />
+          <label>Buscar producto</label>
+          <div class="autocomplete-wrap">
+            <input id="ventaBuscador" placeholder="Escribí nombre o código..." oninput="autocompleteVenta()" autocomplete="off" />
+            <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
+          </div>
+          <div id="ventaProductoSeleccionado" class="producto-seleccionado hidden"></div>
+          <input type="hidden" id="ventaCodigo" />
         </div>
         <div class="input-group">
           <label>Vendedor</label>
@@ -142,7 +149,7 @@
         </div>
         <div class="input-group">
           <label>Cantidad</label>
-          <input type="number" id="ventaCantidad" value="1" />
+          <input type="number" id="ventaCantidad" value="1" min="1" />
         </div>
         <button class="primary success" onclick="registrarVenta()">✓ Registrar venta</button>
         <button class="primary danger" onclick="revertirUltimaVenta()">↩ Revertir última venta</button>
@@ -153,7 +160,26 @@
     <section id="stats">
       <div class="section-header">
         <h2>Estadísticas</h2>
-        <span class="section-sub">Historial de ventas</span>
+      </div>
+      <div class="stats-filtros card-box" style="margin-bottom:16px;">
+        <div class="stats-filtros-inner">
+          <div class="input-group" style="margin:0; flex:1; min-width:140px;">
+            <label>Período</label>
+            <select id="filtroFecha" onchange="renderStats()">
+              <option value="todo">Todo</option>
+              <option value="hoy">Hoy</option>
+              <option value="semana">Esta semana</option>
+              <option value="mes">Este mes</option>
+            </select>
+          </div>
+          <div class="input-group" style="margin:0; flex:1; min-width:140px;">
+            <label>Vendedor</label>
+            <select id="filtroVendedor" onchange="renderStats()">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div class="stats-resumen" id="statsResumen"></div>
+        </div>
       </div>
       <div class="card-box">
         <div id="statsContent"></div>
