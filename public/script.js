@@ -182,10 +182,22 @@ window.limpiarSeleccionVenta = function() {
   document.getElementById("ventaBuscador").focus();
 };
 
-// Cerrar dropdown al hacer click afuera
+// Cerrar dropdown al hacer click afuera o al presionar Escape
 document.addEventListener("click", (e) => {
+  const wrap = document.getElementById("autocompleteDropdown");
+  if (!wrap) return;
   if (!e.target.closest(".autocomplete-wrap")) {
-    document.getElementById("autocompleteDropdown")?.classList.add("hidden");
+    wrap.classList.add("hidden");
+    wrap.innerHTML = "";
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const wrap = document.getElementById("autocompleteDropdown");
+    if (wrap) { wrap.classList.add("hidden"); wrap.innerHTML = ""; }
+    const buscador = document.getElementById("ventaBuscador");
+    if (buscador) buscador.blur();
   }
 });
 
