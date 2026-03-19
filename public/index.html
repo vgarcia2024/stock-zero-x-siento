@@ -137,7 +137,7 @@
         <div class="input-group">
           <label>Buscar producto</label>
           <div class="autocomplete-wrap">
-            <input id="ventaBuscador" placeholder="Escribí nombre o código..." oninput="autocompleteVenta()" autocomplete="off" />
+          <input id="ventaBuscador" placeholder="Escribí nombre o código..." oninput="autocompleteVenta()" onblur="setTimeout(()=>{ const d=document.getElementById('autocompleteDropdown'); if(d){d.classList.add('hidden'); d.innerHTML='';} }, 200)" autocomplete="off" />
             <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
           </div>
           <div id="ventaProductoSeleccionado" class="producto-seleccionado hidden"></div>
