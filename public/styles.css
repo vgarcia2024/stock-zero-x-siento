@@ -565,7 +565,190 @@ tr:hover td { background: #f5f3ff; }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ── RESPONSIVE ──────────────────────────── */
+/* ── AUTOCOMPLETE ────────────────────────── */
+.autocomplete-wrap { position: relative; }
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.autocomplete-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.1s;
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: #f5f3ff; }
+.autocomplete-item-nombre { font-weight: 600; color: var(--text); }
+.autocomplete-item-meta   { font-size: 12px; color: var(--text-soft); }
+.autocomplete-item-stock  {
+  font-size: 11px; font-weight: 600; padding: 2px 8px;
+  border-radius: 100px; flex-shrink: 0;
+}
+.autocomplete-item-stock.ok  { background: #dcfce7; color: #16a34a; }
+.autocomplete-item-stock.low { background: #fef2f2; color: #dc2626; }
+
+.producto-seleccionado {
+  margin-top: 8px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.producto-seleccionado-nombre { font-weight: 600; color: #15803d; }
+.producto-seleccionado-meta   { font-size: 12px; color: #16a34a; }
+.producto-seleccionado-clear  {
+  background: none; border: none; color: #dc2626;
+  cursor: pointer; font-size: 16px; padding: 0 2px;
+  line-height: 1; flex-shrink: 0;
+}
+
+/* ── STATS FILTROS ───────────────────────── */
+.stats-filtros-inner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.stats-resumen {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-left: auto;
+}
+
+.stats-chip {
+  background: #f5f3ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* ── TABLA RESPONSIVE ────────────────────── */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+}
+
+/* Cards en mobile para ventas */
+.venta-cards { display: none; }
+
+.venta-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 8px;
+}
+
+.venta-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.venta-card-producto {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.venta-card-cantidad {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.venta-card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.venta-card-tag {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  background: #f3f4f6;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .stats-tabla { display: none; }
+  .venta-cards { display: block; }
+  .stats-filtros-inner { flex-direction: column; align-items: stretch; }
+  .stats-resumen { margin-left: 0; }
+
+  /* Dashboard tabla responsive */
+  #productosDisponibles thead { display: none; }
+  #productosDisponibles tr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+  #productosDisponibles td {
+    padding: 2px 6px;
+    border: none;
+    font-size: 13px;
+  }
+  #productosDisponibles td:first-child {
+    font-size: 11px;
+    color: var(--text-soft);
+    width: 100%;
+    padding-bottom: 0;
+  }
+  #productosDisponibles td:nth-child(2) {
+    font-weight: 700;
+    font-size: 14px;
+    width: 100%;
+  }
+  #productosDisponibles td:nth-child(3) {
+    background: #f3f4f6;
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--text-soft);
+  }
+  #productosDisponibles td:last-child {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  #productosDisponibles tr.sin-stock td:last-child { color: #dc2626; }
+}
+
+/* ── RESPONSIVE BASE ─────────────────────── */
 @media (max-width: 768px) {
   nav { gap: 5px; padding: 8px 10px; }
   nav button { flex: 1 1 42%; font-size: 12px; padding: 7px 8px; }
