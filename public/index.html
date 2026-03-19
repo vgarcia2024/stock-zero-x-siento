@@ -47,7 +47,7 @@
   </header>
 
   <nav>
-    <button onclick="showSection('dashboard')" class="active">🏠 Inicio</button>
+    <button onclick="showSection('dashboard')" class="active">🏠 Inicio <span id="navBadgeStock" class="nav-badge hidden"></span></button>
     <button onclick="showSection('stock')">📦 Stock</button>
     <button onclick="showSection('ventas')">💰 Ventas</button>
     <button onclick="showSection('stats')">📊 Estadísticas</button>
@@ -64,6 +64,10 @@
         <h2>Inicio</h2>
         <span class="section-sub">Resumen del día</span>
       </div>
+
+      <!-- Alerta stock bajo -->
+      <div id="alertaStockBajo" class="alerta-stock hidden"></div>
+
       <div class="cards">
         <div class="card">
           <div class="card-icon">💰</div>
