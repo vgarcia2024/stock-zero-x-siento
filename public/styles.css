@@ -14,7 +14,6 @@
   --ok-bg:     #f1f5f2;
   --radius:    3px;
   --radius-lg: 4px;
-  --sidebar-w: 220px;
 }
 
 * { box-sizing: border-box; }
@@ -38,7 +37,6 @@ header {
   top: 0;
   z-index: 50;
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  grid-area: header;
 }
 
 .header-inner {
@@ -87,7 +85,6 @@ nav {
   padding: 4px 16px;
   flex-wrap: wrap;
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  grid-area: nav;
 }
 
 nav button {
@@ -101,9 +98,7 @@ nav button {
   font-weight: 500;
   font-size: 13px;
   font-family: inherit;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-  text-align: center;
-  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 nav button:hover { color: rgba(255,255,255,0.85); }
@@ -115,60 +110,11 @@ nav button.active {
   font-weight: 600;
 }
 
-/* ── LAYOUT: SIDEBAR (desktop) ───────────── */
-@media (min-width: 900px) {
-  body {
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "header header"
-      "nav    main";
-    min-height: 100vh;
-  }
-
-  header { border-bottom: none; }
-
-  nav {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    flex-wrap: nowrap;
-    gap: 2px;
-    padding: 18px 12px;
-    border-bottom: none;
-    border-right: 1px solid rgba(255,255,255,0.07);
-    position: sticky;
-    top: 65px;
-    align-self: start;
-    height: calc(100vh - 65px);
-    overflow-y: auto;
-  }
-
-  nav button {
-    text-align: left;
-    padding: 10px 14px;
-    border-bottom: none;
-    border-left: 2px solid transparent;
-    border-radius: var(--radius);
-  }
-
-  nav button:hover { background: rgba(255,255,255,0.05); }
-
-  nav button.active {
-    background: rgba(255,255,255,0.08);
-    border-left-color: white;
-    border-bottom-color: transparent;
-  }
-}
-
 /* ── MAIN ────────────────────────────────── */
 main {
   max-width: 1100px;
   margin: 32px auto;
   padding: 0 20px 40px;
-  grid-area: main;
-  width: 100%;
 }
 
 /* ── SECTION ─────────────────────────────── */
