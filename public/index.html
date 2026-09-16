@@ -5,7 +5,8 @@
   <title>Zero X Siento - Stock</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <script type="module" src="script.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -29,270 +30,288 @@
 
 <!-- ══════════════ APP ══════════════ -->
 <div id="app" style="display:none;">
+  <div class="app-shell">
 
-  <header>
-    <div class="header-inner">
-      <div class="header-brand">
-        <div class="header-logo">ZX</div>
-        <div>
-          <div class="header-title">Zero X Siento</div>
-          <div class="header-sub">Sistema de Stock</div>
+    <!-- checkbox invisible: controla el drawer del sidebar en mobile, sin JS -->
+    <input type="checkbox" id="sidebarToggle" class="sidebar-toggle-input" />
+
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark">ZX</div>
+        <div class="brand-copy">
+          <div class="brand-name">Zero X Siento</div>
+          <div class="brand-tag">Sistema de Stock</div>
+        </div>
+        <label for="sidebarToggle" class="sidebar-close">✕</label>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button onclick="showSection('dashboard')" class="active">🏠 Inicio <span id="navBadgeStock" class="nav-badge hidden"></span></button>
+        <button onclick="showSection('stock')">📦 Stock</button>
+        <button onclick="showSection('ventas')">💰 Ventas</button>
+        <button onclick="showSection('stats')">📊 Estadísticas</button>
+        <button onclick="showSection('documentos')">📁 Documentos</button>
+        <button onclick="showSection('recibos')">🧾 Recibos</button>
+        <button id="btnAjustes" onclick="showSection('ajustes')">⚙️ Ajustes</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-bar">
+          <span id="userName"></span>
+          <button onclick="logout()">Salir</button>
         </div>
       </div>
-      <div class="user-bar">
-        <span id="userName"></span>
-        <button onclick="logout()">Salir</button>
+    </aside>
+
+    <!-- overlay que cierra el drawer al tocar afuera, en mobile -->
+    <label for="sidebarToggle" class="sidebar-overlay"></label>
+
+    <div class="content-area">
+
+      <div class="topbar">
+        <label for="sidebarToggle" class="hamburger-btn">☰</label>
+        <div class="topbar-brand">ZX <span>Zero X Siento</span></div>
       </div>
+
+      <main>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="active">
+          <div class="section-header">
+            <h2>Inicio</h2>
+            <span class="section-sub">Resumen del día</span>
+          </div>
+
+
+          <div class="cards">
+            <div class="card">
+              <div class="card-icon">💰</div>
+              <h4>Ventas Hoy</h4>
+              <p id="ventasHoy">0</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">📦</div>
+              <h4>Stock Total</h4>
+              <p id="stockTotal">0</p>
+            </div>
+            <div class="card">
+              <div class="card-icon">🏆</div>
+              <h4>Mejor Vendedor</h4>
+              <p id="mejorVendedor" style="font-size:18px;">-</p>
+            </div>
+          </div>
+          <div class="card-box">
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="busquedaProducto" placeholder="Buscar producto por nombre, código o categoría..." oninput="filtrarProductos()" />
+            </div>
+            <div class="table-wrap">
+            <table id="productosDisponibles">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Producto</th>
+                  <th>Categoría</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- STOCK -->
+        <section id="stock">
+          <div class="section-header">
+            <h2>Stock</h2>
+          </div>
+          <div class="card-box form-box">
+            <div class="input-group">
+              <label>Código</label>
+              <input id="codigo" placeholder="Ej: SAP001" />
+            </div>
+            <div class="input-group">
+              <label>Producto</label>
+              <input id="nombre" placeholder="Nombre del producto" />
+            </div>
+            <div class="input-group">
+              <label>Categoría</label>
+              <select id="categoria"></select>
+            </div>
+            <div class="input-group">
+              <label>Cantidad</label>
+              <input type="number" id="cantidad" placeholder="0" />
+            </div>
+            <button class="primary" onclick="agregarProducto()">Guardar producto</button>
+          </div>
+        </section>
+
+        <!-- VENTAS -->
+        <section id="ventas">
+          <div class="section-header">
+            <h2>Ventas</h2>
+          </div>
+          <div class="card-box form-box">
+            <div class="input-group">
+              <label>Buscar producto</label>
+              <div class="autocomplete-wrap">
+              <input id="ventaBuscador" placeholder="Escribí nombre o código..." oninput="autocompleteVenta()" onblur="setTimeout(()=>{ const d=document.getElementById('autocompleteDropdown'); if(d){d.classList.add('hidden'); d.innerHTML='';} }, 200)" autocomplete="off" />
+                <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
+              </div>
+              <div id="ventaProductoSeleccionado" class="producto-seleccionado hidden"></div>
+              <input type="hidden" id="ventaCodigo" />
+            </div>
+            <div class="input-group">
+              <label>Vendedor</label>
+              <select id="ventaVendedor"></select>
+            </div>
+            <div class="input-group">
+              <label>Cantidad</label>
+              <input type="number" id="ventaCantidad" value="1" min="1" />
+            </div>
+            <button class="primary success" onclick="registrarVenta()">✓ Registrar venta</button>
+            <button class="primary danger" onclick="revertirUltimaVenta()">↩ Revertir última venta</button>
+          </div>
+        </section>
+
+        <!-- ESTADÍSTICAS -->
+        <section id="stats">
+          <div class="section-header">
+            <h2>Estadísticas</h2>
+          </div>
+          <div class="stats-filtros card-box" style="margin-bottom:16px;">
+            <div class="stats-filtros-inner">
+              <div class="input-group" style="margin:0; flex:1; min-width:140px;">
+                <label>Período</label>
+                <select id="filtroFecha" onchange="renderStats()">
+                  <option value="todo">Todo</option>
+                  <option value="hoy">Hoy</option>
+                  <option value="semana">Esta semana</option>
+                  <option value="mes">Este mes</option>
+                </select>
+              </div>
+              <div class="input-group" style="margin:0; flex:1; min-width:140px;">
+                <label>Vendedor</label>
+                <select id="filtroVendedor" onchange="renderStats()">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="stats-resumen" id="statsResumen"></div>
+            </div>
+          </div>
+          <div class="card-box">
+            <div id="statsContent"></div>
+          </div>
+        </section>
+
+        <!-- DOCUMENTOS -->
+        <section id="documentos">
+          <div class="section-header">
+            <div>
+              <h2>Documentos</h2>
+              <span class="section-sub" id="docContador">0 clientes registrados</span>
+            </div>
+            <button class="primary" style="width:auto; margin:0; padding:10px 20px;" onclick="docCrearNuevo()">+ Nueva carpeta</button>
+          </div>
+
+          <div class="doc-toolbar">
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="docBuscador" placeholder="Buscar por nombre, apellido o DNI..." oninput="docFiltrar()" />
+            </div>
+            <div class="doc-vista-btns">
+              <button id="btnVistaDocs" class="vista-btn active" onclick="docMostrarVista('documentos')" title="Vista documentos">📁</button>
+              <button id="btnVistaGestion" class="vista-btn" onclick="docMostrarVista('gestion')" title="Gestionar">🗑️</button>
+            </div>
+          </div>
+
+          <div id="docGrid" class="doc-grid">
+            <div class="empty-state">Cargando documentos...</div>
+          </div>
+        </section>
+
+        <!-- RECIBOS -->
+        <section id="recibos">
+          <div class="section-header">
+            <h2>Recibos</h2>
+            <span class="section-sub">Generar comprobante de pago</span>
+          </div>
+          <div class="card-box form-box">
+            <div class="input-group">
+              <label>Nombre</label>
+              <input id="reciboNombre" placeholder="Juan" />
+            </div>
+            <div class="input-group">
+              <label>Apellido</label>
+              <input id="reciboApellido" placeholder="García" />
+            </div>
+            <div class="input-group">
+              <label>Monto</label>
+              <input type="number" id="reciboMonto" placeholder="0.00" />
+            </div>
+            <div class="input-group">
+              <label>Comentario</label>
+              <input id="reciboComentario" placeholder="Detalle del pago..." />
+            </div>
+            <button class="primary success" onclick="crearRecibo()">🧾 Generar Recibo</button>
+          </div>
+        </section>
+
+        <!-- AJUSTES -->
+        <section id="ajustes">
+          <div class="section-header">
+            <h2>Ajustes</h2>
+            <span class="section-sub">Panel de administración</span>
+          </div>
+          <div class="card-box">
+            <div class="ajuste-bloque">
+              <h3>⚠️ Zona de peligro</h3>
+              <button class="primary danger" onclick="resetearTodo()">Resetear Stock y Ventas</button>
+            </div>
+
+            <div class="ajuste-bloque">
+              <h3>📂 Categorías</h3>
+              <div class="input-row">
+                <input id="nuevaCategoria" placeholder="Nueva categoría" />
+                <button class="primary" style="width:auto; margin:0;" onclick="agregarCategoria()">Agregar</button>
+              </div>
+              <div class="input-row" style="margin-top:10px;">
+                <select id="categoriaEliminar"></select>
+                <button class="primary danger" style="width:auto; margin:0;" onclick="eliminarCategoria()">Eliminar</button>
+              </div>
+            </div>
+
+            <div class="ajuste-bloque">
+              <h3>🔧 Herramientas</h3>
+              <button class="primary" onclick="capitalizarProductos()">Capitalizar nombres de productos</button>
+            </div>
+
+            <div class="ajuste-bloque">
+              <h3>👥 Usuarios</h3>
+              <div class="input-group"><label>Email</label><input id="nuevoUsuarioEmail" type="email" placeholder="Email" /></div>
+              <div class="input-group"><label>Contraseña</label><input id="nuevoUsuarioClave" type="password" placeholder="Contraseña" /></div>
+              <div class="input-group">
+                <label>Rol</label>
+                <select id="nuevoUsuarioRol">
+                  <option value="vendedor">Vendedor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
+              <table id="tablaUsuarios">
+                <thead><tr><th>Email</th><th>Rol</th><th>Acción</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <div id="toast"></div>
     </div>
-  </header>
-
-  <nav>
-    <button onclick="showSection('dashboard')" class="active">🏠 Inicio <span id="navBadgeStock" class="nav-badge hidden"></span></button>
-    <button onclick="showSection('stock')">📦 Stock</button>
-    <button onclick="showSection('ventas')">💰 Ventas</button>
-    <button onclick="showSection('stats')">📊 Estadísticas</button>
-    <button onclick="showSection('documentos')">📁 Documentos</button>
-    <button onclick="showSection('recibos')">🧾 Recibos</button>
-    <button id="btnAjustes" onclick="showSection('ajustes')">⚙️ Ajustes</button>
-  </nav>
-
-  <main>
-
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="active">
-      <div class="section-header">
-        <h2>Inicio</h2>
-        <span class="section-sub">Resumen del día</span>
-      </div>
-
-
-      <div class="cards">
-        <div class="card">
-          <div class="card-icon">💰</div>
-          <h4>Ventas Hoy</h4>
-          <p id="ventasHoy">0</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">📦</div>
-          <h4>Stock Total</h4>
-          <p id="stockTotal">0</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">🏆</div>
-          <h4>Mejor Vendedor</h4>
-          <p id="mejorVendedor" style="font-size:18px;">-</p>
-        </div>
-      </div>
-      <div class="card-box">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="busquedaProducto" placeholder="Buscar producto por nombre, código o categoría..." oninput="filtrarProductos()" />
-        </div>
-        <div class="table-wrap">
-        <table id="productosDisponibles">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Producto</th>
-              <th>Categoría</th>
-              <th>Cantidad</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- STOCK -->
-    <section id="stock">
-      <div class="section-header">
-        <h2>Stock</h2>
-      </div>
-      <div class="card-box form-box">
-        <div class="input-group">
-          <label>Código</label>
-          <input id="codigo" placeholder="Ej: SAP001" />
-        </div>
-        <div class="input-group">
-          <label>Producto</label>
-          <input id="nombre" placeholder="Nombre del producto" />
-        </div>
-        <div class="input-group">
-          <label>Categoría</label>
-          <select id="categoria"></select>
-        </div>
-        <div class="input-group">
-          <label>Cantidad</label>
-          <input type="number" id="cantidad" placeholder="0" />
-        </div>
-        <button class="primary" onclick="agregarProducto()">Guardar producto</button>
-      </div>
-    </section>
-
-    <!-- VENTAS -->
-    <section id="ventas">
-      <div class="section-header">
-        <h2>Ventas</h2>
-      </div>
-      <div class="card-box form-box">
-        <div class="input-group">
-          <label>Buscar producto</label>
-          <div class="autocomplete-wrap">
-          <input id="ventaBuscador" placeholder="Escribí nombre o código..." oninput="autocompleteVenta()" onblur="setTimeout(()=>{ const d=document.getElementById('autocompleteDropdown'); if(d){d.classList.add('hidden'); d.innerHTML='';} }, 200)" autocomplete="off" />
-            <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
-          </div>
-          <div id="ventaProductoSeleccionado" class="producto-seleccionado hidden"></div>
-          <input type="hidden" id="ventaCodigo" />
-        </div>
-        <div class="input-group">
-          <label>Vendedor</label>
-          <select id="ventaVendedor"></select>
-        </div>
-        <div class="input-group">
-          <label>Cantidad</label>
-          <input type="number" id="ventaCantidad" value="1" min="1" />
-        </div>
-        <button class="primary success" onclick="registrarVenta()">✓ Registrar venta</button>
-        <button class="primary danger" onclick="revertirUltimaVenta()">↩ Revertir última venta</button>
-      </div>
-    </section>
-
-    <!-- ESTADÍSTICAS -->
-    <section id="stats">
-      <div class="section-header">
-        <h2>Estadísticas</h2>
-      </div>
-      <div class="stats-filtros card-box" style="margin-bottom:16px;">
-        <div class="stats-filtros-inner">
-          <div class="input-group" style="margin:0; flex:1; min-width:140px;">
-            <label>Período</label>
-            <select id="filtroFecha" onchange="renderStats()">
-              <option value="todo">Todo</option>
-              <option value="hoy">Hoy</option>
-              <option value="semana">Esta semana</option>
-              <option value="mes">Este mes</option>
-            </select>
-          </div>
-          <div class="input-group" style="margin:0; flex:1; min-width:140px;">
-            <label>Vendedor</label>
-            <select id="filtroVendedor" onchange="renderStats()">
-              <option value="">Todos</option>
-            </select>
-          </div>
-          <div class="stats-resumen" id="statsResumen"></div>
-        </div>
-      </div>
-      <div class="card-box">
-        <div id="statsContent"></div>
-      </div>
-    </section>
-
-    <!-- DOCUMENTOS -->
-    <section id="documentos">
-      <div class="section-header">
-        <div>
-          <h2>Documentos</h2>
-          <span class="section-sub" id="docContador">0 clientes registrados</span>
-        </div>
-        <button class="primary" style="width:auto; margin:0; padding:10px 20px;" onclick="docCrearNuevo()">+ Nueva carpeta</button>
-      </div>
-
-      <div class="doc-toolbar">
-        <div class="search-wrap">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="docBuscador" placeholder="Buscar por nombre, apellido o DNI..." oninput="docFiltrar()" />
-        </div>
-        <div class="doc-vista-btns">
-          <button id="btnVistaDocs" class="vista-btn active" onclick="docMostrarVista('documentos')" title="Vista documentos">📁</button>
-          <button id="btnVistaGestion" class="vista-btn" onclick="docMostrarVista('gestion')" title="Gestionar">🗑️</button>
-        </div>
-      </div>
-
-      <div id="docGrid" class="doc-grid">
-        <div class="empty-state">Cargando documentos...</div>
-      </div>
-    </section>
-
-    <!-- RECIBOS -->
-    <section id="recibos">
-      <div class="section-header">
-        <h2>Recibos</h2>
-        <span class="section-sub">Generar comprobante de pago</span>
-      </div>
-      <div class="card-box form-box">
-        <div class="input-group">
-          <label>Nombre</label>
-          <input id="reciboNombre" placeholder="Juan" />
-        </div>
-        <div class="input-group">
-          <label>Apellido</label>
-          <input id="reciboApellido" placeholder="García" />
-        </div>
-        <div class="input-group">
-          <label>Monto</label>
-          <input type="number" id="reciboMonto" placeholder="0.00" />
-        </div>
-        <div class="input-group">
-          <label>Comentario</label>
-          <input id="reciboComentario" placeholder="Detalle del pago..." />
-        </div>
-        <button class="primary success" onclick="crearRecibo()">🧾 Generar Recibo</button>
-      </div>
-    </section>
-
-    <!-- AJUSTES -->
-    <section id="ajustes">
-      <div class="section-header">
-        <h2>Ajustes</h2>
-        <span class="section-sub">Panel de administración</span>
-      </div>
-      <div class="card-box">
-        <div class="ajuste-bloque">
-          <h3>⚠️ Zona de peligro</h3>
-          <button class="primary danger" onclick="resetearTodo()">Resetear Stock y Ventas</button>
-        </div>
-
-        <div class="ajuste-bloque">
-          <h3>📂 Categorías</h3>
-          <div class="input-row">
-            <input id="nuevaCategoria" placeholder="Nueva categoría" />
-            <button class="primary" style="width:auto; margin:0;" onclick="agregarCategoria()">Agregar</button>
-          </div>
-          <div class="input-row" style="margin-top:10px;">
-            <select id="categoriaEliminar"></select>
-            <button class="primary danger" style="width:auto; margin:0;" onclick="eliminarCategoria()">Eliminar</button>
-          </div>
-        </div>
-
-        <div class="ajuste-bloque">
-          <h3>🔧 Herramientas</h3>
-          <button class="primary" onclick="capitalizarProductos()">Capitalizar nombres de productos</button>
-        </div>
-
-        <div class="ajuste-bloque">
-          <h3>👥 Usuarios</h3>
-          <div class="input-group"><label>Email</label><input id="nuevoUsuarioEmail" type="email" placeholder="Email" /></div>
-          <div class="input-group"><label>Contraseña</label><input id="nuevoUsuarioClave" type="password" placeholder="Contraseña" /></div>
-          <div class="input-group">
-            <label>Rol</label>
-            <select id="nuevoUsuarioRol">
-              <option value="vendedor">Vendedor</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <button class="primary" onclick="crearUsuario()">Crear Usuario</button>
-          <table id="tablaUsuarios">
-            <thead><tr><th>Email</th><th>Rol</th><th>Acción</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <div id="toast"></div>
+  </div>
 </div>
 
 <!-- ══════ MODAL EDITAR PRODUCTO ══════ -->
